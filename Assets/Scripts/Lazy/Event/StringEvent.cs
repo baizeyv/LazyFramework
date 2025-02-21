@@ -70,20 +70,20 @@ namespace Lazy.Event
             }
         }
 
-        public void Trigger(string stringEvent)
+        public void Fire(string stringEvent)
         {
             if (!_events.TryGetValue(stringEvent, out var evt))
                 return;
             var simpleEvent = evt as SimpleEvent;
-            simpleEvent?.Trigger();
+            simpleEvent?.Fire();
         }
 
-        public void Trigger<T>(string stringEvent, T data)
+        public void Fire<T>(string stringEvent, T data)
         {
             if (!_events.TryGetValue(stringEvent, out var evt))
                 return;
             var simpleEvent = evt as SimpleEvent<T>;
-            simpleEvent?.Trigger(data);
+            simpleEvent?.Fire(data);
         }
 
         public void Dispose()

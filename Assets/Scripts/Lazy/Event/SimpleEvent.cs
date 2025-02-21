@@ -69,12 +69,12 @@ namespace Lazy.Event
             this.value = value;
         }
 
-        public void Trigger(T val)
+        public void Fire(T val)
         {
             OnNext(val);
         }
 
-        public void Trigger()
+        public void Fire()
         {
             OnNext(value);
         }

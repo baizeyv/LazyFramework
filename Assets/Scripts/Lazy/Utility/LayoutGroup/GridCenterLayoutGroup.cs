@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Lazy.Utility
 {
-    [AddComponentMenu("Layout/Grid Center Layout Group", 999)]
+    [AddComponentMenu("Lazy/Layout/Grid Center Layout Group", 999)]
     public class GridCenterLayoutGroup : LayoutGroup
     {
         public enum Corner
@@ -317,14 +317,14 @@ namespace Lazy.Utility
                     out var offsetY
                 );
 
-                // TODO: Position set center
-                SetChildAlongAxis( // ? 水平轴
+                // # Position set center
+                SetChildAlongAxis( // # 水平轴
                     rectChildren[i],
                     0,
                     startOffset.x + (cellSize[0] + spacing[0]) * positionX + offsetX,
                     cellSize[0]
                 );
-                SetChildAlongAxis( // ? 垂直轴
+                SetChildAlongAxis( // # 垂直轴
                     rectChildren[i],
                     1,
                     startOffset.y + (cellSize[1] + spacing[1]) * positionY + offsetY,

@@ -1,5 +1,7 @@
 using System;
 using System.Reflection;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Lazy.Singleton
 {
@@ -27,6 +29,97 @@ namespace Lazy.Singleton
             var instance = CreateNonPublicConstructorObject<T>();
             instance.OnSingletonInitialize();
             return instance;
+        }
+
+        public static T CreateMonoSingleton<T>() where T : class, ISingleton
+        {
+            T instance = null;
+            var type = typeof(T);
+            instance = Object.FindObjectOfType(type) as T;
+            if (instance != null)
+            {
+                instance.OnSingletonInitialize();
+                return instance;
+            }
+
+            var attributes = type.GetCustomAttributes(true);
+            foreach (var attribute in attributes)
+            {
+                var defineAttribute = attribute as MonoSingletonPathAttribute;
+                if (defineAttribute == null)
+                    continue;
+                instance = CreateComponentOnGameObject<T>(defineAttribute.PathInHierarchy, true);
+                break;
+            }
+
+            if (instance == null)
+            {
+                var obj = new GameObject(type.Name);
+                Object.DontDestroyOnLoad(obj);
+                instance = obj.AddComponent(type) as T;
+            }
+
+            instance?.OnSingletonInitialize();
+            return instance;
+        }
+
+        private static T CreateComponentOnGameObject<T>(string path, bool dontDestroy) where T : class
+        {
+            var obj = FindGameObject(path, dontDestroy);
+            if (obj == null)
+            {
+                obj = new GameObject($"[Singleton {typeof(T).Name}]");
+                if (dontDestroy)
+                {
+                    Object.DontDestroyOnLoad(obj);
+                }
+            }
+
+            return obj.AddComponent(typeof(T)) as T;
+        }
+
+        private static GameObject FindGameObject(string path, bool dontDestroy)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            var subPath = path.Split('/');
+            if (subPath == null || subPath.Length == 0)
+                return null;
+
+            return FindGameObject(null, subPath, 0, dontDestroy);
+        }
+
+        private static GameObject FindGameObject(GameObject root, string[] subPath, int index, bool dontDestroy)
+        {
+            GameObject obj = null;
+            if (root == null)
+            {
+                obj = GameObject.Find(subPath[index]);
+            }
+            else
+            {
+                var child = root.transform.Find(subPath[index]);
+                if (child != null)
+                {
+                    obj = child.gameObject;
+                }
+            }
+
+            if (obj == null)
+            {
+                obj = new GameObject(subPath[index]);
+                if (root != null)
+                {
+                    obj.transform.SetParent(root.transform);
+                }
+                if (dontDestroy && index == 0)
+                    Object.DontDestroyOnLoad(obj);
+            }
+
+            if (obj == null)
+                return null;
+            return ++index == subPath.Length ? obj : FindGameObject(obj, subPath, index, dontDestroy);
         }
     }
 }
