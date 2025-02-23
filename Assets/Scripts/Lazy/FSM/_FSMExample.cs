@@ -18,7 +18,7 @@ namespace Lazy.FSM
             fsm.AddStateToggleEvent((prev, next) => { Debug.Log($"State: {prev} -> {next}"); });
 
             fsm.DefineState(States.A).OnCondition(() => fsm.CurrentStateKey == States.B)
-                .OnEnter(() => { Debug.Log("ENTER A"); }).OnUpdate(() => { }).OnFixedUpdate(() => { }).OnGUI(() =>
+                .OnEnter(() => { Debug.Log("ENTER A", this); }).OnUpdate(() => { }).OnFixedUpdate(() => { }).OnGUI(() =>
                 {
                     GUILayout.Label("State A");
                     if (GUILayout.Button("TO B"))
