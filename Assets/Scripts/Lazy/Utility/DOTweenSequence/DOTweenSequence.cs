@@ -19,7 +19,7 @@ namespace Lazy.Utility
         float m_Delay = 0;
 
         [SerializeField]
-        Ease m_Ease = Ease.OutQuad;
+        DG.Tweening.Ease m_Ease = DG.Tweening.Ease.OutQuad;
 
         [SerializeField]
         int m_Loops = 1;
@@ -396,7 +396,7 @@ namespace Lazy.Utility
 
             public AnimationCurve EaseCurve;
 
-            public Ease Ease = Ease.OutQuad;
+            public DG.Tweening.Ease Ease = DG.Tweening.Ease.OutQuad;
 
             public int Loops = 1;
 
