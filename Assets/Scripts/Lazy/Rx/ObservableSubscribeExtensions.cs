@@ -1,4 +1,5 @@
 using System;
+using Lazy.Utility;
 
 namespace Lazy.Rx
 {
@@ -14,13 +15,20 @@ namespace Lazy.Rx
                 )
             );
         }
+
+        public static IDisposable Subscribe<T, TState>(this Observable<T> source, TState state,
+            Action<T, TState> onNext)
+        {
+            return source.Subscribe(new AnonymousObserver<T, TState>(onNext, Stubs<TState>.HandleException,
+                Stubs<TState>.HandleResult, state));
+        }
     }
 
     internal sealed class AnonymousObserver<T> : Observer<T>
     {
-        private Action<T> onNext;
-        private Action<Exception> onError;
-        private Action<Result> onCompleted;
+        private readonly Action<T> _onNext;
+        private readonly Action<Exception> _onError;
+        private readonly Action<Result> _onCompleted;
 
         public AnonymousObserver(
             Action<T> onNext,
@@ -28,24 +36,60 @@ namespace Lazy.Rx
             Action<Result> onCompleted
         )
         {
-            this.onNext = onNext;
-            this.onError = onError;
-            this.onCompleted = onCompleted;
+            _onNext = onNext;
+            _onError = onError;
+            _onCompleted = onCompleted;
         }
 
         protected override void OnCompletedCore(Result result)
         {
-            onCompleted?.Invoke(result);
+            _onCompleted?.Invoke(result);
         }
 
         protected override void OnNextCore(T value)
         {
-            onNext?.Invoke(value);
+            _onNext?.Invoke(value);
         }
 
         protected override void OnErrorCore(Exception error)
         {
-            onError?.Invoke(error);
+            _onError?.Invoke(error);
+        }
+    }
+
+    internal sealed class AnonymousObserver<T, TState> : Observer<T>
+    {
+        private readonly Action<T, TState> _onNext;
+        private readonly Action<Exception, TState> _onError;
+        private readonly Action<Result, TState> _onCompleted;
+        private readonly TState _state;
+
+        public AnonymousObserver(
+            Action<T, TState> onNext,
+            Action<Exception, TState> onError,
+            Action<Result, TState> onCompleted,
+            TState state
+        )
+        {
+            _onNext = onNext;
+            _onError = onError;
+            _onCompleted = onCompleted;
+            _state = state;
+        }
+
+        protected override void OnCompletedCore(Result result)
+        {
+            _onCompleted.Fire(result, _state);
+        }
+
+        protected override void OnNextCore(T value)
+        {
+            _onNext.Fire(value, _state);
+        }
+
+        protected override void OnErrorCore(Exception error)
+        {
+            _onError.Fire(error, _state);
         }
     }
 }

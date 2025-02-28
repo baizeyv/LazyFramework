@@ -3,7 +3,7 @@
 namespace Lazy.UI.Common
 {
 	/// <summary>
-	/// 替换空 Image 扩大点击区域，降低 Drawcall。
+	/// 替换空 Image 扩大点击区域，降低 DrawCall。
 	/// </summary>
     public class Empty4Raycast : MaskableGraphic
     {

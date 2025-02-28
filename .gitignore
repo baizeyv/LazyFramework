@@ -122,6 +122,7 @@ xx/
 build/
 /output
 /Assets/Plugins/F8
+/Assets/Plugins/F8.meta
 
 提交更新到服务器.bat
 
