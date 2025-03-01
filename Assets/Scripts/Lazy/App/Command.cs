@@ -10,6 +10,11 @@
         void Fire(TArg arg);
     }
 
+    public interface IStructCommand : ICanSetApp, ICanSendQuery, ICanSendCommand, ICanSendRequest, ICanGetModel
+    {
+        void Fire();
+    }
+
     public interface ICanSendCommand: IModule { }
 
     public abstract class ABSCommand : ICommand
@@ -57,6 +62,11 @@
             where T : class, ICommand<TArg>, new() where TArg : struct
         {
             source.App.SendCommand<T, TArg>(arg);
+        }
+
+        public static void LazyStructCommand(this ICanSendCommand source, IStructCommand cmd)
+        {
+            source.App.SendStructCommand(cmd);
         }
     }
 }

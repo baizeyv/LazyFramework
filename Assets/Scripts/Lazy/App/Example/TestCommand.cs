@@ -42,4 +42,22 @@ namespace Lazy.App.Example
             }
         }
     }
+
+    public struct MyTestStructCommand : IStructCommand
+    {
+        // arguments
+        public int a;
+        public string b;
+
+        public IApp App { get; private set; }
+        public void Fire()
+        {
+            // .............
+        }
+
+        public void SetApp(IApp app)
+        {
+            App = app;
+        }
+    }
 }

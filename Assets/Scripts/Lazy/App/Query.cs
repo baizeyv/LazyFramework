@@ -10,6 +10,11 @@
         TR Fire(T arg);
     }
 
+    public interface IStructQuery<T> : ICanSetApp, ICanSendQuery, ICanGetModel
+    {
+        T Fire();
+    }
+
     public interface ICanSendQuery : IModule
     {
     }
@@ -59,6 +64,11 @@
             where T : class, IQuery<TArg, TR>, new() where TArg : struct
         {
             return source.App.SendQuery<T, TArg, TR>(arg);
+        }
+
+        public static TR LazyStructQuery<TR>(this ICanSendQuery source, IStructQuery<TR> query)
+        {
+            return source.App.SendStructQuery(query);
         }
     }
 }

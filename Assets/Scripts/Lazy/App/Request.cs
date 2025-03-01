@@ -12,6 +12,11 @@ namespace Lazy.App
         TResult Fire(TArgument arg);
     }
 
+    public interface IStructRequest<TR> : ICanSetApp, ICanSendRequest, ICanSendQuery, ICanSendCommand, ICanGetModel
+    {
+        TR Fire();
+    }
+
     public interface ICanSendRequest : IModule
     {
     }
@@ -61,6 +66,11 @@ namespace Lazy.App
             where T : class, IRequest<TArg, TR>, new() where TArg : struct
         {
             return source.App.SendRequest<T, TArg, TR>(arg);
+        }
+
+        public static TR LazyStructRequest<TR>(this ICanSendRequest source, IStructRequest<TR> request)
+        {
+            return source.App.SendStructRequest(request);
         }
     }
 }
