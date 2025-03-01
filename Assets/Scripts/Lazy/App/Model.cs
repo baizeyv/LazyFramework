@@ -1,8 +1,12 @@
 ﻿namespace Lazy.App
 {
-    public interface IModel : IModule, ICanSetApp, ICanSetup, ICanGetUtility { }
+    public interface IModel : ICanSetApp, ICanSetup, ICanGetUtility
+    {
+    }
 
-    public interface ICanGetModel : IModule { }
+    public interface ICanGetModel : IModule
+    {
+    }
 
     public abstract class ABSModel : IModel
     {
@@ -21,5 +25,10 @@
         }
 
         protected abstract void OnSetup();
+    }
+
+    public static class CanGetModelExtensions
+    {
+        public static T GetModel<T>(this ICanGetModel source) where T : class, IModel => source.App.GetModel<T>();
     }
 }

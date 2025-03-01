@@ -23,12 +23,20 @@ namespace Lazy.App
         T GetUtility<T>()
             where T : class, IUtility;
 
-        void SendCommand<T>(T command)
-            where T : ICommand;
+        void SendCommand<T>() where T : class, ICommand, new();
 
-        T SendCommand<T>(ICommand<T> command);
+        void SendCommand<T, TArgument>(TArgument arg) where T : class, ICommand<TArgument>, new()
+            where TArgument : struct;
 
-        T SendQuery<T>(IQuery<T> query);
+        TResult SendQuery<TQuery, TResult>() where TQuery : class, IQuery<TResult>, new();
+
+        TResult SendQuery<TQuery, TArgument, TResult>(TArgument arg)
+            where TQuery : class, IQuery<TArgument, TResult>, new() where TArgument : struct;
+
+        TResult SendRequest<TRequest, TResult>() where TRequest : class, IRequest<TResult>, new();
+
+        TResult SendRequest<TRequest, TArgument, TResult>(TArgument arg) where TRequest : class, IRequest<TArgument, TResult>, new()
+            where TArgument : struct;
     }
 
     public abstract class ABSApp<T> : IApp
@@ -42,6 +50,11 @@ namespace Lazy.App
         protected static T App;
 
         private readonly IOCContainer _ioc = new();
+
+        /// <summary>
+        /// * Command Query Request IOC Container
+        /// </summary>
+        private readonly IOCContainer _cqrIOC = new();
 
         public static IApp Gate
         {
@@ -147,26 +160,75 @@ namespace Lazy.App
             return _ioc.Get<T1>();
         }
 
-        public void SendCommand<T1>(T1 command)
-            where T1 : ICommand
+        public void SendCommand<T1>() where T1 : class, ICommand, new()
         {
-            FireCommand(command);
+            var cmd = _cqrIOC.Get<T1>();
+            if (cmd == null)
+            {
+                cmd = new T1();
+                _cqrIOC.Register(cmd);
+            }
+
+            FireCommand(cmd);
         }
 
-        public T1 SendCommand<T1>(ICommand<T1> command)
+        public void SendCommand<T1, TArgument>(TArgument arg) where T1 : class, ICommand<TArgument>, new()
+            where TArgument : struct
         {
-            return FireCommand(command);
+            var cmd = _cqrIOC.Get<T1>();
+            if (cmd == null)
+            {
+                cmd = new T1();
+                _cqrIOC.Register(cmd);
+            }
+
+            FireCommand(cmd, arg);
         }
 
-        public T1 SendQuery<T1>(IQuery<T1> query)
+        public TResult SendQuery<TQuery, TResult>() where TQuery : class, IQuery<TResult>, new()
         {
+            var query = _cqrIOC.Get<TQuery>();
+            if (query == null)
+            {
+                query = new TQuery();
+                _cqrIOC.Register(query);
+            }
             return FireQuery(query);
         }
 
-        protected virtual TR FireCommand<TR>(ICommand<TR> command)
+        public TResult SendQuery<TQuery, TArgument, TResult>(TArgument arg) where TQuery : class, IQuery<TArgument, TResult>, new()
+            where TArgument : struct
         {
-            command.SetApp(this);
-            return command.Fire();
+            var query = _cqrIOC.Get<TQuery>();
+            if (query == null)
+            {
+                query = new TQuery();
+                _cqrIOC.Register(query);
+            }
+            return FireQuery(query, arg);
+        }
+
+        public TResult SendRequest<TRequest, TResult>() where TRequest : class, IRequest<TResult>, new()
+        {
+            var request = _cqrIOC.Get<TRequest>();
+            if (request == null)
+            {
+                request = new TRequest();
+                _cqrIOC.Register(request);
+            }
+            return FireRequest(request);
+        }
+
+        public TResult SendRequest<TRequest, TArgument, TResult>(TArgument arg) where TRequest : class, IRequest<TArgument, TResult>, new()
+            where TArgument : struct
+        {
+            var request = _cqrIOC.Get<TRequest>();
+            if (request == null)
+            {
+                request = new TRequest();
+                _cqrIOC.Register(request);
+            }
+            return FireRequest(request, arg);
         }
 
         protected virtual void FireCommand(ICommand command)
@@ -175,11 +237,36 @@ namespace Lazy.App
             command.Fire();
         }
 
+        protected virtual void FireCommand<TA>(ICommand<TA> command, TA arg) where TA : struct
+        {
+            command.SetApp(this);
+            command.Fire(arg);
+        }
+
         protected virtual TR FireQuery<TR>(IQuery<TR> query)
         {
             query.SetApp(this);
             return query.Fire();
         }
+
+        protected virtual TR FireQuery<TA, TR>(IQuery<TA, TR> query, TA arg) where TA : struct
+        {
+            query.SetApp(this);
+            return query.Fire(arg);
+        }
+
+        protected virtual TR FireRequest<TR>(IRequest<TR> request)
+        {
+            request.SetApp(this);
+            return request.Fire();
+        }
+
+        protected virtual TR FireRequest<TA, TR>(IRequest<TA, TR> request, TA arg) where TA : struct
+        {
+            request.SetApp(this);
+            return request.Fire(arg);
+        }
+
     }
 
     public interface ICanSetApp

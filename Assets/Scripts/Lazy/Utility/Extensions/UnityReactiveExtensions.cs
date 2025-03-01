@@ -1,6 +1,7 @@
 ﻿using System;
 using Lazy.Rx;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Lazy.Utility
@@ -53,5 +54,50 @@ namespace Lazy.Utility
         {
             return source.Subscribe<T, TMP_Text>(text, (x, t) => t.text = selector.Fire(x));
         }
+
+        /// <summary>
+        /// * Unity Text 绑定 RxVariable
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeToText(this Observable<int> source, Text text)
+        {
+            return source.Subscribe<int, Text>(text, (x, t) => t.text = x.ToString());
+        }
+
+        /// <summary>
+        /// * Unity TMP_Text 绑定 RxVariable
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeToTMPText(this Observable<int> source, TMP_Text text)
+        {
+            return source.Subscribe<int, TMP_Text>(text, (x, t) => t.text = x.ToString());
+        }
+
+        /// <summary>
+        /// * Unity GameObject 可见性绑定 RxVariable
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeToVisible(this Observable<bool> source, GameObject gameObject)
+        {
+            return source.Subscribe<bool, GameObject>(gameObject, (x, o) => o.SetVisible(x));
+        }
+
+        /// <summary>
+        /// * Unity MonoBehaviour的GameObject 可见性绑定 RxVariable
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeToVisible(this Observable<bool> source, MonoBehaviour gameObject)
+        {
+            return source.Subscribe<bool, MonoBehaviour>(gameObject, (x, o) => o.SetVisible(x));
+        }
+
     }
 }
