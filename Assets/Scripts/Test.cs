@@ -1,6 +1,8 @@
 ﻿using System;
 using Lazy.Rx;
+using Lazy.Rx.Operator;
 using Lazy.Rx.Variables;
+using R3;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -15,6 +17,10 @@ namespace DefaultNamespace
             {
 
             }
+
+            bb.Where(x => x > 5).Where(x => x < 10);
+
+            ReactiveProperty<int> ccc = new();
         }
     }
 }

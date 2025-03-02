@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Lazy.App.Example
 {
     /// <summary>
-    /// ! ViewModel Layer
+    /// ! Presenter Layer
     /// </summary>
-    public partial class TestPanel : MonoBehaviour, IViewModel
+    public partial class TestPanel : MonoBehaviour, IPresenter
     {
         private void OnClickIncrease()
         {
