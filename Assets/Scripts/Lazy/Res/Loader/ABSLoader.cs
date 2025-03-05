@@ -34,7 +34,8 @@ namespace Lazy.Res.Loader
             _onCompleted = onCompleted;
         }
 
-        public virtual T GetAssetObject<T>(string subAssetName = null) where T : UnityEngine.Object
+        public virtual T GetAssetObject<T>(string subAssetName = null)
+            where T : Object
         {
             return null;
         }
@@ -55,7 +56,7 @@ namespace Lazy.Res.Loader
             return !LoaderSuccess;
         }
 
-        public void Reset()
+        void IEnumerator.Reset()
         {
             throw new NotSupportedException();
         }
@@ -65,9 +66,9 @@ namespace Lazy.Res.Loader
             get
             {
                 if (LoaderSuccess)
-                {
-                    Log.Log.MsgE("Load Completed, Please use 'GetAssetObject' method to get asset.");
-                }
+                    Log.Log.MsgE(
+                        "Load Completed, Please use 'GetAssetObject' method to get asset."
+                    );
 
                 return null;
             }

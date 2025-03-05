@@ -1,4 +1,5 @@
 ﻿using System;
+using F8Framework.Core;
 using Lazy.Rx;
 using Lazy.Rx.Operator;
 using Lazy.Rx.Variables;
