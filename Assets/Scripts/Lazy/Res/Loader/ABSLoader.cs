@@ -46,6 +46,7 @@ namespace Lazy.Res.Loader
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("这个方法是异步/等待支持所必需的，你不应该直接使用它。")]
         public virtual LoaderAwaiter GetAwaiter()
         {
             return new LoaderAwaiter(this);

@@ -15,6 +15,11 @@ namespace Lazy.Res.Loader
         private string _resourcePath = "";
 
         /// <summary>
+        /// * 子资源名称
+        /// </summary>
+        private string _subAssetName = "";
+
+        /// <summary>
         /// * 资源对象
         /// </summary>
         private Object _resourceObject;
@@ -324,6 +329,9 @@ namespace Lazy.Res.Loader
                     ro = obj;
             }
 
+            if (ro != null)
+                _subAssetName = subAssetName;
+
             _loaderState = LoaderState.Loaded;
             return ro != null ? (T)ro : _resourceObject as T;
         }
@@ -359,6 +367,9 @@ namespace Lazy.Res.Loader
                 if (!string.IsNullOrEmpty(subAssetName) && obj.name.Equals(subAssetName))
                     ro = obj;
             }
+
+            if (ro != null)
+                _subAssetName = subAssetName;
 
             _loaderState = LoaderState.Loaded;
             return ro != null ? ro : _resourceObject;
@@ -423,9 +434,58 @@ namespace Lazy.Res.Loader
             }
         }
 
+        public override T GetAssetObject<T>(string subAssetName = null)
+        {
+            if (IsLoaded)
+            {
+                if (string.IsNullOrEmpty(subAssetName))
+                {
+                    if (string.IsNullOrEmpty(_subAssetName))
+                        return _resourceObject as T;
+
+                    if (TryGetAsset(_resourcePath + _subAssetName, out var obj))
+                        return obj as T;
+                }
+                else
+                {
+                    if (TryGetAsset(_resourcePath + subAssetName, out var obj))
+                        return obj as T;
+                    if (string.IsNullOrEmpty(_subAssetName))
+                        return _resourceObject as T;
+                }
+            }
+
+            return null;
+        }
+
+        public override Object GetAssetObject(string subAssetName = null)
+        {
+            if (IsLoaded)
+            {
+                if (string.IsNullOrEmpty(subAssetName))
+                {
+                    if (string.IsNullOrEmpty(_subAssetName))
+                        return _resourceObject;
+
+                    if (TryGetAsset(_resourcePath + _subAssetName, out var obj))
+                        return obj;
+                }
+                else
+                {
+                    if (TryGetAsset(_resourcePath + subAssetName, out var obj))
+                        return obj;
+                    if (string.IsNullOrEmpty(_subAssetName))
+                        return _resourceObject;
+                }
+            }
+
+            return null;
+        }
+
         void IPoolable.Reset()
         {
             _resourcePath = "";
+            _subAssetName = "";
             if (_resourceObject != null)
                 Resources.UnloadAsset(_resourceObject);
             foreach (var item in _resourceObjects.Values)
