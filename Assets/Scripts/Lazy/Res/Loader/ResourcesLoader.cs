@@ -436,23 +436,23 @@ namespace Lazy.Res.Loader
 
         public override T GetAssetObject<T>(string subAssetName = null)
         {
-            if (IsLoaded)
-            {
-                if (string.IsNullOrEmpty(subAssetName))
-                {
-                    if (string.IsNullOrEmpty(_subAssetName))
-                        return _resourceObject as T;
+            if (!IsLoaded)
+                return null;
 
-                    if (TryGetAsset(_resourcePath + _subAssetName, out var obj))
-                        return obj as T;
-                }
-                else
-                {
-                    if (TryGetAsset(_resourcePath + subAssetName, out var obj))
-                        return obj as T;
-                    if (string.IsNullOrEmpty(_subAssetName))
-                        return _resourceObject as T;
-                }
+            if (string.IsNullOrEmpty(subAssetName))
+            {
+                if (string.IsNullOrEmpty(_subAssetName))
+                    return _resourceObject as T;
+
+                if (TryGetAsset(_resourcePath + _subAssetName, out var obj))
+                    return obj as T;
+            }
+            else
+            {
+                if (TryGetAsset(_resourcePath + subAssetName, out var obj))
+                    return obj as T;
+                if (string.IsNullOrEmpty(_subAssetName))
+                    return _resourceObject as T;
             }
 
             return null;
@@ -480,6 +480,15 @@ namespace Lazy.Res.Loader
             }
 
             return null;
+        }
+
+        public bool Is(Object obj)
+        {
+            if (obj == null)
+                return false;
+            if (_resourceObject != null && string.IsNullOrEmpty(_subAssetName))
+                return _resourceObject == obj;
+            return _resourceObjects != null && _resourceObjects.ContainsValue(obj);
         }
 
         void IPoolable.Reset()
