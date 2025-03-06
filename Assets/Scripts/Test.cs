@@ -1,5 +1,6 @@
 ﻿using System;
 using F8Framework.Core;
+using F8Framework.Launcher;
 using Lazy.Rx;
 using Lazy.Rx.Operator;
 using Lazy.Rx.Variables;
@@ -22,6 +23,7 @@ namespace DefaultNamespace
             bb.Where(x => x > 5).Where(x => x < 10);
 
             ReactiveProperty<int> ccc = new();
+            FF8.Asset.Load("jigsaw_0");
         }
     }
 }
