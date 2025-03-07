@@ -5,6 +5,7 @@
 
     public class AssetManager
     {
+        public const string DirectorySuffix = "@Directory";
         // TODO:
     }
 }

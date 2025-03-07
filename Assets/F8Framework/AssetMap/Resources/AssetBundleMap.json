@@ -76,6 +76,28 @@
     "Package": "",
     "Updated": ""
   },
+  "2": {
+    "AbName": "test/cc",
+    "AssetPath": [
+      "assets/assetbundles/test/cc/2.png"
+    ],
+    "Version": "1.0.0",
+    "Size": "0",
+    "MD5": "",
+    "Package": "",
+    "Updated": ""
+  },
+  "Imagec99429cf-1489-4b89-a0c4-ae4d8ff29a43": {
+    "AbName": "test/cc/image",
+    "AssetPath": [
+      "assets/assetbundles/test/cc/image.prefab"
+    ],
+    "Version": "1.0.0",
+    "Size": "0",
+    "MD5": "",
+    "Package": "",
+    "Updated": ""
+  },
   "Config_Directory": {
     "AbName": "",
     "AssetPath": [],
@@ -103,6 +125,18 @@
       "LocalizedStrings",
       "Sheet1",
       "Sheet2"
+    ],
+    "Version": "1.0.0",
+    "Size": "",
+    "MD5": "",
+    "Package": "",
+    "Updated": ""
+  },
+  "CC_Directory": {
+    "AbName": "",
+    "AssetPath": [
+      "2",
+      "Image"
     ],
     "Version": "1.0.0",
     "Size": "",
