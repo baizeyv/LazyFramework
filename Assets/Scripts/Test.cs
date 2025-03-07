@@ -24,6 +24,8 @@ namespace DefaultNamespace
 
             ReactiveProperty<int> ccc = new();
             FF8.Asset.Load("jigsaw_0");
+            var eee = Resources.Load<TextAsset>("a");
+            Debug.Log(eee.text);
         }
     }
 }

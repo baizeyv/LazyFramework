@@ -336,15 +336,15 @@ namespace Lazy.Editor.AssetEditor
 
         private static void WriteResourceNames()
         {
-            var resourceMapPath =
-                FileUtility.FormatToUnityPath(FileUtility.TruncatePath(GetScriptPath(), 3))
-                + "/AssetMap/Resources/"
-                + nameof(ResourceMapping)
-                + ".json";
-            FileUtility.SafeDeleteFile(resourceMapPath);
-            FileUtility.SafeDeleteFile(resourceMapPath + ".meta");
-            FileUtility.CheckFileAndCreateDirWhenNeeded(resourceMapPath);
-            AssetDatabase.Refresh();
+            // var resourceMapPath =
+            //     FileUtility.FormatToUnityPath(FileUtility.TruncatePath(GetScriptPath(), 5))
+            //     + "/AssetMap/Resources/"
+            //     + nameof(ResourceMapping)
+            //     + ".json";
+            // FileUtility.SafeDeleteFile(resourceMapPath);
+            // FileUtility.SafeDeleteFile(resourceMapPath + ".meta");
+            // FileUtility.CheckFileAndCreateDirWhenNeeded(resourceMapPath);
+            // AssetDatabase.Refresh();
 
             var path =
                 Application.dataPath
@@ -363,15 +363,15 @@ namespace Lazy.Editor.AssetEditor
 
         private static void WriteAssetNames()
         {
-            var assetMapPath =
-                FileUtility.FormatToUnityPath(FileUtility.TruncatePath(GetScriptPath(), 3))
-                + "/AssetMap/Resources/"
-                + nameof(AssetBundleMapping)
-                + ".json";
-            FileUtility.SafeDeleteFile(assetMapPath);
-            FileUtility.SafeDeleteFile(assetMapPath + ".meta");
-            FileUtility.CheckFileAndCreateDirWhenNeeded(assetMapPath);
-            AssetDatabase.Refresh();
+            // var assetMapPath =
+            //     FileUtility.FormatToUnityPath(FileUtility.TruncatePath(GetScriptPath(), 5))
+            //     + "/AssetMap/Resources/"
+            //     + nameof(AssetBundleMapping)
+            //     + ".json";
+            // FileUtility.SafeDeleteFile(assetMapPath);
+            // FileUtility.SafeDeleteFile(assetMapPath + ".meta");
+            // FileUtility.CheckFileAndCreateDirWhenNeeded(assetMapPath);
+            // AssetDatabase.Refresh();
 
             var assetBundleMapPath =
                 Application.dataPath
