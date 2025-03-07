@@ -206,38 +206,38 @@ namespace Lazy.Editor.AssetEditor
                             new AssetMapping("", assetNameDir, "", 0, "", "", false)
                         );
                     }
+                }
 
-                    if (isWrite)
-                    {
-                        // # 把总的manifest加上
-                        if (tmpNames.Contains(PathSetting.GetPlatformName()))
-                            Debug.LogError(
-                                "总AssetBundleManifest和其他资产名重复，请检查资产："
-                                    + PathSetting.GetPlatformName()
-                            );
-                        else
-                            _assetMapping.Add(
+                if (isWrite)
+                {
+                    // # 把总的manifest加上
+                    if (tmpNames.Contains(PathSetting.GetPlatformName()))
+                        Debug.LogError(
+                            "总AssetBundleManifest和其他资产名重复，请检查资产："
+                                + PathSetting.GetPlatformName()
+                        );
+                    else
+                        _assetMapping.Add(
+                            PathSetting.GetPlatformName(),
+                            new AssetMapping(
                                 PathSetting.GetPlatformName(),
-                                new AssetMapping(
-                                    PathSetting.GetPlatformName(),
-                                    new string[] { },
-                                    "",
-                                    FileUtility.GetFileSize(
-                                        AssetBundlePathHelper.GetAssetBundleFullName(
-                                            PathSetting.GetPlatformName()
-                                        )
-                                    ),
-                                    FileUtility.CreateMD5ForFile(
-                                        AssetBundlePathHelper.GetAssetBundleFullName(
-                                            PathSetting.GetPlatformName()
-                                        )
-                                    ),
-                                    "",
-                                    false
-                                )
-                            );
-                        WriteAssetNames();
-                    }
+                                new string[] { },
+                                "",
+                                FileUtility.GetFileSize(
+                                    AssetBundlePathHelper.GetAssetBundleFullName(
+                                        PathSetting.GetPlatformName()
+                                    )
+                                ),
+                                FileUtility.CreateMD5ForFile(
+                                    AssetBundlePathHelper.GetAssetBundleFullName(
+                                        PathSetting.GetPlatformName()
+                                    )
+                                ),
+                                "",
+                                false
+                            )
+                        );
+                    WriteAssetNames();
                 }
             }
         }
@@ -375,7 +375,7 @@ namespace Lazy.Editor.AssetEditor
 
             var assetBundleMapPath =
                 Application.dataPath
-                + "/Lazy/AssetMap/Resources"
+                + "/Lazy/AssetMap/Resources/"
                 + nameof(AssetBundleMapping)
                 + ".json";
             FileUtility.CheckFileAndCreateDirWhenNeeded(assetBundleMapPath);
