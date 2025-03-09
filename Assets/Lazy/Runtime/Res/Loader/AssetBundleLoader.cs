@@ -822,7 +822,6 @@ namespace Lazy.Res.Loader
             if (_assetBundle == null || !IsLoaded || !IsExpandCompleted) return null;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                // TODO: 怀疑这个三目表达式:后半部分有误
                 if (TryGetAsset(
                         string.IsNullOrEmpty(_subAssetName) ? _assetPaths[0] : _assetPaths[0] + _subAssetName,
                         out var obj))
@@ -845,7 +844,6 @@ namespace Lazy.Res.Loader
             if (_assetBundle == null || !IsLoaded || !IsExpandCompleted) return null;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                // TODO: 怀疑这个三目表达式:后半部分有误
                 if (TryGetAsset(
                         string.IsNullOrEmpty(_subAssetName) ? _assetPaths[0] : _assetPaths[0] + _subAssetName,
                         out var obj))
