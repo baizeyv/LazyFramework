@@ -1,1 +1,145 @@
-{"red_dot_shop":{"AssetBundleName":"red_dot_shop","AssetPath":["assets/assetbundles/red_dot_shop.png"],"VersionName":"","Size":7013,"MD5":"06e8a8e3a39604240e450c5f40641153","Package":"","Updated":false},"jigsaw_0":{"AssetBundleName":"aa","AssetPath":["assets/assetbundles/aa/jigsaw_0.jpg"],"VersionName":"","Size":192493,"MD5":"92d7fe7b766095ba7d5139fe74079f91","Package":"","Updated":false},"loadingBarBg":{"AssetBundleName":"aa","AssetPath":["assets/assetbundles/aa/loadingbarbg.png"],"VersionName":"","Size":192493,"MD5":"92d7fe7b766095ba7d5139fe74079f91","Package":"","Updated":false},"2":{"AssetBundleName":"aa","AssetPath":["assets/assetbundles/aa/cc/2.png"],"VersionName":"","Size":192493,"MD5":"92d7fe7b766095ba7d5139fe74079f91","Package":"","Updated":false},"Image":{"AssetBundleName":"aa","AssetPath":["assets/assetbundles/aa/cc/image.prefab"],"VersionName":"","Size":192493,"MD5":"92d7fe7b766095ba7d5139fe74079f91","Package":"","Updated":false},"LocalizedStrings":{"AssetBundleName":"config/binconfigdata/localizedstrings","AssetPath":["assets/assetbundles/config/binconfigdata/localizedstrings.json"],"VersionName":"","Size":3064,"MD5":"3057619f6ae848c2e6ebde30d49eaf1e","Package":"","Updated":false},"Sheet1":{"AssetBundleName":"config/binconfigdata/sheet1","AssetPath":["assets/assetbundles/config/binconfigdata/sheet1.json"],"VersionName":"","Size":1380,"MD5":"f1bc02970567b10cd3df04f933371aad","Package":"","Updated":false},"Sheet2":{"AssetBundleName":"config/binconfigdata/sheet2","AssetPath":["assets/assetbundles/config/binconfigdata/sheet2.json"],"VersionName":"","Size":1410,"MD5":"053d258ee3e118f468579d69caceac81","Package":"","Updated":false},"aa@Directory":{"AssetBundleName":"","AssetPath":["jigsaw_0","loadingBarBg"],"VersionName":"","Size":0,"MD5":"","Package":"","Updated":false},"Config@Directory":{"AssetBundleName":"","AssetPath":[],"VersionName":"","Size":0,"MD5":"","Package":"","Updated":false},"CC@Directory":{"AssetBundleName":"","AssetPath":["2","Image"],"VersionName":"","Size":0,"MD5":"","Package":"","Updated":false},"BinConfigData@Directory":{"AssetBundleName":"","AssetPath":["LocalizedStrings","Sheet1","Sheet2"],"VersionName":"","Size":0,"MD5":"","Package":"","Updated":false},"Windows":{"AssetBundleName":"Windows","AssetPath":[],"VersionName":"","Size":1726,"MD5":"5e8deef00db256fb8d2ae28394d63b19","Package":"","Updated":false}}
+{
+  "red_dot_shop": {
+    "AssetBundleName": "red_dot_shop",
+    "AssetPath": [
+      "assets/assetbundles/red_dot_shop.png"
+    ],
+    "VersionName": "",
+    "Size": 7013,
+    "MD5": "06e8a8e3a39604240e450c5f40641153",
+    "Package": "",
+    "Updated": false
+  },
+  "jigsaw_0": {
+    "AssetBundleName": "aa",
+    "AssetPath": [
+      "assets/assetbundles/aa/jigsaw_0.jpg"
+    ],
+    "VersionName": "",
+    "Size": 192493,
+    "MD5": "92d7fe7b766095ba7d5139fe74079f91",
+    "Package": "",
+    "Updated": false
+  },
+  "loadingBarBg": {
+    "AssetBundleName": "aa",
+    "AssetPath": [
+      "assets/assetbundles/aa/loadingbarbg.png"
+    ],
+    "VersionName": "",
+    "Size": 192493,
+    "MD5": "92d7fe7b766095ba7d5139fe74079f91",
+    "Package": "",
+    "Updated": false
+  },
+  "2": {
+    "AssetBundleName": "aa",
+    "AssetPath": [
+      "assets/assetbundles/aa/cc/2.png"
+    ],
+    "VersionName": "",
+    "Size": 192493,
+    "MD5": "92d7fe7b766095ba7d5139fe74079f91",
+    "Package": "",
+    "Updated": false
+  },
+  "Image": {
+    "AssetBundleName": "aa",
+    "AssetPath": [
+      "assets/assetbundles/aa/cc/image.prefab"
+    ],
+    "VersionName": "",
+    "Size": 192493,
+    "MD5": "92d7fe7b766095ba7d5139fe74079f91",
+    "Package": "",
+    "Updated": false
+  },
+  "LocalizedStrings": {
+    "AssetBundleName": "config/binconfigdata/localizedstrings",
+    "AssetPath": [
+      "assets/assetbundles/config/binconfigdata/localizedstrings.json"
+    ],
+    "VersionName": "",
+    "Size": 3064,
+    "MD5": "3057619f6ae848c2e6ebde30d49eaf1e",
+    "Package": "",
+    "Updated": false
+  },
+  "Sheet1": {
+    "AssetBundleName": "config/binconfigdata/sheet1",
+    "AssetPath": [
+      "assets/assetbundles/config/binconfigdata/sheet1.json"
+    ],
+    "VersionName": "",
+    "Size": 1380,
+    "MD5": "f1bc02970567b10cd3df04f933371aad",
+    "Package": "",
+    "Updated": false
+  },
+  "Sheet2": {
+    "AssetBundleName": "config/binconfigdata/sheet2",
+    "AssetPath": [
+      "assets/assetbundles/config/binconfigdata/sheet2.json"
+    ],
+    "VersionName": "",
+    "Size": 1410,
+    "MD5": "053d258ee3e118f468579d69caceac81",
+    "Package": "",
+    "Updated": false
+  },
+  "aa@Directory": {
+    "AssetBundleName": "",
+    "AssetPath": [
+      "jigsaw_0",
+      "loadingBarBg"
+    ],
+    "VersionName": "",
+    "Size": 0,
+    "MD5": "",
+    "Package": "",
+    "Updated": false
+  },
+  "Config@Directory": {
+    "AssetBundleName": "",
+    "AssetPath": [],
+    "VersionName": "",
+    "Size": 0,
+    "MD5": "",
+    "Package": "",
+    "Updated": false
+  },
+  "CC@Directory": {
+    "AssetBundleName": "",
+    "AssetPath": [
+      "2",
+      "Image"
+    ],
+    "VersionName": "",
+    "Size": 0,
+    "MD5": "",
+    "Package": "",
+    "Updated": false
+  },
+  "BinConfigData@Directory": {
+    "AssetBundleName": "",
+    "AssetPath": [
+      "LocalizedStrings",
+      "Sheet1",
+      "Sheet2"
+    ],
+    "VersionName": "",
+    "Size": 0,
+    "MD5": "",
+    "Package": "",
+    "Updated": false
+  },
+  "Windows": {
+    "AssetBundleName": "Windows",
+    "AssetPath": [],
+    "VersionName": "",
+    "Size": 1726,
+    "MD5": "5e8deef00db256fb8d2ae28394d63b19",
+    "Package": "",
+    "Updated": false
+  }
+}
