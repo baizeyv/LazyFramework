@@ -14,27 +14,22 @@ namespace Lazy.IOC
         public void Register<T>(T instance)
         {
             var key = typeof(T);
-            if (_instances.ContainsKey(key))
-            {
-                _instances[key] = instance;
-            }
-            else
-            {
-                _instances.Add(key, instance);
-            }
+            _instances[key] = instance;
+        }
+
+        public void Unregister<T>()
+        {
+            var key = typeof(T);
+            _instances.Remove(key);
         }
 
         public void RegisterSpecial<T>(object obj)
         {
             var key = typeof(T);
             if (_instances.ContainsKey(key))
-            {
                 _instances[key] = obj;
-            }
             else
-            {
                 _instances.Add(key, obj);
-            }
         }
 
         public object GetSpecial<T>()
@@ -49,9 +44,7 @@ namespace Lazy.IOC
         {
             var key = typeof(T);
             if (_instances.TryGetValue(key, out var retInstance))
-            {
                 return retInstance as T;
-            }
 
             return null;
         }
@@ -67,6 +60,9 @@ namespace Lazy.IOC
             return _instances;
         }
 
-        public void Clear() => _instances.Clear();
+        public void Clear()
+        {
+            _instances.Clear();
+        }
     }
 }

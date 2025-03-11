@@ -9,13 +9,6 @@
       },
       "hash": "dd0db5d885d572f7d359434ba82faecd4fc4bf29"
     },
-    "com.tippinggame.f8framework": {
-      "version": "https://github.com/TippingGame/F8Framework.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "d979be685c136e8ab1f0d0cf28d7a62b66ba5250"
-    },
     "com.unity.2d.animation": {
       "version": "10.1.4",
       "depth": 1,

@@ -16,5 +16,12 @@ namespace Lazy.Res
         {
             SafeObjectPool<ResourcesLoader>.Instance.Free(loader);
         }
+
+        public static AssetBundleLoader CreateABLoader(string assetBundlePath)
+        {
+            var loader = new AssetBundleLoader();
+            loader.Setup(assetBundlePath);
+            return loader;
+        }
     }
 }

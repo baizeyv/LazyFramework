@@ -6,6 +6,9 @@
 
         public const string KeySortOrder = "Lazy.Editor.Prefs.SortOrder";
 
-        public const string KeyRelativeSplitterPosition = "Lazy.Editor.Prefs.RelativeSplitterPosition";
+        public const string KeyRelativeSplitterPosition =
+            "Lazy.Editor.Prefs.RelativeSplitterPosition";
+
+        public const string IsEditorModeKey = "IsEditorMode";
     }
 }

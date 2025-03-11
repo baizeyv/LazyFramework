@@ -30,14 +30,15 @@ namespace Lazy.Res.Loader
         /// <summary>
         /// * AssetBundle
         /// </summary>
-        private AssetBundle _assetBundle;
+        public AssetBundle AssetBundle { get; private set; }
 
         /// <summary>
         /// * AssetBundle包的Hash
         /// </summary>
         private Hash128 _hash128;
 
-        private readonly string _keyword = $"{PathSetting.AssetBundlesName}/{PathSetting.GetPlatformName()}/";
+        private readonly string _keyword =
+            $"{PathSetting.AssetBundlesName}/{PathSetting.GetPlatformName()}/";
 
         private List<string> _assetPaths = new();
 
@@ -88,7 +89,7 @@ namespace Lazy.Res.Loader
         /// <summary>
         /// * AssetBundle异步本地加载请求
         /// </summary>
-        private AssetBundleCreateRequest _assetBundleLoadRequest;
+        public AssetBundleCreateRequest AssetBundleLoadRequest { get; private set; }
 
         /// <summary>
         /// * AssetBundle异步本地卸载请求
@@ -149,17 +150,13 @@ namespace Lazy.Res.Loader
         public virtual AssetBundle LoadSync()
         {
             ClearUnloadData();
-            if (_assetBundleLoadState == LoaderState.Loaded && _assetBundle == null)
-            {
+            if (_assetBundleLoadState == LoaderState.Loaded && AssetBundle == null)
                 // # 状态虽是加载完成,但没有值的情况直接判定为未加载过
                 _assetBundleLoadState = LoaderState.Idle;
-            }
 
             if (_assetBundleLoadState == LoaderState.Loaded)
-            {
                 // # 真正加载成功,直接返回
-                return _assetBundle;
-            }
+                return AssetBundle;
 
             _loaderType = AssetBundleLoaderType.LocalSync;
             if (URLUtility.IsLegalHttpUri(_assetBundlePath))
@@ -173,19 +170,20 @@ namespace Lazy.Res.Loader
                 });
 #else
                 var request = new DownloadRequest(_assetBundlePath, _hash128);
-                while (!request.IsFinished) ;
-                _assetBundle = request.DownloadedAssetBundle;
+                while (!request.IsFinished)
+                    ;
+                AssetBundle = request.DownloadedAssetBundle;
                 GetAssetPaths();
 #endif
             }
             else
             {
-                _assetBundle = AssetBundle.LoadFromFile(_assetBundlePath);
+                AssetBundle = AssetBundle.LoadFromFile(_assetBundlePath);
                 GetAssetPaths();
             }
 
             _assetBundleLoadState = LoaderState.Loaded;
-            return _assetBundle;
+            return AssetBundle;
         }
 
         /// <summary>
@@ -195,29 +193,30 @@ namespace Lazy.Res.Loader
         public virtual void LoadAsync(OnLoadFinished callback = null)
         {
             ClearUnloadData();
-            if (_assetBundleLoadState == LoaderState.Loaded && _assetBundle == null)
-            {
+            if (_assetBundleLoadState == LoaderState.Loaded && AssetBundle == null)
                 // # 状态虽是加载完成,但没有值的情况直接判定为未加载过
                 _assetBundleLoadState = LoaderState.Idle;
-            }
 
             _onLoadFinished += callback;
 
-            if (_assetBundleLoadState != LoaderState.Idle) return;
+            if (_assetBundleLoadState != LoaderState.Idle)
+                return;
             _assetBundleLoadState = LoaderState.Loading;
             if (URLUtility.IsLegalHttpUri(_assetBundlePath))
             {
                 _loaderType = AssetBundleLoaderType.RemoteAsync;
                 _assetBundleDownloadRequest = new DownloadRequest(_assetBundlePath, _hash128);
-                if (_assetBundleDownloadRequest != null) return;
+                if (_assetBundleDownloadRequest != null)
+                    return;
                 _assetBundleLoadState = LoaderState.Loaded;
                 Log.Log.MsgE($"找不到远程AssetBundle:{_assetBundlePath}");
             }
             else
             {
                 _loaderType = AssetBundleLoaderType.LocalAsync;
-                _assetBundleLoadRequest = AssetBundle.LoadFromFileAsync(_assetBundlePath);
-                if (_assetBundleLoadRequest != null) return;
+                AssetBundleLoadRequest = AssetBundle.LoadFromFileAsync(_assetBundlePath);
+                if (AssetBundleLoadRequest != null)
+                    return;
                 _assetBundleLoadState = LoaderState.Loaded;
                 Log.Log.MsgE($"找不到本地AssetBundle:{_assetBundlePath}");
             }
@@ -232,58 +231,64 @@ namespace Lazy.Res.Loader
         /// <param name="subAssetName"></param>
         public virtual void ExpandSync(string assetPath, Type assetType, string subAssetName = null)
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
             {
                 _assetBundleExpandState = LoaderState.Idle;
                 return;
             }
 
-            if (_assetBundleExpandState == LoaderState.Loaded && _assetObjects.Count != _assetPaths.Count)
+            if (
+                _assetBundleExpandState == LoaderState.Loaded
+                && _assetObjects.Count != _assetPaths.Count
+            )
                 _assetBundleExpandState = LoaderState.Idle;
 
-            if (_assetBundleExpandState == LoaderState.Loaded && !string.IsNullOrEmpty(subAssetName) &&
-                string.IsNullOrEmpty(_subAssetName))
-            {
+            if (
+                _assetBundleExpandState == LoaderState.Loaded
+                && !string.IsNullOrEmpty(subAssetName)
+                && string.IsNullOrEmpty(_subAssetName)
+            )
                 _assetBundleExpandState = LoaderState.Idle;
-            }
 
             if (_assetBundleExpandState == LoaderState.Loaded)
                 return;
 
             _expandCount = 0;
             foreach (var path in _assetPaths)
-            {
                 if (path.Equals(assetPath))
-                {
                     LoadAssetObjectSync(path, assetType, subAssetName);
-                }
                 else
-                {
                     LoadAssetObjectSync(path, subAssetName);
-                }
-            }
 
             _expandCount = _assetPaths.Count;
             _assetBundleExpandState = LoaderState.Loaded;
         }
 
-        public virtual void ExpandAsync(string assetPath, Type assetType, string subAssetName = null,
-            OnExpandFinished callback = null)
+        public virtual void ExpandAsync(
+            string assetPath,
+            Type assetType,
+            string subAssetName = null,
+            OnExpandFinished callback = null
+        )
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
             {
                 _assetBundleExpandState = LoaderState.Idle;
                 return;
             }
 
-            if (_assetBundleExpandState == LoaderState.Loaded && _assetObjects.Count != _assetPaths.Count)
+            if (
+                _assetBundleExpandState == LoaderState.Loaded
+                && _assetObjects.Count != _assetPaths.Count
+            )
                 _assetBundleExpandState = LoaderState.Idle;
 
-            if (_assetBundleExpandState == LoaderState.Loaded && string.IsNullOrEmpty(_subAssetName) &&
-                !string.IsNullOrEmpty(subAssetName))
-            {
+            if (
+                _assetBundleExpandState == LoaderState.Loaded
+                && string.IsNullOrEmpty(_subAssetName)
+                && !string.IsNullOrEmpty(subAssetName)
+            )
                 _assetBundleExpandState = LoaderState.Idle;
-            }
 
             _onExpandFinished += callback;
 
@@ -291,52 +296,58 @@ namespace Lazy.Res.Loader
             {
                 _expandCount = 0;
                 _assetBundleExpandState = LoaderState.Loading;
-                for (int i = 0; i < _assetPaths.Count; i++)
-                {
+                for (var i = 0; i < _assetPaths.Count; i++)
                     if (_assetPaths[i].Equals(assetPath))
-                    {
-                        LoadAssetObjectAsync(_assetPaths[i], assetType, subAssetName, OnOneExpandCallBack);
-                    }
+                        LoadAssetObjectAsync(
+                            _assetPaths[i],
+                            assetType,
+                            subAssetName,
+                            OnOneExpandCallBack
+                        );
                     else
-                    {
                         LoadAssetObjectAsync(_assetPaths[i], subAssetName, OnOneExpandCallBack);
-                    }
-                }
             }
         }
 
-        public IEnumerator ExpandCoroutine(string assetPath, Type assetType, string subAssetName = null)
+        public IEnumerator ExpandCoroutine(
+            string assetPath,
+            Type assetType,
+            string subAssetName = null
+        )
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
             {
                 _assetBundleExpandState = LoaderState.Idle;
                 yield break;
             }
 
-            if (_assetBundleExpandState == LoaderState.Loaded && _assetObjects.Count != _assetPaths.Count)
+            if (
+                _assetBundleExpandState == LoaderState.Loaded
+                && _assetObjects.Count != _assetPaths.Count
+            )
                 _assetBundleExpandState = LoaderState.Idle;
 
-            if (_assetBundleExpandState == LoaderState.Loaded && string.IsNullOrEmpty(_subAssetName) &&
-                !string.IsNullOrEmpty(subAssetName))
-            {
+            if (
+                _assetBundleExpandState == LoaderState.Loaded
+                && string.IsNullOrEmpty(_subAssetName)
+                && !string.IsNullOrEmpty(subAssetName)
+            )
                 _assetBundleExpandState = LoaderState.Idle;
-            }
 
             if (_assetBundleExpandState == LoaderState.Idle)
             {
                 _expandCount = 0;
                 _assetBundleExpandState = LoaderState.Loading;
-                for (int i = 0; i < _assetPaths.Count; i++)
-                {
+                for (var i = 0; i < _assetPaths.Count; i++)
                     if (_assetPaths[i].Equals(assetPath))
-                    {
-                        LoadAssetObjectAsync(_assetPaths[i], assetType, subAssetName, OnOneExpandCallBack);
-                    }
+                        LoadAssetObjectAsync(
+                            _assetPaths[i],
+                            assetType,
+                            subAssetName,
+                            OnOneExpandCallBack
+                        );
                     else
-                    {
                         LoadAssetObjectAsync(_assetPaths[i], subAssetName, OnOneExpandCallBack);
-                    }
-                }
 
                 yield return new WaitUntil(() => ExpandProgress >= 1f);
             }
@@ -353,33 +364,37 @@ namespace Lazy.Res.Loader
         /// <param name="assetType"></param>
         /// <param name="subAssetName"></param>
         /// <returns></returns>
-        public Object LoadAssetObjectSync(string assetPath, Type assetType, string subAssetName = null)
+        public Object LoadAssetObjectSync(
+            string assetPath,
+            Type assetType,
+            string subAssetName = null
+        )
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
                 return null;
 
             // * 流化场景资产包不需要扩展,但必须通过UnityEngine进行访问 SceneManager
-            if (_assetBundle.isStreamedSceneAssetBundle)
+            if (AssetBundle.isStreamedSceneAssetBundle)
                 return null;
 
-            var o = assetType == null
-                ? _assetBundle.LoadAsset(assetPath)
-                : _assetBundle.LoadAsset(assetPath, assetType);
+            var o =
+                assetType == null
+                    ? AssetBundle.LoadAsset(assetPath)
+                    : AssetBundle.LoadAsset(assetPath, assetType);
             SetAssetObject(assetPath, o);
 
             if (!string.IsNullOrEmpty(subAssetName))
             {
                 _subAssetName = subAssetName;
-                var objects = assetType == null
-                    ? _assetBundle.LoadAssetWithSubAssets(assetPath)
-                    : _assetBundle.LoadAssetWithSubAssets(assetPath, assetType);
+                var objects =
+                    assetType == null
+                        ? AssetBundle.LoadAssetWithSubAssets(assetPath)
+                        : AssetBundle.LoadAssetWithSubAssets(assetPath, assetType);
                 foreach (var obj in objects)
                 {
                     SetAssetObject(assetPath + obj.name, obj);
                     if (obj.name.Equals(subAssetName))
-                    {
                         o = obj;
-                    }
                 }
             }
 
@@ -387,9 +402,7 @@ namespace Lazy.Res.Loader
                 return o;
 
             if (assetType.IsAssignableFrom(o.GetType()))
-            {
                 return o;
-            }
 
             Log.Log.MsgE($"与输入的资产类型不一致:{assetPath}");
             return null;
@@ -403,66 +416,68 @@ namespace Lazy.Res.Loader
         /// <returns></returns>
         public Object LoadAssetObjectSync(string assetPath, string subAssetName = null)
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
                 return null;
 
             // * 流化场景资产包不需要扩展,但必须通过UnityEngine进行访问 SceneManager
-            if (_assetBundle.isStreamedSceneAssetBundle)
+            if (AssetBundle.isStreamedSceneAssetBundle)
                 return null;
 
-            var o = _assetBundle.LoadAsset(assetPath);
+            var o = AssetBundle.LoadAsset(assetPath);
             SetAssetObject(assetPath, o);
 
-            if (string.IsNullOrEmpty(subAssetName)) return o;
+            if (string.IsNullOrEmpty(subAssetName))
+                return o;
 
             _subAssetName = subAssetName;
-            var objects = _assetBundle.LoadAssetWithSubAssets(assetPath);
+            var objects = AssetBundle.LoadAssetWithSubAssets(assetPath);
             foreach (var obj in objects)
             {
                 SetAssetObject(assetPath + obj.name, obj);
                 if (obj.name.Equals(subAssetName))
-                {
                     o = obj;
-                }
             }
 
             return o;
         }
 
-        public T LoadAssetObjectSync<T>(string assetPath, string subAssetName = null) where T : Object
+        public T LoadAssetObjectSync<T>(string assetPath, string subAssetName = null)
+            where T : Object
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
                 return null;
 
             // * 流化场景资产包不需要扩展,但必须通过UnityEngine进行访问 SceneManager
-            if (_assetBundle.isStreamedSceneAssetBundle)
+            if (AssetBundle.isStreamedSceneAssetBundle)
                 return null;
 
-            var o = _assetBundle.LoadAsset<T>(assetPath);
+            var o = AssetBundle.LoadAsset<T>(assetPath);
             SetAssetObject(assetPath, o);
 
             if (!string.IsNullOrEmpty(subAssetName))
             {
                 _subAssetName = subAssetName;
-                var objects = _assetBundle.LoadAssetWithSubAssets<T>(assetPath);
+                var objects = AssetBundle.LoadAssetWithSubAssets<T>(assetPath);
                 foreach (var obj in objects)
                 {
                     SetAssetObject(assetPath + obj.name, obj);
                     if (obj.name.Equals(subAssetName))
-                    {
                         o = obj;
-                    }
                 }
             }
 
             return o;
         }
 
-        public void LoadAssetObjectAsync(string assetPath, Type assetType, string subAssetName = null,
-            AssetLoadedCallback<Object> callback = null)
+        public void LoadAssetObjectAsync(
+            string assetPath,
+            Type assetType,
+            string subAssetName = null,
+            AssetLoadedCallback<Object> callback = null
+        )
         {
             // * 流化场景资产包不需要扩展,但必须通过UnityEngine进行访问 SceneManager
-            if (_assetBundle == null || _assetBundle.isStreamedSceneAssetBundle)
+            if (AssetBundle == null || AssetBundle.isStreamedSceneAssetBundle)
             {
                 End();
                 return;
@@ -471,16 +486,18 @@ namespace Lazy.Res.Loader
             AssetBundleRequest request;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                request = assetType == null
-                    ? _assetBundle.LoadAssetAsync(assetPath)
-                    : _assetBundle.LoadAssetAsync(assetPath, assetType);
+                request =
+                    assetType == null
+                        ? AssetBundle.LoadAssetAsync(assetPath)
+                        : AssetBundle.LoadAssetAsync(assetPath, assetType);
             }
             else
             {
                 _subAssetName = subAssetName;
-                request = assetType == null
-                    ? _assetBundle.LoadAssetWithSubAssetsAsync(assetPath)
-                    : _assetBundle.LoadAssetWithSubAssetsAsync(assetPath, assetType);
+                request =
+                    assetType == null
+                        ? AssetBundle.LoadAssetWithSubAssetsAsync(assetPath)
+                        : AssetBundle.LoadAssetWithSubAssetsAsync(assetPath, assetType);
             }
 
             request.completed += _ =>
@@ -492,9 +509,7 @@ namespace Lazy.Res.Loader
                 {
                     SetAssetObject(assetPath + asset.name, asset);
                     if (asset.name.Equals(subAssetName))
-                    {
                         o = asset;
-                    }
                 }
 
                 if (assetType == null)
@@ -522,11 +537,14 @@ namespace Lazy.Res.Loader
             }
         }
 
-        public void LoadAssetObjectAsync(string assetPath, string subAssetName = null,
-            AssetLoadedCallback<Object> callback = null)
+        public void LoadAssetObjectAsync(
+            string assetPath,
+            string subAssetName = null,
+            AssetLoadedCallback<Object> callback = null
+        )
         {
             // * 流化场景资产包不需要扩展,但必须通过UnityEngine进行访问 SceneManager
-            if (_assetBundle == null || _assetBundle.isStreamedSceneAssetBundle)
+            if (AssetBundle == null || AssetBundle.isStreamedSceneAssetBundle)
             {
                 End();
                 return;
@@ -535,12 +553,12 @@ namespace Lazy.Res.Loader
             AssetBundleRequest request;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                request = _assetBundle.LoadAssetAsync(assetPath);
+                request = AssetBundle.LoadAssetAsync(assetPath);
             }
             else
             {
                 _subAssetName = subAssetName;
-                request = _assetBundle.LoadAssetWithSubAssetsAsync(assetPath);
+                request = AssetBundle.LoadAssetWithSubAssetsAsync(assetPath);
             }
 
             request.completed += _ =>
@@ -552,9 +570,7 @@ namespace Lazy.Res.Loader
                 {
                     SetAssetObject(assetPath + asset.name, asset);
                     if (asset.name.Equals(subAssetName))
-                    {
                         o = asset;
-                    }
                 }
 
                 End(o);
@@ -567,11 +583,15 @@ namespace Lazy.Res.Loader
             }
         }
 
-        public void LoadAssetObjectAsync<T>(string assetPath, string subAssetName = null,
-            AssetLoadedCallback<T> callback = null) where T : Object
+        public void LoadAssetObjectAsync<T>(
+            string assetPath,
+            string subAssetName = null,
+            AssetLoadedCallback<T> callback = null
+        )
+            where T : Object
         {
             // * 流化场景资产包不需要扩展,但必须通过UnityEngine进行访问 SceneManager
-            if (_assetBundle == null || _assetBundle.isStreamedSceneAssetBundle)
+            if (AssetBundle == null || AssetBundle.isStreamedSceneAssetBundle)
             {
                 End();
                 return;
@@ -580,12 +600,12 @@ namespace Lazy.Res.Loader
             AssetBundleRequest request;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                request = _assetBundle.LoadAssetAsync<T>(assetPath);
+                request = AssetBundle.LoadAssetAsync<T>(assetPath);
             }
             else
             {
                 _subAssetName = subAssetName;
-                request = _assetBundle.LoadAssetWithSubAssetsAsync<T>(assetPath);
+                request = AssetBundle.LoadAssetWithSubAssetsAsync<T>(assetPath);
             }
 
             request.completed += _ =>
@@ -596,9 +616,7 @@ namespace Lazy.Res.Loader
                 {
                     SetAssetObject(assetPath + asset.name, asset);
                     if (asset.name.Equals(subAssetName))
-                    {
                         o = asset;
-                    }
                 }
 
                 End(o as T);
@@ -630,9 +648,7 @@ namespace Lazy.Res.Loader
             else
             {
                 if (!loadFinished)
-                {
                     _dependentNames.TryAdd(name, false);
-                }
             }
 
             return _dependentNames.Count;
@@ -707,21 +723,22 @@ namespace Lazy.Res.Loader
         /// </param>
         public virtual void UnloadSync(bool unloadAllLoadedObjects = false)
         {
-            if (_assetBundle != null)
+            if (AssetBundle != null)
             {
-                _assetBundle.Unload(unloadAllLoadedObjects);
+                AssetBundle.Unload(unloadAllLoadedObjects);
                 if (unloadAllLoadedObjects)
-                {
                     ClearLoadedData();
-                }
             }
 
             _assetBundleUnloadState = LoaderState.Loaded;
         }
 
-        public virtual void UnloadAsync(bool unloadAllLoadedObjects = false, OnUnloadFinished callback = null)
+        public virtual void UnloadAsync(
+            bool unloadAllLoadedObjects = false,
+            OnUnloadFinished callback = null
+        )
         {
-            if (_assetBundle == null)
+            if (AssetBundle == null)
                 _assetBundleUnloadState = LoaderState.Loaded;
 
             _onUnloadFinished += callback;
@@ -730,7 +747,7 @@ namespace Lazy.Res.Loader
             {
                 _assetBundleUnloadState = LoaderState.Loading;
                 _unloadType = AssetBundleLoaderType.LocalAsync;
-                _assetBundleUnloadRequest = _assetBundle.UnloadAsync(unloadAllLoadedObjects);
+                _assetBundleUnloadRequest = AssetBundle.UnloadAsync(unloadAllLoadedObjects);
                 ClearLoadedData();
             }
         }
@@ -784,21 +801,18 @@ namespace Lazy.Res.Loader
         /// </summary>
         private void GetAssetPaths()
         {
-            if (_assetBundle)
+            if (AssetBundle)
             {
                 _assetPaths.Clear();
                 // * 流化场景资源不需要加载AssetObject
-                if (_assetBundle.isStreamedSceneAssetBundle)
+                if (AssetBundle.isStreamedSceneAssetBundle)
                 {
                     _assetPaths.Add(string.Empty);
                     return;
                 }
 
-                foreach (var assetName in
-                         _assetBundle.GetAllAssetNames()) // 获取到的小写: assets/assetbundles/prefabs/cube.prefab
-                {
+                foreach (var assetName in AssetBundle.GetAllAssetNames()) // 获取到的小写: assets/assetbundles/prefabs/cube.prefab
                     _assetPaths.Add(assetName);
-                }
             }
         }
 
@@ -819,47 +833,124 @@ namespace Lazy.Res.Loader
 
         public override T GetAssetObject<T>(string subAssetName = null)
         {
-            if (_assetBundle == null || !IsLoaded || !IsExpandCompleted) return null;
+            if (AssetBundle == null || !IsLoaded || !IsExpandCompleted)
+                return null;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                if (TryGetAsset(
-                        string.IsNullOrEmpty(_subAssetName) ? _assetPaths[0] : _assetPaths[0] + _subAssetName,
-                        out var obj))
-                {
+                if (
+                    TryGetAsset(
+                        string.IsNullOrEmpty(_subAssetName)
+                            ? _assetPaths[0]
+                            : _assetPaths[0] + _subAssetName,
+                        out var obj
+                    )
+                )
                     return obj as T;
-                }
             }
             else
             {
                 if (TryGetAsset(_assetPaths[0] + subAssetName, out var obj))
-                {
                     return obj as T;
-                }
             }
+
             return null;
         }
 
         public override Object GetAssetObject(string subAssetName = null)
         {
-            if (_assetBundle == null || !IsLoaded || !IsExpandCompleted) return null;
+            if (AssetBundle == null || !IsLoaded || !IsExpandCompleted)
+                return null;
             if (string.IsNullOrEmpty(subAssetName))
             {
-                if (TryGetAsset(
-                        string.IsNullOrEmpty(_subAssetName) ? _assetPaths[0] : _assetPaths[0] + _subAssetName,
-                        out var obj))
-                {
+                if (
+                    TryGetAsset(
+                        string.IsNullOrEmpty(_subAssetName)
+                            ? _assetPaths[0]
+                            : _assetPaths[0] + _subAssetName,
+                        out var obj
+                    )
+                )
                     return obj;
-                }
             }
             else
             {
                 if (TryGetAsset(_assetPaths[0] + subAssetName, out var obj))
-                {
                     return obj;
-                }
             }
 
             return null;
+        }
+
+        public virtual void OnUpdate()
+        {
+            if (_assetBundleLoadState == LoaderState.Loading)
+            {
+                // # 正在加载AssetBundle
+                switch (_loaderType)
+                {
+                    case AssetBundleLoaderType.LocalAsync:
+                        if (AssetBundleLoadRequest != null)
+                            if (AssetBundleLoadRequest.isDone)
+                            {
+                                if (!AssetBundleLoadRequest.assetBundle)
+                                {
+                                    _assetBundleLoadState = LoaderState.Loaded;
+                                    Log.Log.MsgE($"无法加载本地资产捆绑包 {_assetBundlePath} ");
+                                }
+                                else
+                                {
+                                    AssetBundle = AssetBundleLoadRequest.assetBundle;
+                                    GetAssetPaths();
+                                    _assetBundleLoadState = LoaderState.Loaded;
+                                }
+                            }
+
+                        break;
+                    case AssetBundleLoaderType.RemoteAsync:
+                        if (_assetBundleDownloadRequest != null)
+                            if (_assetBundleDownloadRequest.IsFinished)
+                            {
+                                if (!_assetBundleDownloadRequest.DownloadedAssetBundle)
+                                {
+                                    _assetBundleLoadState = LoaderState.Loaded;
+                                    Log.Log.MsgE($"无法加载远程资产捆绑包 {_assetBundlePath} ");
+                                }
+                                else
+                                {
+                                    AssetBundle = _assetBundleDownloadRequest.DownloadedAssetBundle;
+                                    GetAssetPaths();
+                                    _assetBundleLoadState = LoaderState.Loaded;
+                                }
+                            }
+
+                        break;
+                }
+
+                if (_assetBundleLoadState == LoaderState.Loaded && _onLoadCompletedEvent != null)
+                {
+                    _onLoadCompletedEvent(AssetBundle);
+                    _onLoadCompletedEvent = null;
+                }
+            }
+
+            if (_assetBundleUnloadState == LoaderState.Loading)
+            {
+                switch (_unloadType)
+                {
+                    case AssetBundleLoaderType.LocalAsync:
+                        if (_assetBundleUnloadRequest != null)
+                            if (_assetBundleUnloadRequest.isDone)
+                                _assetBundleUnloadState = LoaderState.Loaded;
+
+                        break;
+                }
+
+                if (
+                    _assetBundleUnloadState == LoaderState.Loaded
+                    && _onUnloadCompletedEvent != null
+                )
+                    _onUnloadCompletedEvent();
+            }
         }
 
         /// <summary>
@@ -876,8 +967,8 @@ namespace Lazy.Res.Loader
                             return 1f;
                         break;
                     case AssetBundleLoaderType.LocalAsync:
-                        if (_assetBundleLoadRequest != null)
-                            return _assetBundleLoadRequest.progress;
+                        if (AssetBundleLoadRequest != null)
+                            return AssetBundleLoadRequest.progress;
                         break;
                     case AssetBundleLoaderType.RemoteAsync:
                         if (_assetBundleDownloadRequest != null)
@@ -893,7 +984,9 @@ namespace Lazy.Res.Loader
         /// * 资产展开进度
         /// </summary>
         public float ExpandProgress =>
-            (_assetPaths == null || _assetPaths.Count == 0) ? 0 : _expandCount * 1f / _assetPaths.Count;
+            _assetPaths == null || _assetPaths.Count == 0
+                ? 0
+                : _expandCount * 1f / _assetPaths.Count;
 
         /// <summary>
         /// * 卸载进度
@@ -918,7 +1011,6 @@ namespace Lazy.Res.Loader
             }
         }
 
-
         /// <summary>
         /// * 清空已加载的数据
         /// </summary>
@@ -927,9 +1019,9 @@ namespace Lazy.Res.Loader
             _unloadType = AssetBundleLoaderType.None;
             _assetBundleLoadState = LoaderState.Idle;
             _assetBundleExpandState = LoaderState.Idle;
-            _assetBundle = null;
+            AssetBundle = null;
             _assetObjects.Clear();
-            _assetBundleLoadRequest = null;
+            AssetBundleLoadRequest = null;
             _assetBundleDownloadRequest?.Dispose();
             _assetBundleDownloadRequest = null;
             _expandCount = 0;
@@ -967,7 +1059,7 @@ namespace Lazy.Res.Loader
                 if (value == null)
                     return;
                 if (_assetBundleLoadState == LoaderState.Loaded)
-                    value(_assetBundle);
+                    value(AssetBundle);
                 else
                     _onLoadCompletedEvent += value;
             }
@@ -1019,7 +1111,7 @@ namespace Lazy.Res.Loader
             _assetBundlePath = "";
             _subAssetName = "";
             _assetPaths.Clear();
-            if (_assetBundle != null)
+            if (AssetBundle != null)
                 UnloadSync(unloadAllLoadedObjects);
 
             _loaderType = AssetBundleLoaderType.None;
@@ -1029,7 +1121,7 @@ namespace Lazy.Res.Loader
             _assetBundleExpandState = LoaderState.Idle;
             _assetBundleUnloadState = LoaderState.Idle;
 
-            _assetBundleLoadRequest = null;
+            AssetBundleLoadRequest = null;
             _assetBundleDownloadRequest?.Dispose();
             _assetBundleDownloadRequest = null;
             _assetBundleUnloadRequest = null;

@@ -2,13 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Lazy.Manage;
 using Lazy.Res.Loader;
+using Lazy.Singleton;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Lazy.Res.Manager
 {
-    public class ResourcesManager
+    public class ResourcesManager : Singleton<ResourcesManager>, IManager
     {
         private readonly Dictionary<string, ResourcesLoader> _resourceLoaders = new();
 
@@ -369,6 +371,17 @@ namespace Lazy.Res.Manager
             foreach (var loader in _resourceLoaders.Values)
                 LoaderFactory.ReleaseLoader(loader);
             _resourceLoaders.Clear();
+        }
+
+        public void OnUpdate() { }
+
+        public void OnFixedUpdate() { }
+
+        public void OnLateUpdate() { }
+
+        public void OnDestroy()
+        {
+            Clear();
         }
     }
 }
