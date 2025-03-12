@@ -16,7 +16,7 @@ namespace Lazy.Res.Loader
         /// <summary>
         /// * 加载器是否加载成功
         /// </summary>
-        public virtual bool LoaderSuccess => false;
+        public virtual bool LoadSuccess => false;
 
         /// <summary>
         /// * 加载完成回调方法
@@ -54,7 +54,7 @@ namespace Lazy.Res.Loader
 
         public bool MoveNext()
         {
-            return !LoaderSuccess;
+            return !LoadSuccess;
         }
 
         void IEnumerator.Reset()
@@ -66,7 +66,7 @@ namespace Lazy.Res.Loader
         {
             get
             {
-                if (LoaderSuccess)
+                if (LoadSuccess)
                     Log.Log.MsgE(
                         "Load Completed, Please use 'GetAssetObject' method to get asset."
                     );
@@ -82,7 +82,7 @@ namespace Lazy.Res.Loader
     {
         private readonly ABSLoader _loader;
 
-        public bool IsCompleted => _loader.LoaderSuccess;
+        public bool IsCompleted => _loader.LoadSuccess;
 
         internal LoaderAwaiter(ABSLoader loader)
         {

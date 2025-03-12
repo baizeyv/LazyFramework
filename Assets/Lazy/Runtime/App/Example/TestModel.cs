@@ -1,6 +1,6 @@
 using Lazy.Rx;
 
-namespace Lazy.App.Example
+namespace Lazy.Example
 {
     public interface ITestModel : IModel
     {
@@ -10,10 +10,7 @@ namespace Lazy.App.Example
 
     public class TestModel : ABSModel, ITestModel
     {
-        protected override void OnSetup()
-        {
-
-        }
+        protected override void OnSetup() { }
 
         public ReactiveVariable<string> Counter { get; } = new("3");
         public ReactiveVariable<int> Multiple { get; } = new(10);

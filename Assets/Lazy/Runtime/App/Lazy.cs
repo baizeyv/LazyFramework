@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Lazy.IOC;
 
-namespace Lazy.App
+namespace Lazy
 {
     public interface IApp
     {
@@ -23,23 +23,29 @@ namespace Lazy.App
         T GetUtility<T>()
             where T : class, IUtility;
 
-        void SendCommand<T>() where T : class, ICommand, new();
+        void SendCommand<T>()
+            where T : class, ICommand, new();
 
-        void SendCommand<T, TArgument>(TArgument arg) where T : class, ICommand<TArgument>, new()
+        void SendCommand<T, TArgument>(TArgument arg)
+            where T : class, ICommand<TArgument>, new()
             where TArgument : struct;
 
         void SendStructCommand(IStructCommand structCommand);
 
-        TResult SendQuery<TQuery, TResult>() where TQuery : class, IQuery<TResult>, new();
+        TResult SendQuery<TQuery, TResult>()
+            where TQuery : class, IQuery<TResult>, new();
 
         TResult SendQuery<TQuery, TArgument, TResult>(TArgument arg)
-            where TQuery : class, IQuery<TArgument, TResult>, new() where TArgument : struct;
+            where TQuery : class, IQuery<TArgument, TResult>, new()
+            where TArgument : struct;
 
         TResult SendStructQuery<TResult>(IStructQuery<TResult> structQuery);
 
-        TResult SendRequest<TRequest, TResult>() where TRequest : class, IRequest<TResult>, new();
+        TResult SendRequest<TRequest, TResult>()
+            where TRequest : class, IRequest<TResult>, new();
 
-        TResult SendRequest<TRequest, TArgument, TResult>(TArgument arg) where TRequest : class, IRequest<TArgument, TResult>, new()
+        TResult SendRequest<TRequest, TArgument, TResult>(TArgument arg)
+            where TRequest : class, IRequest<TArgument, TResult>, new()
             where TArgument : struct;
 
         TResult SendStructRequest<TResult>(IStructRequest<TResult> structRequest);
@@ -166,7 +172,8 @@ namespace Lazy.App
             return _ioc.Get<T1>();
         }
 
-        public void SendCommand<T1>() where T1 : class, ICommand, new()
+        public void SendCommand<T1>()
+            where T1 : class, ICommand, new()
         {
             var cmd = _cqrIOC.Get<T1>();
             if (cmd == null)
@@ -178,7 +185,8 @@ namespace Lazy.App
             FireCommand(cmd);
         }
 
-        public void SendCommand<T1, TArgument>(TArgument arg) where T1 : class, ICommand<TArgument>, new()
+        public void SendCommand<T1, TArgument>(TArgument arg)
+            where T1 : class, ICommand<TArgument>, new()
             where TArgument : struct
         {
             var cmd = _cqrIOC.Get<T1>();
@@ -196,7 +204,8 @@ namespace Lazy.App
             FireStructCommand(structCommand);
         }
 
-        public TResult SendQuery<TQuery, TResult>() where TQuery : class, IQuery<TResult>, new()
+        public TResult SendQuery<TQuery, TResult>()
+            where TQuery : class, IQuery<TResult>, new()
         {
             var query = _cqrIOC.Get<TQuery>();
             if (query == null)
@@ -204,10 +213,12 @@ namespace Lazy.App
                 query = new TQuery();
                 _cqrIOC.Register(query);
             }
+
             return FireQuery(query);
         }
 
-        public TResult SendQuery<TQuery, TArgument, TResult>(TArgument arg) where TQuery : class, IQuery<TArgument, TResult>, new()
+        public TResult SendQuery<TQuery, TArgument, TResult>(TArgument arg)
+            where TQuery : class, IQuery<TArgument, TResult>, new()
             where TArgument : struct
         {
             var query = _cqrIOC.Get<TQuery>();
@@ -216,6 +227,7 @@ namespace Lazy.App
                 query = new TQuery();
                 _cqrIOC.Register(query);
             }
+
             return FireQuery(query, arg);
         }
 
@@ -224,7 +236,8 @@ namespace Lazy.App
             return FireStructQuery(structQuery);
         }
 
-        public TResult SendRequest<TRequest, TResult>() where TRequest : class, IRequest<TResult>, new()
+        public TResult SendRequest<TRequest, TResult>()
+            where TRequest : class, IRequest<TResult>, new()
         {
             var request = _cqrIOC.Get<TRequest>();
             if (request == null)
@@ -232,10 +245,12 @@ namespace Lazy.App
                 request = new TRequest();
                 _cqrIOC.Register(request);
             }
+
             return FireRequest(request);
         }
 
-        public TResult SendRequest<TRequest, TArgument, TResult>(TArgument arg) where TRequest : class, IRequest<TArgument, TResult>, new()
+        public TResult SendRequest<TRequest, TArgument, TResult>(TArgument arg)
+            where TRequest : class, IRequest<TArgument, TResult>, new()
             where TArgument : struct
         {
             var request = _cqrIOC.Get<TRequest>();
@@ -244,6 +259,7 @@ namespace Lazy.App
                 request = new TRequest();
                 _cqrIOC.Register(request);
             }
+
             return FireRequest(request, arg);
         }
 
@@ -258,7 +274,8 @@ namespace Lazy.App
             command.Fire();
         }
 
-        protected virtual void FireCommand<TA>(ICommand<TA> command, TA arg) where TA : struct
+        protected virtual void FireCommand<TA>(ICommand<TA> command, TA arg)
+            where TA : struct
         {
             command.SetApp(this);
             command.Fire(arg);
@@ -276,7 +293,8 @@ namespace Lazy.App
             return query.Fire();
         }
 
-        protected virtual TR FireQuery<TA, TR>(IQuery<TA, TR> query, TA arg) where TA : struct
+        protected virtual TR FireQuery<TA, TR>(IQuery<TA, TR> query, TA arg)
+            where TA : struct
         {
             query.SetApp(this);
             return query.Fire(arg);
@@ -294,7 +312,8 @@ namespace Lazy.App
             return request.Fire();
         }
 
-        protected virtual TR FireRequest<TA, TR>(IRequest<TA, TR> request, TA arg) where TA : struct
+        protected virtual TR FireRequest<TA, TR>(IRequest<TA, TR> request, TA arg)
+            where TA : struct
         {
             request.SetApp(this);
             return request.Fire(arg);
@@ -305,7 +324,6 @@ namespace Lazy.App
             structRequest.SetApp(this);
             return structRequest.Fire();
         }
-
     }
 
     public interface ICanSetApp

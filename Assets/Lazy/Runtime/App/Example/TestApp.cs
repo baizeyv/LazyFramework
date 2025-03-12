@@ -1,4 +1,4 @@
-namespace Lazy.App.Example
+namespace Lazy.Example
 {
     public class TestApp : ABSApp<TestApp>
     {

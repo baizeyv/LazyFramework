@@ -68,31 +68,29 @@ namespace Lazy.Log
 
         public static void MsgI(object message, Object context = null)
         {
-            I(context).Msg(message);
+            I(context).Msg(message).Do();
         }
 
         public static void MsgD(object message, Object context = null)
         {
-            D(context).Msg(message);
+            D(context).Msg(message).Do();
         }
 
         public static void MsgE(object message, Object context = null)
         {
-            E(context).Msg(message);
+            E(context).Msg(message).Do();
         }
 
         public static void MsgW(object message, Object context = null)
         {
-            W(context).Msg(message);
+            W(context).Msg(message).Do();
         }
 
         public static void VarI(Object context = null, params object[] content)
         {
             var logger = I(context);
-            for (int i = 0; i < content.Length; i+=2)
-            {
-                logger.Var(content[i].ToString(), content[i + 1]);
-            }
+            for (var i = 0; i < content.Length; i += 2)
+                logger.Var(content[i].ToString(), content[i + 1]).Do();
         }
 
         internal class LoggerType : IPoolable
@@ -165,7 +163,9 @@ namespace Lazy.Log
 
             public Logger Tag(string tagName)
             {
-                _preSb.Append($"[<color=#{ColorUtility.ToHtmlStringRGB(Pink)}><i><u>{tagName}</u></i></color>] ");
+                _preSb.Append(
+                    $"[<color=#{ColorUtility.ToHtmlStringRGB(Pink)}><i><u>{tagName}</u></i></color>] "
+                );
                 return this;
             }
 
@@ -179,13 +179,16 @@ namespace Lazy.Log
             {
                 name = name.Replace(" ", "_");
                 _sb.Append(
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(_varColor)}><b>{name}</b></color>=<color=#{ColorUtility.ToHtmlStringRGB(Green)}><i>{value}</i></color> ");
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(_varColor)}><b>{name}</b></color>=<color=#{ColorUtility.ToHtmlStringRGB(Green)}><i>{value}</i></color> "
+                );
                 return this;
             }
 
             public Logger Msg(object msg)
             {
-                _sb.Append($"<color=#{ColorUtility.ToHtmlStringRGB(_msgColor)}><u>{msg}</u></color> ");
+                _sb.Append(
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(_msgColor)}><u>{msg}</u></color> "
+                );
                 return this;
             }
 
@@ -199,7 +202,8 @@ namespace Lazy.Log
             {
                 _sb.AppendLine();
                 _sb.AppendLine(
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(Teal)}>----------------------------------------------</color>");
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(Teal)}>----------------------------------------------</color>"
+                );
                 return this;
             }
 
@@ -209,13 +213,9 @@ namespace Lazy.Log
                 {
                     var content = _preSb.Append(_sb);
                     if (_context == null)
-                    {
                         Debug.Log(content.ToString());
-                    }
                     else
-                    {
                         Debug.Log(content.ToString(), _context);
-                    }
                 }
 
                 SafeObjectPool<LoggerType>.Instance.Free(_loggerType);
@@ -313,7 +313,7 @@ namespace Lazy.Log
             Debug = 0,
             Info = 1,
             Warning = 2,
-            Error = 3
+            Error = 3,
         }
     }
 }

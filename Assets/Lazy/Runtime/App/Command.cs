@@ -1,21 +1,37 @@
-﻿namespace Lazy.App
+﻿namespace Lazy
 {
-    public interface ICommand : ICanSetApp, ICanSendQuery, ICanSendCommand, ICanSendRequest, ICanGetModel
+    public interface ICommand
+        : ICanSetApp,
+            ICanSendQuery,
+            ICanSendCommand,
+            ICanSendRequest,
+            ICanGetModel
     {
         void Fire();
     }
 
-    public interface ICommand<TArg> : ICanSetApp, ICanSendQuery, ICanSendCommand, ICanSendRequest, ICanGetModel where TArg : struct
+    public interface ICommand<TArg>
+        : ICanSetApp,
+            ICanSendQuery,
+            ICanSendCommand,
+            ICanSendRequest,
+            ICanGetModel
+        where TArg : struct
     {
         void Fire(TArg arg);
     }
 
-    public interface IStructCommand : ICanSetApp, ICanSendQuery, ICanSendCommand, ICanSendRequest, ICanGetModel
+    public interface IStructCommand
+        : ICanSetApp,
+            ICanSendQuery,
+            ICanSendCommand,
+            ICanSendRequest,
+            ICanGetModel
     {
         void Fire();
     }
 
-    public interface ICanSendCommand: IModule { }
+    public interface ICanSendCommand : IModule { }
 
     public abstract class ABSCommand : ICommand
     {
@@ -34,7 +50,8 @@
         }
     }
 
-    public abstract class ABSCommand<TArg> : ICommand<TArg> where TArg : struct
+    public abstract class ABSCommand<TArg> : ICommand<TArg>
+        where TArg : struct
     {
         public void Fire(TArg arg)
         {
@@ -53,13 +70,15 @@
 
     public static class CanSendCommandExtensions
     {
-        public static void LazyCommand<T>(this ICanSendCommand source) where T : class, ICommand, new()
+        public static void LazyCommand<T>(this ICanSendCommand source)
+            where T : class, ICommand, new()
         {
             source.App.SendCommand<T>();
         }
 
         public static void LazyCommand<T, TArg>(this ICanSendCommand source, TArg arg)
-            where T : class, ICommand<TArg>, new() where TArg : struct
+            where T : class, ICommand<TArg>, new()
+            where TArg : struct
         {
             source.App.SendCommand<T, TArg>(arg);
         }

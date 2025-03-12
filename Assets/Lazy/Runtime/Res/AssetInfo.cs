@@ -33,11 +33,11 @@ namespace Lazy.Res
         public readonly string AssetBundleName;
 
         public AssetInfo(
-            AssetType assetType,
-            string assetName,
-            string[] assetPath,
-            string assetBundlePathWithoutBundleName,
-            string assetBundleName
+            AssetType assetType = default,
+            string assetName = null,
+            string[] assetPath = null,
+            string assetBundlePathWithoutBundleName = null,
+            string assetBundleName = null
         )
         {
             AssetType = assetType;

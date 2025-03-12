@@ -69,6 +69,6 @@ namespace Lazy.Res
 
     public static class ResourceMapping
     {
-        public static Dictionary<string, AssetMapping> Mappings { get; set; } = new();
+        public static Dictionary<string, string[]> Mappings { get; set; } = new();
     }
 }

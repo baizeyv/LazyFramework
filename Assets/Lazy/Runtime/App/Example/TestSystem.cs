@@ -1,4 +1,4 @@
-namespace Lazy.App.Example
+namespace Lazy.Example
 {
     public interface ITestSystem : ISystem
     {
@@ -7,10 +7,7 @@ namespace Lazy.App.Example
 
     public class TestSystem : ABSSystem, ITestSystem
     {
-        protected override void OnSetup()
-        {
-
-        }
+        protected override void OnSetup() { }
 
         public int FindMultiple()
         {

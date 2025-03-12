@@ -30,7 +30,7 @@ namespace Lazy.Res.Manager
         /// <param name="info"></param>
         /// <param name="subAssetName"></param>
         /// <returns></returns>
-        public AssetBundle LoadSync(Type assetType, AssetInfo info, string subAssetName = null)
+        public AssetBundle LoadSync(Type assetType, ref AssetInfo info, string subAssetName = null)
         {
             List<string> assetBundlePaths = new(GetDependenciesAssetBundles(info.AssetBundleName));
 

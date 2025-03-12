@@ -1,4 +1,4 @@
-﻿namespace Lazy.App
+﻿namespace Lazy
 {
     public interface ISystem
         : ICanSetApp,
@@ -6,13 +6,9 @@
             ICanGetUtility,
             ICanSendCommand,
             ICanSendQuery,
-            ICanSendRequest
-    {
-    }
+            ICanSendRequest { }
 
-    public interface ICanGetSystem : IModule
-    {
-    }
+    public interface ICanGetSystem : IModule { }
 
     public abstract class ABSSystem : ISystem
     {
@@ -35,6 +31,10 @@
 
     public static class CanGetSystemExtensions
     {
-        public static T GetSystem<T>(this ICanGetSystem source) where T : class, ISystem => source.App.GetSystem<T>();
+        public static T GetSystem<T>(this ICanGetSystem source)
+            where T : class, ISystem
+        {
+            return source.App.GetSystem<T>();
+        }
     }
 }

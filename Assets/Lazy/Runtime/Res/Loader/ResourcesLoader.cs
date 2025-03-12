@@ -22,7 +22,7 @@ namespace Lazy.Res.Loader
         /// <summary>
         /// * 资源对象
         /// </summary>
-        private Object _resourceObject;
+        public Object ResourceObject { get; private set; }
 
         /// <summary>
         /// * 资源名称及资源对应字典
@@ -50,7 +50,7 @@ namespace Lazy.Res.Loader
         /// </summary>
         private List<GameObject> _prefabInstances;
 
-        public override bool LoaderSuccess => _loaderState == LoaderState.Loaded;
+        public override bool LoadSuccess => _loaderState == LoaderState.Loaded;
 
         /// <summary>
         /// * 初始设置
@@ -75,13 +75,13 @@ namespace Lazy.Res.Loader
             where T : Object
         {
             if (_loaderState == LoaderState.Loaded)
-                return _resourceObject as T;
+                return ResourceObject as T;
 
             _loaderType = ResourceLoaderType.Sync;
             _loaderState = LoaderState.Loading;
-            _resourceObject = Resources.Load<T>(_resourcePath);
+            ResourceObject = Resources.Load<T>(_resourcePath);
             _loaderState = LoaderState.Loaded;
-            return (T)_resourceObject;
+            return (T)ResourceObject;
         }
 
         /// <summary>
@@ -92,12 +92,12 @@ namespace Lazy.Res.Loader
         public virtual Object LoadSync(Type resourceType)
         {
             if (_loaderState == LoaderState.Loaded)
-                return _resourceObject;
+                return ResourceObject;
             _loaderType = ResourceLoaderType.Sync;
             _loaderState = LoaderState.Loading;
-            _resourceObject = Resources.Load(_resourcePath, resourceType);
+            ResourceObject = Resources.Load(_resourcePath, resourceType);
             _loaderState = LoaderState.Loaded;
-            return _resourceObject;
+            return ResourceObject;
         }
 
         /// <summary>
@@ -107,12 +107,12 @@ namespace Lazy.Res.Loader
         public virtual Object LoadSync()
         {
             if (_loaderState == LoaderState.Loaded)
-                return _resourceObject;
+                return ResourceObject;
             _loaderType = ResourceLoaderType.Sync;
             _loaderState = LoaderState.Loading;
-            _resourceObject = Resources.Load(_resourcePath);
+            ResourceObject = Resources.Load(_resourcePath);
             _loaderState = LoaderState.Loaded;
-            return _resourceObject;
+            return ResourceObject;
         }
 
         #endregion
@@ -129,9 +129,9 @@ namespace Lazy.Res.Loader
                 _resourceRequest = Resources.LoadAsync<T>(_resourcePath);
                 _resourceRequest.completed += _ =>
                 {
-                    _resourceObject = _resourceRequest.asset;
+                    ResourceObject = _resourceRequest.asset;
                     _loaderState = LoaderState.Loaded;
-                    End(_resourceObject as T);
+                    End(ResourceObject as T);
                 };
             }
             else if (_loaderState == LoaderState.Loading)
@@ -145,7 +145,7 @@ namespace Lazy.Res.Loader
             else if (_loaderState == LoaderState.Loaded)
             {
                 _loaderType = ResourceLoaderType.Async;
-                callback?.Invoke(_resourceObject as T);
+                callback?.Invoke(ResourceObject as T);
             }
 
             return;
@@ -169,11 +169,11 @@ namespace Lazy.Res.Loader
                 _resourceRequest = Resources.LoadAsync(_resourcePath, resourceType);
                 _resourceRequest.completed += _ =>
                 {
-                    _resourceObject = _resourceRequest.asset;
+                    ResourceObject = _resourceRequest.asset;
                     _loaderState = LoaderState.Loaded;
-                    if (resourceType.IsAssignableFrom(_resourceObject.GetType()))
+                    if (resourceType.IsAssignableFrom(ResourceObject.GetType()))
                     {
-                        End(_resourceObject);
+                        End(ResourceObject);
                     }
                     else
                     {
@@ -193,7 +193,7 @@ namespace Lazy.Res.Loader
             else if (_loaderState == LoaderState.Loaded)
             {
                 _loaderType = ResourceLoaderType.Async;
-                callback?.Invoke(_resourceObject);
+                callback?.Invoke(ResourceObject);
             }
 
             return;
@@ -214,9 +214,9 @@ namespace Lazy.Res.Loader
                 _resourceRequest = Resources.LoadAsync(_resourcePath);
                 _resourceRequest.completed += _ =>
                 {
-                    _resourceObject = _resourceRequest.asset;
+                    ResourceObject = _resourceRequest.asset;
                     _loaderState = LoaderState.Loaded;
-                    End(_resourceObject);
+                    End(ResourceObject);
                 };
             }
             else if (_loaderState == LoaderState.Loading)
@@ -230,7 +230,7 @@ namespace Lazy.Res.Loader
             else if (_loaderState == LoaderState.Loaded)
             {
                 _loaderType = ResourceLoaderType.Async;
-                callback?.Invoke(_resourceObject);
+                callback?.Invoke(ResourceObject);
             }
 
             return;
@@ -255,20 +255,20 @@ namespace Lazy.Res.Loader
                 _loaderState = LoaderState.Loading;
                 _resourceRequest = Resources.LoadAsync<T>(_resourcePath);
                 yield return _resourceRequest;
-                _resourceObject = _resourceRequest.asset;
+                ResourceObject = _resourceRequest.asset;
                 _loaderState = LoaderState.Loaded;
 
-                yield return _resourceObject;
+                yield return ResourceObject;
             }
             else if (_loaderState == LoaderState.Loading)
             {
                 _loaderType = ResourceLoaderType.Async;
                 yield return new WaitUntil(() => IsLoaded);
-                yield return _resourceObject;
+                yield return ResourceObject;
             }
             else if (_loaderState == LoaderState.Loaded)
             {
-                yield return _resourceObject;
+                yield return ResourceObject;
             }
         }
 
@@ -283,20 +283,20 @@ namespace Lazy.Res.Loader
                         ? Resources.LoadAsync(_resourcePath)
                         : Resources.LoadAsync(_resourcePath, resourceType);
                 yield return _resourceRequest;
-                _resourceObject = _resourceRequest.asset;
+                ResourceObject = _resourceRequest.asset;
                 _loaderState = LoaderState.Loaded;
 
-                yield return _resourceObject;
+                yield return ResourceObject;
             }
             else if (_loaderState == LoaderState.Loading)
             {
                 _loaderType = ResourceLoaderType.Async;
                 yield return new WaitUntil(() => IsLoaded);
-                yield return _resourceObject;
+                yield return ResourceObject;
             }
             else if (_loaderState == LoaderState.Loaded)
             {
-                yield return _resourceObject;
+                yield return ResourceObject;
             }
         }
 
@@ -310,7 +310,7 @@ namespace Lazy.Res.Loader
             if (_loaderState == LoaderState.Loaded)
             {
                 if (string.IsNullOrEmpty(subAssetName))
-                    return _resourceObject as T;
+                    return ResourceObject as T;
 
                 if (TryGetAsset(_resourcePath + subAssetName, out var obj))
                     return obj as T;
@@ -319,7 +319,7 @@ namespace Lazy.Res.Loader
             _loaderType = ResourceLoaderType.Sync;
             _loaderState = LoaderState.Loading;
             // # 加载同folder名称一样的资源
-            _resourceObject = Resources.Load<T>(_resourcePath);
+            ResourceObject = Resources.Load<T>(_resourcePath);
             var result = Resources.LoadAll<T>(_resourcePath);
             Object ro = null;
             foreach (var obj in result)
@@ -333,7 +333,7 @@ namespace Lazy.Res.Loader
                 _subAssetName = subAssetName;
 
             _loaderState = LoaderState.Loaded;
-            return ro != null ? (T)ro : _resourceObject as T;
+            return ro != null ? (T)ro : ResourceObject as T;
         }
 
         public virtual Object LoadAll(Type resourceType = null, string subAssetName = null)
@@ -341,7 +341,7 @@ namespace Lazy.Res.Loader
             if (_loaderState == LoaderState.Loaded)
             {
                 if (string.IsNullOrEmpty(subAssetName))
-                    return _resourceObject;
+                    return ResourceObject;
                 if (TryGetAsset(_resourcePath + subAssetName, out var obj))
                     return obj;
             }
@@ -351,12 +351,12 @@ namespace Lazy.Res.Loader
             Object[] result;
             if (resourceType == null)
             {
-                _resourceObject = Resources.Load(_resourcePath);
+                ResourceObject = Resources.Load(_resourcePath);
                 result = Resources.LoadAll(_resourcePath);
             }
             else
             {
-                _resourceObject = Resources.Load(_resourcePath, resourceType);
+                ResourceObject = Resources.Load(_resourcePath, resourceType);
                 result = Resources.LoadAll(_resourcePath, resourceType);
             }
 
@@ -372,7 +372,7 @@ namespace Lazy.Res.Loader
                 _subAssetName = subAssetName;
 
             _loaderState = LoaderState.Loaded;
-            return ro != null ? ro : _resourceObject;
+            return ro != null ? ro : ResourceObject;
         }
 
         #endregion
@@ -442,7 +442,7 @@ namespace Lazy.Res.Loader
             if (string.IsNullOrEmpty(subAssetName))
             {
                 if (string.IsNullOrEmpty(_subAssetName))
-                    return _resourceObject as T;
+                    return ResourceObject as T;
 
                 if (TryGetAsset(_resourcePath + _subAssetName, out var obj))
                     return obj as T;
@@ -452,7 +452,7 @@ namespace Lazy.Res.Loader
                 if (TryGetAsset(_resourcePath + subAssetName, out var obj))
                     return obj as T;
                 if (string.IsNullOrEmpty(_subAssetName))
-                    return _resourceObject as T;
+                    return ResourceObject as T;
             }
 
             return null;
@@ -465,7 +465,7 @@ namespace Lazy.Res.Loader
                 if (string.IsNullOrEmpty(subAssetName))
                 {
                     if (string.IsNullOrEmpty(_subAssetName))
-                        return _resourceObject;
+                        return ResourceObject;
 
                     if (TryGetAsset(_resourcePath + _subAssetName, out var obj))
                         return obj;
@@ -475,7 +475,7 @@ namespace Lazy.Res.Loader
                     if (TryGetAsset(_resourcePath + subAssetName, out var obj))
                         return obj;
                     if (string.IsNullOrEmpty(_subAssetName))
-                        return _resourceObject;
+                        return ResourceObject;
                 }
             }
 
@@ -486,8 +486,8 @@ namespace Lazy.Res.Loader
         {
             if (obj == null)
                 return false;
-            if (_resourceObject != null && string.IsNullOrEmpty(_subAssetName))
-                return _resourceObject == obj;
+            if (ResourceObject != null && string.IsNullOrEmpty(_subAssetName))
+                return ResourceObject == obj;
             return _resourceObjects != null && _resourceObjects.ContainsValue(obj);
         }
 
@@ -495,8 +495,8 @@ namespace Lazy.Res.Loader
         {
             _resourcePath = "";
             _subAssetName = "";
-            if (_resourceObject != null)
-                Resources.UnloadAsset(_resourceObject);
+            if (ResourceObject != null)
+                Resources.UnloadAsset(ResourceObject);
             foreach (var item in _resourceObjects.Values)
                 if (item != null)
                     Resources.UnloadAsset(item);

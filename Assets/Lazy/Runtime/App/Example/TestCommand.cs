@@ -1,6 +1,6 @@
 using Lazy.Utility;
 
-namespace Lazy.App.Example
+namespace Lazy.Example
 {
     public struct CountCommandArguments
     {
@@ -15,13 +15,9 @@ namespace Lazy.App.Example
         {
             _model ??= this.GetModel<ITestModel>();
             if (_model.Counter.Value.TryParseTo(out int value))
-            {
                 _model.Counter.Value = (value + arg.Count).ToString();
-            }
             else
-            {
                 _model.Counter.Value = arg.Count.ToString();
-            }
         }
     }
 
@@ -33,13 +29,9 @@ namespace Lazy.App.Example
         {
             _model ??= this.GetModel<ITestModel>();
             if (_model.Counter.Value.TryParseTo(out int value))
-            {
                 _model.Counter.Value = (value - 1).ToString();
-            }
             else
-            {
                 _model.Counter.Value = "1";
-            }
         }
     }
 
@@ -50,6 +42,7 @@ namespace Lazy.App.Example
         public string b;
 
         public IApp App { get; private set; }
+
         public void Fire()
         {
             // .............

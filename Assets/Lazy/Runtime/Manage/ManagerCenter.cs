@@ -19,22 +19,22 @@ namespace Lazy.Manage
         /// <summary>
         /// * 所有管理器的列表
         /// </summary>
-        private static List<ManagerWrapper> _allManagers = new(100);
+        private static readonly List<ManagerWrapper> AllManagers = new(100);
 
         /// <summary>
         /// * 使用Update()的管理器列表
         /// </summary>
-        private static List<ManagerWrapper> _updateManagers = new(100);
+        private static readonly List<ManagerWrapper> UpdateManagers = new(100);
 
         /// <summary>
         /// * 使用LateUpdate()的管理器列表
         /// </summary>
-        private static List<ManagerWrapper> _lateUpdateManagers = new(100);
+        private static readonly List<ManagerWrapper> LateUpdateManagers = new(100);
 
         /// <summary>
         /// * 使用FixedUpdate()的管理器列表
         /// </summary>
-        private static List<ManagerWrapper> _fixedUpdateManagers = new(100);
+        private static readonly List<ManagerWrapper> FixedUpdateManagers = new(100);
 
         /// <summary>
         /// * 控制翻转容器
@@ -58,20 +58,17 @@ namespace Lazy.Manage
 
             Object.DontDestroyOnLoad(behaviour.gameObject);
             _behaviour = behaviour;
-
-            // TODO:
         }
 
         /// <summary>
         /// * 创建管理器
         /// </summary>
         /// <param name="createMethod"></param>
-        /// <param name="argument">创建参数</param>
         /// <param name="priority">优先级,越小越先执行</param>
         /// <typeparam name="T">管理器类</typeparam>
         /// <returns></returns>
-        public static T Create<T>(Func<T> createMethod, object argument = null, int priority = 0)
-            where T : Singleton<T>, IManager, new()
+        public static T Create<T>(Func<T> createMethod, int priority = 0)
+            where T : Singleton<T>, IManager
         {
             if (priority < 0)
             {
@@ -96,10 +93,10 @@ namespace Lazy.Manage
 
             var mgr = createMethod.Fire();
             var wrapper = new ManagerWrapper(mgr, priority);
-            _allManagers.Add(wrapper);
+            AllManagers.Add(wrapper);
             _ioc.Register(mgr);
 
-            _allManagers.Sort(
+            AllManagers.Sort(
                 (left, right) =>
                 {
                     if (left.priority < right.priority)
@@ -110,8 +107,8 @@ namespace Lazy.Manage
 
             if (typeof(T).GetCustomAttributes(typeof(ManagerUpdateAttribute), false).Length > 0)
             {
-                _updateManagers.Add(wrapper);
-                _updateManagers.Sort(
+                UpdateManagers.Add(wrapper);
+                UpdateManagers.Sort(
                     (left, right) =>
                     {
                         if (left.priority < right.priority)
@@ -123,8 +120,8 @@ namespace Lazy.Manage
 
             if (typeof(T).GetCustomAttributes(typeof(ManagerLateUpdateAttribute), false).Length > 0)
             {
-                _lateUpdateManagers.Add(wrapper);
-                _lateUpdateManagers.Sort(
+                LateUpdateManagers.Add(wrapper);
+                LateUpdateManagers.Sort(
                     (left, right) =>
                     {
                         if (left.priority < right.priority)
@@ -138,8 +135,8 @@ namespace Lazy.Manage
                 typeof(T).GetCustomAttributes(typeof(ManagerFixedUpdateAttribute), false).Length > 0
             )
             {
-                _fixedUpdateManagers.Add(wrapper);
-                _fixedUpdateManagers.Sort(
+                FixedUpdateManagers.Add(wrapper);
+                FixedUpdateManagers.Sort(
                     (left, right) =>
                     {
                         if (left.priority < right.priority)
@@ -157,7 +154,7 @@ namespace Lazy.Manage
         {
             var type = typeof(T);
             var flag = false;
-            foreach (var wrapper in _allManagers.Where(item => item.manager.GetType() == type))
+            foreach (var wrapper in AllManagers.Where(item => item.manager.GetType() == type))
             {
                 wrapper.readyToBeRemoved = true;
                 wrapper.manager.OnDestroy();
@@ -170,7 +167,7 @@ namespace Lazy.Manage
         }
 
         public static bool TryGet<T>(out T manager)
-            where T : Singleton<T>, IManager, new()
+            where T : Singleton<T>, IManager
         {
             var ret = _ioc.Get<T>();
             manager = ret;
@@ -179,52 +176,52 @@ namespace Lazy.Manage
 
         public static void Update()
         {
-            for (var i = 0; i < _updateManagers.Count; i++)
+            for (var i = 0; i < UpdateManagers.Count; i++)
             {
-                if (_updateManagers[i]?.manager == null || _updateManagers[i].readyToBeRemoved)
+                if (UpdateManagers[i]?.manager == null || UpdateManagers[i].readyToBeRemoved)
                 {
-                    _updateManagers.RemoveAt(i);
+                    UpdateManagers.RemoveAt(i);
                     i--;
                     continue;
                 }
 
-                _updateManagers[i].manager.OnUpdate();
+                UpdateManagers[i].manager.OnUpdate();
             }
         }
 
         public static void LateUpdate()
         {
-            for (var i = 0; i < _lateUpdateManagers.Count; i++)
+            for (var i = 0; i < LateUpdateManagers.Count; i++)
             {
                 if (
-                    _lateUpdateManagers[i]?.manager == null
-                    || _lateUpdateManagers[i].readyToBeRemoved
+                    LateUpdateManagers[i]?.manager == null
+                    || LateUpdateManagers[i].readyToBeRemoved
                 )
                 {
-                    _lateUpdateManagers.RemoveAt(i);
+                    LateUpdateManagers.RemoveAt(i);
                     i--;
                     continue;
                 }
 
-                _lateUpdateManagers[i].manager.OnUpdate();
+                LateUpdateManagers[i].manager.OnUpdate();
             }
         }
 
         public static void FixedUpdate()
         {
-            for (var i = 0; i < _fixedUpdateManagers.Count; i++)
+            for (var i = 0; i < FixedUpdateManagers.Count; i++)
             {
                 if (
-                    _fixedUpdateManagers[i]?.manager == null
-                    || _fixedUpdateManagers[i].readyToBeRemoved
+                    FixedUpdateManagers[i]?.manager == null
+                    || FixedUpdateManagers[i].readyToBeRemoved
                 )
                 {
-                    _fixedUpdateManagers.RemoveAt(i);
+                    FixedUpdateManagers.RemoveAt(i);
                     i--;
                     continue;
                 }
 
-                _fixedUpdateManagers[i].manager.OnUpdate();
+                FixedUpdateManagers[i].manager.OnUpdate();
             }
         }
 
@@ -234,7 +231,7 @@ namespace Lazy.Manage
         /// <returns></returns>
         private static int GetMaxPriority()
         {
-            return _allManagers.Select(item => item.priority).Max();
+            return AllManagers.Select(item => item.priority).Prepend(int.MinValue).Max();
         }
 
         private class ManagerWrapper

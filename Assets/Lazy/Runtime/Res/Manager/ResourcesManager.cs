@@ -14,6 +14,8 @@ namespace Lazy.Res.Manager
     {
         private readonly Dictionary<string, ResourcesLoader> _resourceLoaders = new();
 
+        private ResourcesManager() { }
+
         /// <summary>
         /// * 同步加载Resources资源
         /// </summary>
@@ -217,8 +219,11 @@ namespace Lazy.Res.Manager
         /// * 卸载指定资源
         /// </summary>
         /// <param name="resourcePath"></param>
-        public void Unload(string resourcePath)
+        /// <param name="unloadAllLoadedObjects"></param>
+        public void Unload(string resourcePath, bool unloadAllLoadedObjects = true)
         {
+            if (!unloadAllLoadedObjects)
+                return;
             if (!_resourceLoaders.TryGetValue(resourcePath, out var loader))
                 return;
             LoaderFactory.ReleaseLoader(loader);
@@ -229,9 +234,12 @@ namespace Lazy.Res.Manager
         /// * 卸载指定资源加载器
         /// </summary>
         /// <param name="loader"></param>
-        public void Unload(ResourcesLoader loader)
+        /// <param name="unloadAllLoadedObjects"></param>
+        public void Unload(ResourcesLoader loader, bool unloadAllLoadedObjects = true)
         {
             if (loader == null)
+                return;
+            if (!unloadAllLoadedObjects)
                 return;
             if (_resourceLoaders.ContainsValue(loader))
             {
@@ -253,9 +261,12 @@ namespace Lazy.Res.Manager
         /// * 卸载指定资源
         /// </summary>
         /// <param name="obj"></param>
-        public void Unload(Object obj)
+        /// <param name="unloadAllLoadedObjects"></param>
+        public void Unload(Object obj, bool unloadAllLoadedObjects = true)
         {
             if (obj == null)
+                return;
+            if (!unloadAllLoadedObjects)
                 return;
 
             var keys = (from kv in _resourceLoaders where kv.Value.Is(obj) select kv.Key).ToList();
@@ -331,10 +342,15 @@ namespace Lazy.Res.Manager
             where T : Object
         {
             if (IsLoaded(resourcePath))
-            {
-                loader = _resourceLoaders[resourcePath];
-                return loader.GetAssetObject<T>(subAssetName);
-            }
+                if (_resourceLoaders.TryGetValue(resourcePath, out var loader2))
+                {
+                    loader = loader2;
+                    if (string.IsNullOrEmpty(subAssetName))
+                        return loader2.ResourceObject as T;
+
+                    if (loader2.TryGetAsset(resourcePath + subAssetName, out var obj))
+                        return obj as T;
+                }
 
             loader = null;
             return null;
@@ -354,10 +370,15 @@ namespace Lazy.Res.Manager
         )
         {
             if (IsLoaded(resourcePath))
-            {
-                loader = _resourceLoaders[resourcePath];
-                return loader.GetAssetObject(subAssetName);
-            }
+                if (_resourceLoaders.TryGetValue(resourcePath, out var loader2))
+                {
+                    loader = loader2;
+                    if (string.IsNullOrEmpty(subAssetName))
+                        return loader2.ResourceObject;
+
+                    if (loader2.TryGetAsset(resourcePath + subAssetName, out var obj))
+                        return obj;
+                }
 
             loader = null;
             return null;

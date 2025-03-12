@@ -1,7 +1,7 @@
 using Lazy.Rx;
 using UnityEngine;
 
-namespace Lazy.App.Example
+namespace Lazy.Example
 {
     /// <summary>
     /// ! Presenter Layer
@@ -10,7 +10,9 @@ namespace Lazy.App.Example
     {
         private void OnClickIncrease()
         {
-            this.LazyCommand<IncreaseCommand, CountCommandArguments>(new CountCommandArguments() { Count = 2 });
+            this.LazyCommand<IncreaseCommand, CountCommandArguments>(
+                new CountCommandArguments() { Count = 2 }
+            );
         }
 
         private void OnClickDecrease()

@@ -1,11 +1,12 @@
-﻿namespace Lazy.App
+﻿namespace Lazy
 {
     public interface IQuery<T> : ICanSetApp, ICanSendQuery, ICanGetModel
     {
         T Fire();
     }
 
-    public interface IQuery<T, TR> : ICanSetApp, ICanSendQuery, ICanGetModel where T : struct
+    public interface IQuery<T, TR> : ICanSetApp, ICanSendQuery, ICanGetModel
+        where T : struct
     {
         TR Fire(T arg);
     }
@@ -15,9 +16,7 @@
         T Fire();
     }
 
-    public interface ICanSendQuery : IModule
-    {
-    }
+    public interface ICanSendQuery : IModule { }
 
     public abstract class ABSQuery<T> : IQuery<T>
     {
@@ -36,7 +35,8 @@
         }
     }
 
-    public abstract class ABSQuery<TArgument, TResult> : IQuery<TArgument, TResult> where TArgument : struct
+    public abstract class ABSQuery<TArgument, TResult> : IQuery<TArgument, TResult>
+        where TArgument : struct
     {
         public TResult Fire(TArgument arg)
         {
@@ -55,13 +55,15 @@
 
     public static class QueryExtensions
     {
-        public static TR LazyQuery<T, TR>(this ICanSendQuery source) where T : class, IQuery<TR>, new()
+        public static TR LazyQuery<T, TR>(this ICanSendQuery source)
+            where T : class, IQuery<TR>, new()
         {
             return source.App.SendQuery<T, TR>();
         }
 
         public static TR LazyQuery<T, TArg, TR>(this ICanSendQuery source, TArg arg)
-            where T : class, IQuery<TArg, TR>, new() where TArg : struct
+            where T : class, IQuery<TArg, TR>, new()
+            where TArg : struct
         {
             return source.App.SendQuery<T, TArg, TR>(arg);
         }

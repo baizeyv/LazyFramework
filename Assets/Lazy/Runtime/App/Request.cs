@@ -1,25 +1,38 @@
-namespace Lazy.App
+namespace Lazy
 {
     // ! Command 和 Query 的结合体
-    public interface IRequest<TResult> : ICanSetApp, ICanSendRequest, ICanSendQuery, ICanSendCommand, ICanGetModel
+    public interface IRequest<TResult>
+        : ICanSetApp,
+            ICanSendRequest,
+            ICanSendQuery,
+            ICanSendCommand,
+            ICanGetModel
     {
         TResult Fire();
     }
 
-    public interface IRequest<TArgument, TResult> : ICanSetApp, ICanSendRequest, ICanSendQuery, ICanSendCommand,
-        ICanGetModel where TArgument : struct
+    public interface IRequest<TArgument, TResult>
+        : ICanSetApp,
+            ICanSendRequest,
+            ICanSendQuery,
+            ICanSendCommand,
+            ICanGetModel
+        where TArgument : struct
     {
         TResult Fire(TArgument arg);
     }
 
-    public interface IStructRequest<TR> : ICanSetApp, ICanSendRequest, ICanSendQuery, ICanSendCommand, ICanGetModel
+    public interface IStructRequest<TR>
+        : ICanSetApp,
+            ICanSendRequest,
+            ICanSendQuery,
+            ICanSendCommand,
+            ICanGetModel
     {
         TR Fire();
     }
 
-    public interface ICanSendRequest : IModule
-    {
-    }
+    public interface ICanSendRequest : IModule { }
 
     public abstract class ABSRequest<TResult> : IRequest<TResult>
     {
@@ -38,7 +51,8 @@ namespace Lazy.App
         }
     }
 
-    public abstract class ABSRequest<TArgument, TResult> : IRequest<TArgument, TResult> where TArgument : struct
+    public abstract class ABSRequest<TArgument, TResult> : IRequest<TArgument, TResult>
+        where TArgument : struct
     {
         public TResult Fire(TArgument arg)
         {
@@ -57,18 +71,23 @@ namespace Lazy.App
 
     public static class RequestExtensions
     {
-        public static TR LazyRequest<T, TR>(this ICanSendRequest source) where T : class, IRequest<TR>, new()
+        public static TR LazyRequest<T, TR>(this ICanSendRequest source)
+            where T : class, IRequest<TR>, new()
         {
             return source.App.SendRequest<T, TR>();
         }
 
         public static TR LazyRequest<T, TArg, TR>(this ICanSendRequest source, TArg arg)
-            where T : class, IRequest<TArg, TR>, new() where TArg : struct
+            where T : class, IRequest<TArg, TR>, new()
+            where TArg : struct
         {
             return source.App.SendRequest<T, TArg, TR>(arg);
         }
 
-        public static TR LazyStructRequest<TR>(this ICanSendRequest source, IStructRequest<TR> request)
+        public static TR LazyStructRequest<TR>(
+            this ICanSendRequest source,
+            IStructRequest<TR> request
+        )
         {
             return source.App.SendStructRequest(request);
         }

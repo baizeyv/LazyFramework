@@ -1,8 +1,9 @@
-namespace Lazy.App.Example
+namespace Lazy.Example
 {
     public class MultipleCount : ABSQuery<int>
     {
         private ITestModel _model;
+
         protected override int OnFire()
         {
             _model ??= this.GetModel<ITestModel>();

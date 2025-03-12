@@ -1,8 +1,10 @@
-﻿namespace Lazy.App
+﻿namespace Lazy
 {
-    public interface IPresenter : IModule, ICanGetSystem, ICanGetModel, ICanSendCommand, ICanSendQuery, ICanSendRequest
-    {
-
-    }
-
+    public interface IPresenter
+        : IModule,
+            ICanGetSystem,
+            ICanGetModel,
+            ICanSendCommand,
+            ICanSendQuery,
+            ICanSendRequest { }
 }

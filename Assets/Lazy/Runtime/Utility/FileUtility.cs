@@ -9,6 +9,22 @@ namespace Lazy.Utility
 {
     public static class FileUtility
     {
+        public static string SafeReadAllText(string file)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(file) || !File.Exists(file))
+                    return null;
+                File.SetAttributes(file, FileAttributes.Normal);
+                return File.ReadAllText(file);
+            }
+            catch (Exception e)
+            {
+                Log.Log.MsgE($"ReadAllText Failed: {file}, error: {e.Message}");
+                return null;
+            }
+        }
+
         public static bool SafeDeleteFile(string filePath)
         {
             try
