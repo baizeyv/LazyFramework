@@ -51,5 +51,10 @@
         /// * 取消下载
         /// </summary>
         void CancelDownload();
+
+        /// <summary>
+        /// * 释放下载器
+        /// </summary>
+        void Release();
     }
 }
