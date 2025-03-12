@@ -232,7 +232,11 @@ namespace Lazy.Res
                 if (IsEditorMode)
                     assetPath = info.AssetPath == null ? SearchAsset(assetName) : info.AssetPath[0];
 #endif
-                var o = ResourcesManager.Instance.GetAssetObject<T>(subAssetName, out var loader);
+                var o = ResourcesManager.Instance.GetAssetObject<T>(
+                    assetPath,
+                    out var loader,
+                    subAssetName
+                );
                 if (o != null)
                 {
                     End(o);
@@ -1068,7 +1072,7 @@ namespace Lazy.Res
 #endif
             if (assetInfo.AssetType == AssetType.None)
                 return false;
-            if (assetInfo.AssetType == AssetType.Resource && assetInfo.AssetPath != null)
+            if (assetInfo.AssetType == AssetType.Resource && assetInfo.AssetPath == null)
                 return false;
 
             if (
