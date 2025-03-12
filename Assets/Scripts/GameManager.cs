@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Http;
 using DG.Tweening.Core;
 using Lazy;
 using Lazy.Log;
@@ -46,6 +48,13 @@ namespace DefaultNamespace
             //     new Vector2(0.5f, 0.5f)
             // );
             // img.sprite = sprite;
+
+            var url = "https://www.google.com/";
+            using (var client = new HttpClient())
+            {
+                var response = client.GetAsync(url).Result;
+                Log.VarI(null, nameof(response), response.StatusCode);
+            }
         }
     }
 }

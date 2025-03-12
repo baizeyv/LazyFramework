@@ -166,6 +166,17 @@ namespace Lazy.Manage
             return flag;
         }
 
+        public static void Destroy()
+        {
+            for (var i = AllManagers.Count - 1; i >= 0; i--)
+                AllManagers[i].manager.OnDestroy();
+            AllManagers.Clear();
+            UpdateManagers.Clear();
+            LateUpdateManagers.Clear();
+            FixedUpdateManagers.Clear();
+            _ioc.Clear();
+        }
+
         public static bool TryGet<T>(out T manager)
             where T : Singleton<T>, IManager
         {

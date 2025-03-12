@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using Lazy.Manage;
+using Lazy.Platform;
 using Lazy.Res;
 using Lazy.Res.Manager;
 using Lazy.Singleton;
 using Lazy.Utility;
+using Unity.VisualScripting;
 
 namespace Lazy
 {
@@ -16,10 +18,26 @@ namespace Lazy
         /// </summary>
         public event Action OnStartGame;
 
+        /// <summary>
+        /// * 退出游戏
+        /// </summary>
+        public event Action OnQuitGame;
+
+        /// <summary>
+        /// * 暂停游戏
+        /// </summary>
+        public event Action<bool> OnPauseGame;
+
+        /// <summary>
+        /// * 聚焦游戏
+        /// </summary>
+        public event Action<bool> OnFocusGame;
+
         private IEnumerator Start()
         {
             ManagerCenter.Setup(this);
 
+            App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
             App.Asset = ManagerCenter.Create(() => AssetManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
@@ -51,6 +69,23 @@ namespace Lazy
         private void OnDestroy()
         {
             OnStartGame = null;
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            OnFocusGame?.Invoke(hasFocus);
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            OnPauseGame?.Invoke(pauseStatus);
+        }
+
+        protected override void OnApplicationQuit()
+        {
+            base.OnApplicationQuit();
+            OnQuitGame?.Invoke();
+            ManagerCenter.Destroy();
         }
     }
 }

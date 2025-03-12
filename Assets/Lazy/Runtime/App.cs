@@ -1,10 +1,25 @@
 ﻿using Lazy.Manage;
+using Lazy.Platform;
 using Lazy.Res;
 
 namespace Lazy
 {
     public static class App
     {
+        private static PlatformManager _platformManager;
+
+        /// <summary>
+        /// * 平台管理器
+        /// </summary>
+        public static PlatformManager Platform
+        {
+            get
+            {
+                return _platformManager ??= ManagerCenter.Create(() => PlatformManager.Instance);
+            }
+            set => _platformManager ??= value;
+        }
+
         private static AssetManager _assetManager;
 
         /// <summary>
