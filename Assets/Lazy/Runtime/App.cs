@@ -1,4 +1,5 @@
-﻿using Lazy.Manage;
+﻿using Lazy.Download;
+using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Res;
 
@@ -29,6 +30,20 @@ namespace Lazy
         {
             get { return _assetManager ??= ManagerCenter.Create(() => AssetManager.Instance); }
             set => _assetManager ??= value;
+        }
+
+        private static DownloadManager _downloadManager;
+
+        /// <summary>
+        /// * 下载管理器
+        /// </summary>
+        public static DownloadManager Download
+        {
+            get
+            {
+                return _downloadManager ??= ManagerCenter.Create(() => DownloadManager.Instance);
+            }
+            set => _downloadManager ??= value;
         }
     }
 }

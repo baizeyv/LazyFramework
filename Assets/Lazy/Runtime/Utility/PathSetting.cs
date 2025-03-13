@@ -27,6 +27,8 @@ namespace Lazy
 
         public static string AssetBundlesFolder => $"{Application.dataPath}/{AssetBundlesName}";
 
+        public static string ImagePath => $"{Application.persistentDataPath}/images/";
+
         public static string GetPlatformName()
         {
 #if UNITY_STANDALONE_WIN

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Lazy.Download;
 using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Res;
@@ -42,6 +43,7 @@ namespace Lazy
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 #endif
+            App.Download = ManagerCenter.Create(() => DownloadManager.Instance);
             StartGame();
             yield break;
         }

@@ -245,6 +245,13 @@ namespace Lazy.Manage
             return AllManagers.Select(item => item.priority).Prepend(int.MinValue).Max();
         }
 
+        public static MonoBehaviour GetBehaviour()
+        {
+            if (_behaviour == null)
+                Log.Log.MsgE($"{nameof(ManagerCenter)} 未初始化。");
+            return _behaviour;
+        }
+
         private class ManagerWrapper
         {
             /// <summary>

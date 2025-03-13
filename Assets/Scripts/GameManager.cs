@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using DG.Tweening.Core;
@@ -25,7 +26,7 @@ namespace DefaultNamespace
                 "DOTweenSettings",
                 x =>
                 {
-                    Log.MsgD(x.debugMode);
+                    Log.VarI(this, "DOTweenSettings debugMode:", x.debugMode);
                 }
             );
             // App.Asset.LoadAsync<Texture2D>(
@@ -49,12 +50,22 @@ namespace DefaultNamespace
             // );
             // img.sprite = sprite;
 
-            var url = "https://www.google.com/";
-            using (var client = new HttpClient())
-            {
-                var response = client.GetAsync(url).Result;
-                Log.VarI(null, nameof(response), response.StatusCode);
-            }
+            // var url = "https://www.google.com/";
+            // using (var client = new HttpClient())
+            // {
+            //     var response = client.GetAsync(url).Result;
+            //     Log.VarI(null, nameof(response), response.StatusCode);
+            // }
+
+            var path = Application.persistentDataPath + "/a.png";
+            App.Download.SafeDownload(
+                "https://wangjunyong.cdn-doodlemobile.com/yahtzee/skin/skin_19.png",
+                path,
+                (v) =>
+                {
+                    Log.MsgD("SUCCESS!");
+                }
+            );
         }
     }
 }

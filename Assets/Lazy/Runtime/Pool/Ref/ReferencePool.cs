@@ -13,25 +13,30 @@ namespace Lazy.Ref
         /// </summary>
         public int Count => _referenceCollections.Count;
 
+        private ReferencePool() { }
+
         /// <summary>
         /// 获取所有引用池的信息。
         /// </summary>
         /// <returns>所有引用池的信息。</returns>
         public ReferencePoolInfo[] GetAllReferencePoolInfos()
         {
-            int index = 0;
+            var index = 0;
             ReferencePoolInfo[] results = null;
 
             lock (_referenceCollections)
             {
                 results = new ReferencePoolInfo[_referenceCollections.Count];
                 foreach (var item in _referenceCollections)
-                {
-                    results[index++] = new ReferencePoolInfo(item.Key, item.Value.UnusedReferenceCount,
-                        item.Value.UsingReferenceCount, item.Value.ObtainReferenceCount, item.Value.FreeReferenceCount,
-                        item.Value.AddReferenceCount, item.Value.RemoveReferenceCount
+                    results[index++] = new ReferencePoolInfo(
+                        item.Key,
+                        item.Value.UnusedReferenceCount,
+                        item.Value.UsingReferenceCount,
+                        item.Value.ObtainReferenceCount,
+                        item.Value.FreeReferenceCount,
+                        item.Value.AddReferenceCount,
+                        item.Value.RemoveReferenceCount
                     );
-                }
             }
 
             return results;
@@ -45,9 +50,7 @@ namespace Lazy.Ref
             lock (_referenceCollections)
             {
                 foreach (var item in _referenceCollections)
-                {
                     item.Value.RemoveAll();
-                }
 
                 _referenceCollections.Clear();
             }
@@ -58,7 +61,8 @@ namespace Lazy.Ref
         /// </summary>
         /// <typeparam name="T">引用类型。</typeparam>
         /// <returns>引用。</returns>
-        public T Obtain<T>() where T : class, IReference, new()
+        public T Obtain<T>()
+            where T : class, IReference, new()
         {
             return GetReferenceCollection(typeof(T)).Obtain<T>();
         }
@@ -92,7 +96,8 @@ namespace Lazy.Ref
         /// </summary>
         /// <typeparam name="T">引用类型。</typeparam>
         /// <param name="count">追加数量。</param>
-        public void Add<T>(int count) where T : class, IReference, new()
+        public void Add<T>(int count)
+            where T : class, IReference, new()
         {
             GetReferenceCollection(typeof(T)).Add<T>(count);
         }
@@ -113,7 +118,8 @@ namespace Lazy.Ref
         /// </summary>
         /// <typeparam name="T">引用类型。</typeparam>
         /// <param name="count">移除数量。</param>
-        public void Remove<T>(int count) where T : class, IReference, new()
+        public void Remove<T>(int count)
+            where T : class, IReference, new()
         {
             GetReferenceCollection(typeof(T)).Remove(count);
         }
@@ -133,7 +139,8 @@ namespace Lazy.Ref
         /// 从引用池中移除所有的引用。
         /// </summary>
         /// <typeparam name="T">引用类型。</typeparam>
-        public void RemoveAll<T>() where T : class, IReference
+        public void RemoveAll<T>()
+            where T : class, IReference
         {
             GetReferenceCollection(typeof(T)).RemoveAll();
         }
@@ -163,9 +170,7 @@ namespace Lazy.Ref
             }
 
             if (!typeof(IReference).IsAssignableFrom(referenceType))
-            {
                 Log.Log.MsgE($"Reference type '{referenceType.FullName}' is invalid.");
-            }
         }
 
         private ReferenceCollection GetReferenceCollection(Type referenceType)

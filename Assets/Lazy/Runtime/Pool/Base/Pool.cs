@@ -35,14 +35,10 @@ namespace Lazy.Pool
         }
 
         public Pool()
-            : this(16, 20)
-        {
-        }
+            : this(16, 20) { }
 
         public Pool(int initialCapacity)
-            : this(initialCapacity, 20)
-        {
-        }
+            : this(initialCapacity, 20) { }
 
         public Pool(int initialCapacity, int max)
         {
@@ -60,9 +56,7 @@ namespace Lazy.Pool
         public void Free(T obj)
         {
             if (obj == null)
-            {
                 throw new ArgumentNullException(nameof(obj));
-            }
 
             CustomFree(obj);
 
@@ -81,19 +75,12 @@ namespace Lazy.Pool
         protected void Reset(T obj)
         {
             if (obj is IPoolable poolableObject)
-            {
                 poolableObject.Reset();
-            }
         }
 
         public void Clear()
         {
             _freeObjects.Clear();
-        }
-
-        public int GetFree()
-        {
-            return _freeObjects.Count;
         }
     }
 }
