@@ -1,0 +1,1 @@
+    // public List<EntityType> #FIELDNAME#; // Replace 'EntityType' to an actual type that is serializable.

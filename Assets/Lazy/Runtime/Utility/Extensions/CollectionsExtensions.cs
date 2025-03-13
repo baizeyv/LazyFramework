@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Lazy.Utility
 {
@@ -19,6 +22,29 @@ namespace Lazy.Utility
 
                 self.Enqueue(item);
             }
+        }
+
+        public static void Print<T>(this IEnumerable<T> self, Func<T, string> stringMethod = null)
+        {
+            if (self == null)
+                return;
+
+            var sb = new StringBuilder();
+            sb.Append("[");
+            var enumerable = self as T[] ?? self.ToArray();
+            var cnt = enumerable.Count();
+            for (var i = 0; i < cnt; i++)
+            {
+                if (stringMethod != null)
+                    sb.Append(stringMethod.Invoke(enumerable[i]));
+                else
+                    sb.Append(enumerable[i]);
+                if (i + 1 != cnt)
+                    sb.Append(", ");
+            }
+
+            sb.Append("]");
+            Log.Log.MsgD(sb.ToString());
         }
     }
 }

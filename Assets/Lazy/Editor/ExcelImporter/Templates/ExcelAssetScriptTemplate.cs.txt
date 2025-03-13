@@ -1,0 +1,11 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Lazy.Excel;
+using UnityEngine;
+
+[ExcelAsset]
+public class #ASSETSCRIPTNAME# : ScriptableObject
+{
+#ENTITYFIELDS#
+}
