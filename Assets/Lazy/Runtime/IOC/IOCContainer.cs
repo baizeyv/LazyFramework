@@ -49,6 +49,20 @@ namespace Lazy.IOC
             return null;
         }
 
+        public bool TryGet<T>(out T instance)
+            where T : class
+        {
+            var key = typeof(T);
+            if (_instances.TryGetValue(key, out var retInstance))
+            {
+                instance = retInstance as T;
+                return true;
+            }
+
+            instance = null;
+            return false;
+        }
+
         public IEnumerable<T> GetInstancesByType<T>()
         {
             var type = typeof(T);

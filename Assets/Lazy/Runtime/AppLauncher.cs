@@ -8,7 +8,7 @@ using Lazy.Singleton;
 
 namespace Lazy
 {
-    [MonoSingletonPath("AppLauncher")]
+    [MonoSingletonPath("Lazy/AppLauncher")]
     public class AppLauncher : MonoSingleton<AppLauncher>
     {
         /// <summary>

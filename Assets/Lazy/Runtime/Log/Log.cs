@@ -93,6 +93,27 @@ namespace Lazy.Log
                 logger.Var(content[i].ToString(), content[i + 1]).Do();
         }
 
+        public static void VarD(Object context = null, params object[] content)
+        {
+            var logger = D(context);
+            for (var i = 0; i < content.Length; i += 2)
+                logger.Var(content[i].ToString(), content[i + 1]).Do();
+        }
+
+        public static void VarW(Object context = null, params object[] content)
+        {
+            var logger = W(context);
+            for (var i = 0; i < content.Length; i += 2)
+                logger.Var(content[i].ToString(), content[i + 1]).Do();
+        }
+
+        public static void VarE(Object context = null, params object[] content)
+        {
+            var logger = E(context);
+            for (var i = 0; i < content.Length; i += 2)
+                logger.Var(content[i].ToString(), content[i + 1]).Do();
+        }
+
         internal class LoggerType : IPoolable
         {
             internal OutputType _outputType;

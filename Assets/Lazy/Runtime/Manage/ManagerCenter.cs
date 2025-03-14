@@ -149,8 +149,114 @@ namespace Lazy.Manage
             return mgr;
         }
 
+        /// <summary>
+        /// * 创建管理器
+        /// </summary>
+        /// <param name="createMethod"></param>
+        /// <param name="priority">优先级,越小越先执行</param>
+        /// <typeparam name="T">管理器类</typeparam>
+        /// <returns></returns>
+        public static T CreateMono<T>(Func<T> createMethod, int priority = 0)
+            where T : MonoSingleton<T>, IManager
+        {
+            if (priority < 0)
+            {
+                Log.Log.MsgW("Priority can not is negative. Auto switch to 0");
+                priority = 0;
+            }
+
+            if (TryGetMono<T>(out var manager))
+            {
+                Log.Log.MsgW($"{typeof(T)} is already registered.");
+                return manager;
+            }
+
+            if (priority == 0)
+            {
+                // # 没有设置优先级
+                var maxPriority = GetMaxPriority();
+                priority = ++maxPriority;
+            }
+
+            Log.Log.MsgD($"Create Manager {typeof(T)} with priority {priority}");
+
+            var mgr = createMethod.Fire();
+            var wrapper = new ManagerWrapper(mgr, priority);
+            AllManagers.Add(wrapper);
+            _ioc.Register(mgr);
+
+            AllManagers.Sort(
+                (left, right) =>
+                {
+                    if (left.priority < right.priority)
+                        return -1;
+                    return left.priority > right.priority ? 1 : 0;
+                }
+            );
+
+            if (typeof(T).GetCustomAttributes(typeof(ManagerUpdateAttribute), false).Length > 0)
+            {
+                UpdateManagers.Add(wrapper);
+                UpdateManagers.Sort(
+                    (left, right) =>
+                    {
+                        if (left.priority < right.priority)
+                            return -1;
+                        return left.priority > right.priority ? 1 : 0;
+                    }
+                );
+            }
+
+            if (typeof(T).GetCustomAttributes(typeof(ManagerLateUpdateAttribute), false).Length > 0)
+            {
+                LateUpdateManagers.Add(wrapper);
+                LateUpdateManagers.Sort(
+                    (left, right) =>
+                    {
+                        if (left.priority < right.priority)
+                            return -1;
+                        return left.priority > right.priority ? 1 : 0;
+                    }
+                );
+            }
+
+            if (
+                typeof(T).GetCustomAttributes(typeof(ManagerFixedUpdateAttribute), false).Length > 0
+            )
+            {
+                FixedUpdateManagers.Add(wrapper);
+                FixedUpdateManagers.Sort(
+                    (left, right) =>
+                    {
+                        if (left.priority < right.priority)
+                            return -1;
+                        return left.priority > right.priority ? 1 : 0;
+                    }
+                );
+            }
+
+            return mgr;
+        }
+
         public static bool Destroy<T>()
             where T : Singleton<T>, IManager, new()
+        {
+            var type = typeof(T);
+            var flag = false;
+            foreach (var wrapper in AllManagers.Where(item => item.manager.GetType() == type))
+            {
+                wrapper.readyToBeRemoved = true;
+                wrapper.manager.OnDestroy();
+                flag = true;
+            }
+
+            _ioc.Unregister<T>();
+
+            return flag;
+        }
+
+        public static bool DestroyMono<T>()
+            where T : MonoSingleton<T>, IManager, new()
         {
             var type = typeof(T);
             var flag = false;
@@ -179,6 +285,14 @@ namespace Lazy.Manage
 
         public static bool TryGet<T>(out T manager)
             where T : Singleton<T>, IManager
+        {
+            var ret = _ioc.Get<T>();
+            manager = ret;
+            return ret != null;
+        }
+
+        public static bool TryGetMono<T>(out T manager)
+            where T : MonoBehaviour, IManager
         {
             var ret = _ioc.Get<T>();
             manager = ret;
