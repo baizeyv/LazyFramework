@@ -19,6 +19,8 @@ namespace Lazy.Editor.CrackEditor
 
         private Vector2 _scrollPos;
 
+        private int _totalLen;
+
         [MenuItem("Lazy/Crack Editor", false, 100)]
         public static void ShowWindow()
         {
@@ -52,6 +54,8 @@ namespace Lazy.Editor.CrackEditor
             GUILayout.Label("Dimension:");
             _dimension = EditorGUILayout.IntField(_dimension);
             GUILayout.EndHorizontal();
+            if (!string.IsNullOrEmpty(_result))
+                GUILayout.Label($"Length: {_totalLen}", EditorStyles.boldLabel);
 
             if (_dimension < 1)
                 _dimension = 1;
@@ -68,7 +72,12 @@ namespace Lazy.Editor.CrackEditor
                 {
                     try
                     {
-                        _result = Handle(_inputHexText, _selectedValueType, _dimension);
+                        _result = Handle(
+                            _inputHexText,
+                            _selectedValueType,
+                            _dimension,
+                            out _totalLen
+                        );
                     }
                     catch (Exception e)
                     {
@@ -100,7 +109,12 @@ namespace Lazy.Editor.CrackEditor
         /// <param name="content"></param>
         /// <param name="valueType"></param>
         /// * <param name="dimension">维数 (多少个数据为一组)</param>
-        private static string Handle(string content, ValueType valueType, int dimension)
+        private static string Handle(
+            string content,
+            ValueType valueType,
+            int dimension,
+            out int totalLen
+        )
         {
             var byteArray = HandleByteArray(HandleHexStringArray(HandleHexString(content)));
 
@@ -108,6 +122,7 @@ namespace Lazy.Editor.CrackEditor
             {
                 // # 错误信息输出
                 EditorUtility.DisplayDialog("Error", $"dimension {dimension} error !", "OK");
+                totalLen = 0;
                 return "";
             }
 
@@ -128,6 +143,7 @@ namespace Lazy.Editor.CrackEditor
                 ret += "]\n";
             }
 
+            totalLen = byteArray.Length;
             Debug.Log(ret);
             return ret;
         }
