@@ -109,6 +109,7 @@ namespace Lazy.Editor.CrackEditor
         /// <param name="content"></param>
         /// <param name="valueType"></param>
         /// * <param name="dimension">维数 (多少个数据为一组)</param>
+        /// <param name="totalLen">总长度</param>
         private static string Handle(
             string content,
             ValueType valueType,

@@ -3,6 +3,7 @@ using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
 using Lazy.Res;
+using Lazy.Timer;
 
 namespace Lazy
 {
@@ -53,6 +54,14 @@ namespace Lazy
         {
             get { return _poolManager ??= ManagerCenter.Create(() => PoolManager.Instance); }
             set => _poolManager ??= value;
+        }
+
+        private static TimerManager _timerManager;
+
+        public static TimerManager Timer
+        {
+            get { return _timerManager ??= ManagerCenter.Create(() => TimerManager.Instance); }
+            set => _timerManager ??= value;
         }
     }
 }

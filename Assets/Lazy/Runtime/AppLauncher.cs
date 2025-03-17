@@ -6,6 +6,7 @@ using Lazy.Platform;
 using Lazy.Pool;
 using Lazy.Res;
 using Lazy.Singleton;
+using Lazy.Timer;
 
 namespace Lazy
 {
@@ -39,6 +40,7 @@ namespace Lazy
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
             App.Asset = ManagerCenter.Create(() => AssetManager.Instance);
             App.Download = ManagerCenter.Create(() => DownloadManager.Instance);
+            App.Timer = ManagerCenter.Create(() => TimerManager.Instance);
             App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();

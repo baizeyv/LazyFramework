@@ -9,6 +9,8 @@ namespace Lazy.Pool
     {
         public GameObjectPoolManager GameObjectPool { get; private set; }
 
+        private PoolManager() { }
+
         public override void OnSingletonInitialize()
         {
             GameObjectPool = ManagerCenter.Create(() => GameObjectPoolManager.Instance);

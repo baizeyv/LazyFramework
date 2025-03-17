@@ -40,6 +40,11 @@ namespace Lazy.Event
             }
         }
 
+        /// <summary>
+        /// * 是否存在订阅
+        /// </summary>
+        public bool HasSubscriptions => _events.Count > 0;
+
         public IDisposable Subscribe<T>(int intEvent, Observer<T> observer)
         {
             try
@@ -91,9 +96,7 @@ namespace Lazy.Event
             lock (_gate)
             {
                 foreach (var keyValuePair in _events)
-                {
                     keyValuePair.Value?.Dispose();
-                }
 
                 _events.Clear();
             }

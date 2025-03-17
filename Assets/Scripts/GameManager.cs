@@ -17,18 +17,22 @@ namespace DefaultNamespace
         private void Start()
         {
             AppLauncher.Instance.OnStartGame += OnStart;
+            AppLauncher.Instance.OnFocusGame += b =>
+            {
+                Log.MsgD($"focus:{b} -> {Time.unscaledTime}");
+            };
         }
 
         private void OnStart()
         {
             Log.MsgD("START APP GAME !");
-            App.Asset.LoadAsync<DOTweenSettings>(
-                "DOTweenSettings",
-                x =>
-                {
-                    Log.VarI(this, "DOTweenSettings debugMode:", x.debugMode);
-                }
-            );
+            // App.Asset.LoadAsync<DOTweenSettings>(
+            //     "DOTweenSettings",
+            //     x =>
+            //     {
+            //         Log.VarI(this, "DOTweenSettings debugMode:", x.debugMode);
+            //     }
+            // );
             // App.Asset.LoadAsync<Texture2D>(
             //     "jigsaw_0",
             //     texture =>
@@ -57,15 +61,29 @@ namespace DefaultNamespace
             //     Log.VarI(null, nameof(response), response.StatusCode);
             // }
 
-            var path = Application.persistentDataPath + "/a.png";
-            App.Download.SafeDownload(
-                "https://wangjunyong.cdn-doodlemobile.com/yahtzee/skin/skin_19.png",
-                path,
-                (v) =>
-                {
-                    Log.MsgD("SUCCESS!");
-                }
-            );
+            // var path = Application.persistentDataPath + "/a.png";
+            // App.Download.SafeDownload(
+            //     "https://wangjunyong.cdn-doodlemobile.com/yahtzee/skin/skin_19.png",
+            //     path,
+            //     (v) =>
+            //     {
+            //         Log.MsgD("SUCCESS!");
+            //     }
+            // );
+        }
+
+        private void Update()
+        {
+            var ts = App.Timer.GetServerTime(out var utc, out var local);
+            App.Timer.GetLocalTime(out var utcLocal, out var localLocal);
+            if (ts)
+            {
+                Log.VarD(this, nameof(utc), utc);
+                Log.VarD(this, nameof(local), local);
+            }
+
+            Log.VarD(this, nameof(utcLocal), utcLocal);
+            Log.VarD(this, nameof(localLocal), localLocal);
         }
     }
 }
