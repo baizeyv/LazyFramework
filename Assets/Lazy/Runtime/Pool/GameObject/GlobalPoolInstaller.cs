@@ -16,7 +16,7 @@ namespace Lazy.Pool.GameObject
     [ManagerUpdate]
     [ManagerFixedUpdate]
     [ManagerLateUpdate]
-    public sealed class GlobalGameObjectPool : MonoSingleton<GlobalGameObjectPool>, IManager
+    public sealed class GlobalPoolInstaller : MonoSingleton<GlobalPoolInstaller>, IManager
     {
         [Header("Main")]
         [Tooltip(PoolConstant.GlobalPoolUpdateTypeDesc)]
@@ -83,7 +83,7 @@ namespace Lazy.Pool.GameObject
         [SerializeField]
         private bool clearEventsOnDestroy;
 
-        private GlobalGameObjectPool() { }
+        private GlobalPoolInstaller() { }
 
         private void Initialize()
         {
@@ -96,7 +96,7 @@ namespace Lazy.Pool.GameObject
 
             if (!enabled)
                 Log.Log.MsgD(
-                    $"<{nameof(GlobalGameObjectPool)}> 实例已禁用！"
+                    $"<{nameof(GlobalPoolInstaller)}> 实例已禁用！"
                         + "因此，某些功能可能无法正常工作！",
                     this
                 );

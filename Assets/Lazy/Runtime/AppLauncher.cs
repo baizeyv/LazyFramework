@@ -3,6 +3,7 @@ using System.Collections;
 using Lazy.Download;
 using Lazy.Manage;
 using Lazy.Platform;
+using Lazy.Pool;
 using Lazy.Res;
 using Lazy.Singleton;
 
@@ -38,6 +39,7 @@ namespace Lazy
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
             App.Asset = ManagerCenter.Create(() => AssetManager.Instance);
             App.Download = ManagerCenter.Create(() => DownloadManager.Instance);
+            App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 #endif

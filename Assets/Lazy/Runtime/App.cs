@@ -1,6 +1,7 @@
 ﻿using Lazy.Download;
 using Lazy.Manage;
 using Lazy.Platform;
+using Lazy.Pool;
 using Lazy.Res;
 
 namespace Lazy
@@ -44,6 +45,14 @@ namespace Lazy
                 return _downloadManager ??= ManagerCenter.Create(() => DownloadManager.Instance);
             }
             set => _downloadManager ??= value;
+        }
+
+        private static PoolManager _poolManager;
+
+        public static PoolManager Pool
+        {
+            get { return _poolManager ??= ManagerCenter.Create(() => PoolManager.Instance); }
+            set => _poolManager ??= value;
         }
     }
 }
