@@ -1,4 +1,5 @@
-﻿using Lazy.Download;
+﻿using Lazy.Audio;
+using Lazy.Download;
 using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
@@ -50,6 +51,9 @@ namespace Lazy
 
         private static PoolManager _poolManager;
 
+        /// <summary>
+        /// * 池管理器
+        /// </summary>
         public static PoolManager Pool
         {
             get { return _poolManager ??= ManagerCenter.Create(() => PoolManager.Instance); }
@@ -58,10 +62,24 @@ namespace Lazy
 
         private static TimerManager _timerManager;
 
+        /// <summary>
+        /// * 事件管理器
+        /// </summary>
         public static TimerManager Timer
         {
             get { return _timerManager ??= ManagerCenter.Create(() => TimerManager.Instance); }
             set => _timerManager ??= value;
+        }
+
+        private static AudioManager _audioManager;
+
+        /// <summary>
+        /// * 音频管理器
+        /// </summary>
+        public static AudioManager Audio
+        {
+            get { return _audioManager ??= ManagerCenter.CreateMono(() => AudioManager.Instance); }
+            set => _audioManager ??= value;
         }
     }
 }

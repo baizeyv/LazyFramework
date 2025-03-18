@@ -381,7 +381,14 @@ namespace Lazy.Pool.GameObject
         /// <returns></returns>
         private bool TryFindPoolInstallerInstanceAsSingle(out GlobalPoolInstaller installer)
         {
+#if UNITY_6000_0_OR_NEWER
+            var ins = Object.FindObjectsByType<GlobalPoolInstaller>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None
+            );
+#else
             var ins = Object.FindObjectsOfType<GlobalPoolInstaller>();
+#endif
             var length = ins.Length;
             if (length > 0)
             {

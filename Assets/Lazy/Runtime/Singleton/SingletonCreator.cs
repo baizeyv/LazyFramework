@@ -11,14 +11,14 @@ namespace Lazy.Singleton
             where T : class
         {
             var type = typeof(T);
-            var constructorInfos = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic);
+            var constructorInfos = type.GetConstructors(
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
 
             var ctor = Array.Find(constructorInfos, c => c.GetParameters().Length == 0);
 
             if (ctor == null)
-            {
                 throw new Exception("Non-Public Constructor() not found! in " + type);
-            }
 
             return ctor.Invoke(null) as T;
         }
@@ -31,11 +31,16 @@ namespace Lazy.Singleton
             return instance;
         }
 
-        public static T CreateMonoSingleton<T>() where T : class, ISingleton
+        public static T CreateMonoSingleton<T>()
+            where T : class, ISingleton
         {
             T instance = null;
             var type = typeof(T);
+#if UNITY_6000_0_OR_NEWER
+            instance = Object.FindFirstObjectByType(type) as T;
+#else
             instance = Object.FindObjectOfType(type) as T;
+#endif
             if (instance != null)
             {
                 instance.OnSingletonInitialize();
@@ -63,16 +68,15 @@ namespace Lazy.Singleton
             return instance;
         }
 
-        private static T CreateComponentOnGameObject<T>(string path, bool dontDestroy) where T : class
+        private static T CreateComponentOnGameObject<T>(string path, bool dontDestroy)
+            where T : class
         {
             var obj = FindGameObject(path, dontDestroy);
             if (obj == null)
             {
                 obj = new GameObject($"[Singleton {typeof(T).Name}]");
                 if (dontDestroy)
-                {
                     Object.DontDestroyOnLoad(obj);
-                }
             }
 
             return obj.AddComponent(typeof(T)) as T;
@@ -90,7 +94,12 @@ namespace Lazy.Singleton
             return FindGameObject(null, subPath, 0, dontDestroy);
         }
 
-        private static GameObject FindGameObject(GameObject root, string[] subPath, int index, bool dontDestroy)
+        private static GameObject FindGameObject(
+            GameObject root,
+            string[] subPath,
+            int index,
+            bool dontDestroy
+        )
         {
             GameObject obj = null;
             if (root == null)
@@ -101,25 +110,23 @@ namespace Lazy.Singleton
             {
                 var child = root.transform.Find(subPath[index]);
                 if (child != null)
-                {
                     obj = child.gameObject;
-                }
             }
 
             if (obj == null)
             {
                 obj = new GameObject(subPath[index]);
                 if (root != null)
-                {
                     obj.transform.SetParent(root.transform);
-                }
                 if (dontDestroy && index == 0)
                     Object.DontDestroyOnLoad(obj);
             }
 
             if (obj == null)
                 return null;
-            return ++index == subPath.Length ? obj : FindGameObject(obj, subPath, index, dontDestroy);
+            return ++index == subPath.Length
+                ? obj
+                : FindGameObject(obj, subPath, index, dontDestroy);
         }
     }
 }

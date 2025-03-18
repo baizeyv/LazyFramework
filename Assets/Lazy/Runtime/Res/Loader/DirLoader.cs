@@ -51,11 +51,13 @@ namespace Lazy.Res.Loader
             }
         }
 
+#pragma warning disable CS0618
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual LoaderDirAwaiter GetAwaiter()
         {
             return new LoaderDirAwaiter(this);
         }
+#pragma warning restore CS0618
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]

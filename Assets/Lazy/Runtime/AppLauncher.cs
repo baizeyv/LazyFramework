@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Lazy.Audio;
 using Lazy.Download;
 using Lazy.Manage;
 using Lazy.Platform;
@@ -42,6 +43,7 @@ namespace Lazy
             App.Download = ManagerCenter.Create(() => DownloadManager.Instance);
             App.Timer = ManagerCenter.Create(() => TimerManager.Instance);
             App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
+            App.Audio = ManagerCenter.CreateMono(() => AudioManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 #endif

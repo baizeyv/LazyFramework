@@ -10,18 +10,27 @@ namespace Lazy.Debugger.Tool
     {
         public Color customColor = Color.blue;
 
-        static Vector3[] fourCorners = new Vector3[4];
+        private static Vector3[] fourCorners = new Vector3[4];
 
         private void OnDrawGizmos()
         {
+#if UNITY_6000_0_OR_NEWER
+            foreach (
+                var g in FindObjectsByType<MaskableGraphic>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None
+                )
+            )
+#else
             foreach (MaskableGraphic g in FindObjectsOfType<MaskableGraphic>())
+#endif
             {
                 if (!g.raycastTarget)
                     continue;
-                RectTransform rectTransform = g.transform as RectTransform;
+                var rectTransform = g.transform as RectTransform;
                 rectTransform.GetWorldCorners(fourCorners);
                 Gizmos.color = customColor;
-                for (int i = 0; i < 4; i++)
+                for (var i = 0; i < 4; i++)
                     Gizmos.DrawLine(fourCorners[i], fourCorners[(i + 1) % 4]);
             }
         }

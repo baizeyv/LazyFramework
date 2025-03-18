@@ -149,7 +149,7 @@ namespace Lazy.Excel
                     var fieldValue = CellToFieldObject(cell, entityField);
                     entityField.SetValue(entity, fieldValue);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw new Exception(
                         $"Invalid excel cell type at row {row.RowNum}, column {cell.ColumnIndex}, {sheetName} sheet."

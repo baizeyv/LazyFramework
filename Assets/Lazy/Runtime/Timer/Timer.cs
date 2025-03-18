@@ -68,8 +68,8 @@ namespace Lazy.Timer
             _step = step;
             _delay = delay;
             Count = count;
-            onProcess = onProcess;
-            onCompleted = onCompleted;
+            OnProcess = onProcess;
+            OnCompleted = onCompleted;
             IsFrameTimer = isFrameTimer;
             if (_delay <= 0)
                 _isDelayCompleted = true;

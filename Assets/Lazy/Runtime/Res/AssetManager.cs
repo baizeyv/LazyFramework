@@ -44,7 +44,9 @@ namespace Lazy.Res
                         false
                     );
 #endif
+#pragma warning disable CS0162
                 return false;
+#pragma warning restore CS0162
             }
             set { _isEditorMode = value; }
         }
