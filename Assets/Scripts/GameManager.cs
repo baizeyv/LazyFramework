@@ -26,6 +26,13 @@ namespace DefaultNamespace
         private void OnStart()
         {
             Log.MsgD("START APP GAME !");
+            App.Timer.SubscribeClock(
+                9,
+                _ =>
+                {
+                    Log.MsgI("A Time: 9");
+                }
+            );
             // App.Asset.LoadAsync<DOTweenSettings>(
             //     "DOTweenSettings",
             //     x =>
@@ -74,16 +81,16 @@ namespace DefaultNamespace
 
         private void Update()
         {
-            var ts = App.Timer.GetServerTime(out var utc, out var local);
-            App.Timer.GetLocalTime(out var utcLocal, out var localLocal);
-            if (ts)
-            {
-                Log.VarD(this, nameof(utc), utc);
-                Log.VarD(this, nameof(local), local);
-            }
-
-            Log.VarD(this, nameof(utcLocal), utcLocal);
-            Log.VarD(this, nameof(localLocal), localLocal);
+            // var ts = App.Timer.GetServerTime(out var utc, out var local);
+            // App.Timer.GetLocalTime(out var utcLocal, out var localLocal);
+            // if (ts)
+            // {
+            //     Log.VarD(this, nameof(utc), utc);
+            //     Log.VarD(this, nameof(local), local);
+            // }
+            //
+            // Log.VarD(this, nameof(utcLocal), utcLocal);
+            // Log.VarD(this, nameof(localLocal), localLocal);
         }
     }
 }

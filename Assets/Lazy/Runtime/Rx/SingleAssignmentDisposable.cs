@@ -5,7 +5,7 @@ namespace Lazy.Rx
 {
     public struct SingleAssignmentDisposable
     {
-        IDisposable current;
+        private IDisposable current;
 
         public bool IsDisposed => Volatile.Read(ref current) == DisposedSentinel.Instance;
 
@@ -15,9 +15,7 @@ namespace Lazy.Rx
             {
                 var field = Volatile.Read(ref current);
                 if (field == DisposedSentinel.Instance)
-                {
                     return Rx.Disposable.Empty;
-                }
 
                 return field;
             }
@@ -26,9 +24,7 @@ namespace Lazy.Rx
                 // 如果 location1 的值等于 comparand，则将 location1 设置为 value。 返回旧值
                 var field = Interlocked.CompareExchange(ref current, value, null);
                 if (field == null)
-                {
                     return;
-                }
 
                 if (field == DisposedSentinel.Instance)
                 {
@@ -40,7 +36,7 @@ namespace Lazy.Rx
             }
         }
 
-        static void ThrowAlreadyAssignment()
+        private static void ThrowAlreadyAssignment()
         {
             throw new InvalidOperationException("Disposable is already assigned.");
         }
@@ -49,22 +45,16 @@ namespace Lazy.Rx
         {
             var field = Interlocked.Exchange(ref current, DisposedSentinel.Instance);
             if (field != DisposedSentinel.Instance)
-            {
                 field?.Dispose();
-            }
         }
     }
 
-    sealed class DisposedSentinel : IDisposable
+    internal sealed class DisposedSentinel : IDisposable
     {
         public static readonly DisposedSentinel Instance = new();
 
-        DisposedSentinel()
-        {
-        }
+        private DisposedSentinel() { }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }

@@ -55,7 +55,7 @@ namespace Lazy.Editor.CrackEditor
             _dimension = EditorGUILayout.IntField(_dimension);
             GUILayout.EndHorizontal();
             if (!string.IsNullOrEmpty(_result))
-                GUILayout.Label($"Length: {_totalLen}", EditorStyles.boldLabel);
+                GUILayout.Label($" Length: {_totalLen}", EditorStyles.boldLabel);
 
             if (_dimension < 1)
                 _dimension = 1;

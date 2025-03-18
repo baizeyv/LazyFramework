@@ -30,13 +30,25 @@ namespace Lazy.Event
             if (_events.TryGetValue(intEvent, out var evt))
             {
                 var simpleEvent = evt as SimpleEvent;
-                return simpleEvent?.Subscribe(observer);
+                return simpleEvent?.Subscribe(
+                    new AnonymousObserver<Unit>(
+                        observer.OnNext,
+                        observer.OnError,
+                        observer.OnCompleted
+                    )
+                );
             }
             else
             {
                 var simpleEvent = new SimpleEvent();
                 _events.Add(intEvent, simpleEvent);
-                return simpleEvent.Subscribe(observer);
+                return simpleEvent.Subscribe(
+                    new AnonymousObserver<Unit>(
+                        observer.OnNext,
+                        observer.OnError,
+                        observer.OnCompleted
+                    )
+                );
             }
         }
 

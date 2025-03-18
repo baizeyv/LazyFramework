@@ -16,24 +16,9 @@ namespace Lazy.Timer
     public class TimerManager : Singleton.Singleton<TimerManager>, IManager
     {
         /// <summary>
-        /// * 服务器UTC时间的 '整点' 订阅事件 (1点 3点 5点 ......)
+        /// * 时间类型
         /// </summary>
-        private IntEvent _utcServerEvent = new();
-
-        /// <summary>
-        /// * 本地UTC时间的 整点 订阅事件
-        /// </summary>
-        private IntEvent _utcLocalEvent = new();
-
-        /// <summary>
-        /// * 服务器当前时区的整点订阅事件
-        /// </summary>
-        private IntEvent _localServerEvent = new();
-
-        /// <summary>
-        /// * 本地当前时区的整点订阅事件
-        /// </summary>
-        private IntEvent _localLocalEvent = new();
+        public TimeType TimeType { get; set; } = TimeType.ServerUtcTime;
 
         public TimeRequestStatus RequestStatus { get; private set; }
 
@@ -64,12 +49,17 @@ namespace Lazy.Timer
         /// </summary>
         private float _beginWhenGetLocal;
 
+        /// <summary>
+        /// * 指定时间的 '整点' 订阅事件 (1点 3点 5点 ......)
+        /// </summary>
+        private IntEvent _clockEvent = new();
+
         private List<Timer> _timers = new();
 
         /// <summary>
-        /// * 上一帧的时间 TODO:
+        /// * 上一帧的时间 (小时)
         /// </summary>
-        private DateTimeOffset _lastFrameDateTime;
+        private int _lastClock = -1;
 
         private TimerManager() { }
 
@@ -82,36 +72,38 @@ namespace Lazy.Timer
         #region API
 
         /// <summary>
-        /// * 时钟订阅事件 (默认localLocal 本地当前时区的时间)
+        /// * 时钟订阅事件
         /// </summary>
         /// <param name="clock"></param>
         /// <param name="callback"></param>
-        /// <param name="utc"></param>
-        /// <param name="server"></param>
-        public void SubscribeClock(
-            int clock,
-            Observer<Unit> callback,
-            bool utc = false,
-            bool server = false
-        )
+        public void SubscribeClock(int clock, Action<Unit> callback)
         {
-            if (utc)
+            _clockEvent.Subscribe(clock, callback);
+        }
+
+        /// <summary>
+        /// * 根据当前时间管理器的时间类型获取时间
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public bool TryGetTime(out DateTimeOffset time)
+        {
+            switch (TimeType)
             {
-                if (server)
-                    // # utcServer
-                    _utcServerEvent.Subscribe(clock, callback);
-                else
-                    // # utcLocal
-                    _utcLocalEvent.Subscribe(clock, callback);
-            }
-            else
-            {
-                if (server)
-                    // # localServer
-                    _localServerEvent.Subscribe(clock, callback);
-                else
-                    // # localLocal
-                    _localLocalEvent.Subscribe(clock, callback);
+                case TimeType.ServerUtcTime:
+                    return GetServerTime(out time, out _);
+                case TimeType.ServerLocalTime:
+                    return GetServerTime(out _, out time);
+                case TimeType.LocalUtcTime:
+                    GetLocalTime(out time, out _);
+                    return true;
+                case TimeType.LocalLocalTime:
+                    GetLocalTime(out _, out time);
+                    return true;
+                default:
+                    Log.Log.MsgE($"TimeType: {TimeType} ERROR !");
+                    time = DateTimeOffset.MinValue;
+                    return true;
             }
         }
 
@@ -147,8 +139,8 @@ namespace Lazy.Timer
         {
             if (!_isSetServerTime)
             {
-                utc = DateTime.MinValue;
-                local = DateTime.MinValue;
+                utc = DateTimeOffset.MinValue;
+                local = DateTimeOffset.MinValue;
                 return false;
             }
 
@@ -177,7 +169,7 @@ namespace Lazy.Timer
             Action onCompleted = null
         )
         {
-            var timer = new Timer(step, delay, count, onProcess, onCompleted, false);
+            var timer = new Timer(step, delay, count, onProcess, onCompleted);
             _timers.Add(timer);
             return timer.ID;
         }
@@ -339,16 +331,28 @@ namespace Lazy.Timer
         /// * 整点切换的时候会触发事件,例如 6.59->7.00,触发7事件
         /// ! 可触发 0-23 共24个事件
         /// </summary>
-        private void OnClockUpdate()
+        private void OnClockEventUpdate()
         {
-            // TODO:
+            if (!TryGetTime(out var time))
+                return;
+            if (_lastClock < 0)
+            {
+                _lastClock = time.Hour;
+                return;
+            }
+
+            if (!_clockEvent.HasSubscriptions)
+                return;
+
+            if (time.Hour != _lastClock)
+                _clockEvent.Fire(time.Hour);
         }
 
         #endregion
 
         public void OnUpdate()
         {
-            OnClockUpdate();
+            OnClockEventUpdate();
 
             if (_timers.Count <= 0)
                 return;
@@ -393,10 +397,7 @@ namespace Lazy.Timer
         public void OnDestroy()
         {
             _timers.Clear();
-            _utcServerEvent.Dispose();
-            _utcLocalEvent.Dispose();
-            _localLocalEvent.Dispose();
-            _localServerEvent.Dispose();
+            _clockEvent.Dispose();
         }
     }
 }

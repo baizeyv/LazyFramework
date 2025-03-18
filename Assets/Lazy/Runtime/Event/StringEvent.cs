@@ -30,13 +30,25 @@ namespace Lazy.Event
             if (_events.TryGetValue(stringEvent, out var evt))
             {
                 var simpleEvent = evt as SimpleEvent;
-                return simpleEvent?.Subscribe(observer);
+                return simpleEvent?.Subscribe(
+                    new AnonymousObserver<Unit>(
+                        observer.OnNext,
+                        observer.OnError,
+                        observer.OnCompleted
+                    )
+                );
             }
             else
             {
                 var simpleEvent = new SimpleEvent();
                 _events.Add(stringEvent, simpleEvent);
-                return simpleEvent.Subscribe(observer);
+                return simpleEvent.Subscribe(
+                    new AnonymousObserver<Unit>(
+                        observer.OnNext,
+                        observer.OnError,
+                        observer.OnCompleted
+                    )
+                );
             }
         }
 
@@ -91,9 +103,7 @@ namespace Lazy.Event
             lock (_gate)
             {
                 foreach (var keyValuePair in _events)
-                {
                     keyValuePair.Value?.Dispose();
-                }
 
                 _events.Clear();
             }
