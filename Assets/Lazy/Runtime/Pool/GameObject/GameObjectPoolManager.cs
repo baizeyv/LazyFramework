@@ -1144,6 +1144,8 @@ namespace Lazy.Pool.GameObject
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy() { }
+        public void OnDestroyRelease() { }
+
+        public void OnGui() { }
     }
 }

@@ -114,6 +114,12 @@ namespace Lazy.Log
                 logger.Var(content[i].ToString(), content[i + 1]).Do();
         }
 
+        public static void SepD(Object context = null)
+        {
+            var logger = D(context);
+            logger.Sep().Do();
+        }
+
         internal class LoggerType : IPoolable
         {
             internal OutputType _outputType;
@@ -223,7 +229,7 @@ namespace Lazy.Log
             {
                 _sb.AppendLine();
                 _sb.AppendLine(
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(Teal)}>----------------------------------------------</color>"
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(Teal)}>------------------------------------------------------------</color>"
                 );
                 return this;
             }

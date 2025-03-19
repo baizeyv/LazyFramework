@@ -39,6 +39,9 @@ namespace Lazy
         {
             ManagerCenter.Setup(this);
 
+#if DEBUG
+            App.Debugger = ManagerCenter.CreateMono(() => Debugger.Debugger.Instance);
+#endif
             App.Storage = ManagerCenter.Create(() => StorageManager.Instance);
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
             App.Asset = ManagerCenter.Create(() => AssetManager.Instance);
@@ -71,6 +74,11 @@ namespace Lazy
         private void FixedUpdate()
         {
             ManagerCenter.FixedUpdate();
+        }
+
+        private void OnGUI()
+        {
+            ManagerCenter.GUI();
         }
 
         private void OnDestroy()

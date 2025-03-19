@@ -90,5 +90,18 @@ namespace Lazy
             get { return _storageManager ??= ManagerCenter.Create(() => StorageManager.Instance); }
             set => _storageManager ??= value;
         }
+
+        private static Debugger.Debugger _debugger;
+
+        public static Debugger.Debugger Debugger
+        {
+            get
+            {
+                return _debugger ??= ManagerCenter.CreateMono(
+                    () => Lazy.Debugger.Debugger.Instance
+                );
+            }
+            set => _debugger ??= value;
+        }
     }
 }

@@ -72,17 +72,21 @@ namespace Lazy.Audio
             AddChannel(AudioConstant.VoiceSfx, "%Voice%SFX");
 
             // # 初始化一次性特效
-            _audioEffect3D = new AudioEffect();
+            _audioEffect3D = new AudioEffect(transform);
             _volumeAudioEffect = StorageManager.Instance.GetFloat(EffectVolumeKey, 1f);
             _switcherAudioEffect = StorageManager.Instance.Get(EffectSwitcherKey, true);
+            Dictionary<string, bool> tmpChannelSwitchers = new();
             // # 从本地读取音量以及开关值,例如使用 PlayersPref
-            foreach (var item in _channelSwitchers.Keys)
+            foreach (var cs in _channelSwitchers)
             {
+                var item = cs.Key;
                 var val = StorageManager.Instance.Get<bool>(item + SwitcherKey);
-                _channelSwitchers[item] = val;
+                tmpChannelSwitchers.Add(item, val);
                 var vol = StorageManager.Instance.GetFloat(item + VolumeKey);
                 _channelVolumes[item] = vol;
             }
+
+            _channelSwitchers = tmpChannelSwitchers;
         }
 
         /// <summary>
@@ -338,10 +342,12 @@ namespace Lazy.Audio
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy()
+        public void OnDestroyRelease()
         {
             StopAll();
             Destroy(gameObject);
         }
+
+        public void OnGui() { }
     }
 }

@@ -10,4 +10,7 @@ namespace Lazy.Manage
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class ManagerFixedUpdateAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class ManagerGUIAttribute : Attribute { }
 }

@@ -669,9 +669,11 @@ namespace Lazy.Res.Manager
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy()
+        public void OnDestroyRelease()
         {
             Clear();
         }
+
+        public void OnGui() { }
     }
 }

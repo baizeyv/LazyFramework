@@ -37,6 +37,11 @@ namespace Lazy.Manage
         private static readonly List<ManagerWrapper> FixedUpdateManagers = new(100);
 
         /// <summary>
+        /// * 使用OnGUI()的管理器列表
+        /// </summary>
+        private static readonly List<ManagerWrapper> GuiManagers = new(100);
+
+        /// <summary>
         /// * 控制翻转容器
         /// </summary>
         private static IOCContainer _ioc = new();
@@ -235,6 +240,19 @@ namespace Lazy.Manage
                 );
             }
 
+            if (typeof(T).GetCustomAttributes(typeof(ManagerGUIAttribute), false).Length > 0)
+            {
+                GuiManagers.Add(wrapper);
+                GuiManagers.Sort(
+                    (left, right) =>
+                    {
+                        if (left.priority < right.priority)
+                            return -1;
+                        return left.priority > right.priority ? 1 : 0;
+                    }
+                );
+            }
+
             return mgr;
         }
 
@@ -246,7 +264,7 @@ namespace Lazy.Manage
             foreach (var wrapper in AllManagers.Where(item => item.manager.GetType() == type))
             {
                 wrapper.readyToBeRemoved = true;
-                wrapper.manager.OnDestroy();
+                wrapper.manager.OnDestroyRelease();
                 flag = true;
             }
 
@@ -263,7 +281,7 @@ namespace Lazy.Manage
             foreach (var wrapper in AllManagers.Where(item => item.manager.GetType() == type))
             {
                 wrapper.readyToBeRemoved = true;
-                wrapper.manager.OnDestroy();
+                wrapper.manager.OnDestroyRelease();
                 flag = true;
             }
 
@@ -275,7 +293,7 @@ namespace Lazy.Manage
         public static void Destroy()
         {
             for (var i = AllManagers.Count - 1; i >= 0; i--)
-                AllManagers[i].manager.OnDestroy();
+                AllManagers[i].manager.OnDestroyRelease();
             AllManagers.Clear();
             UpdateManagers.Clear();
             LateUpdateManagers.Clear();
@@ -328,7 +346,7 @@ namespace Lazy.Manage
                     continue;
                 }
 
-                LateUpdateManagers[i].manager.OnUpdate();
+                LateUpdateManagers[i].manager.OnLateUpdate();
             }
         }
 
@@ -346,7 +364,22 @@ namespace Lazy.Manage
                     continue;
                 }
 
-                FixedUpdateManagers[i].manager.OnUpdate();
+                FixedUpdateManagers[i].manager.OnFixedUpdate();
+            }
+        }
+
+        public static void GUI()
+        {
+            for (var i = 0; i < GuiManagers.Count; i++)
+            {
+                if (GuiManagers[i]?.manager == null || GuiManagers[i].readyToBeRemoved)
+                {
+                    GuiManagers.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+
+                GuiManagers[i].manager.OnGui();
             }
         }
 

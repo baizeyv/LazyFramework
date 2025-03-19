@@ -178,10 +178,14 @@ namespace Lazy.Download
         {
         }
 
-        public void OnDestroy()
+        public void OnDestroyRelease()
         {
             foreach (var item in _downloaders.Values)
                 item.CancelDownload();
+        }
+
+        public void OnGui()
+        {
         }
     }
 }

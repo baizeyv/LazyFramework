@@ -52,6 +52,8 @@ namespace Lazy.Pool
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy() { }
+        public void OnDestroyRelease() { }
+
+        public void OnGui() { }
     }
 }

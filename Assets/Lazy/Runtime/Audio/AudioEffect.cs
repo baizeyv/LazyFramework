@@ -39,10 +39,10 @@ namespace Lazy.Audio
 
         private const float MaxPitch = 1.2f;
 
-        public AudioEffect()
+        public AudioEffect(Transform parent)
         {
             _oneShotAudio = new GameObject("AudioEffect3D", typeof(AudioSource));
-            Object.DontDestroyOnLoad(_oneShotAudio);
+            _oneShotAudio.transform.SetParent(parent);
         }
 
         /// <summary>

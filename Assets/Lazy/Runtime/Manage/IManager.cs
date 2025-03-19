@@ -10,6 +10,8 @@ namespace Lazy.Manage
 
         void OnLateUpdate();
 
-        void OnDestroy();
+        void OnDestroyRelease();
+
+        void OnGui();
     }
 }

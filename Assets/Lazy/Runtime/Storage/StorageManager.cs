@@ -178,6 +178,8 @@ namespace Lazy.Serializer
             }
         }
 
-        public void OnDestroy() { }
+        public void OnDestroyRelease() { }
+
+        public void OnGui() { }
     }
 }

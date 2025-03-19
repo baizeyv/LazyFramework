@@ -1402,7 +1402,9 @@ namespace Lazy.Res
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy() { }
+        public void OnDestroyRelease() { }
+
+        public void OnGui() { }
 
 #if UNITY_EDITOR
         private List<string> _searchDirs = new();

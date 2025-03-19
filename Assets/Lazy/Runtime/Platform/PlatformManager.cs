@@ -41,6 +41,8 @@ namespace Lazy.Platform
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy() { }
+        public void OnDestroyRelease() { }
+
+        public void OnGui() { }
     }
 }

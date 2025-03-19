@@ -171,13 +171,15 @@ namespace Lazy.Pool.GameObject
                 HandleDespawnRequests(Time.deltaTime);
         }
 
-        public void OnDestroy()
+        public void OnDestroyRelease()
         {
             GameObjectPoolManager.Instance.ResetPool();
             if (clearEventsOnDestroy || GameObjectPoolManager.Instance.isApplicationQuitting)
                 GameObjectPoolManager.Instance.GameObjectInstantiated.Dispose();
             Destroy(gameObject);
         }
+
+        public void OnGui() { }
 
 #if UNITY_EDITOR
         private void OnValidate()

@@ -394,10 +394,12 @@ namespace Lazy.Timer
 
         public void OnLateUpdate() { }
 
-        public void OnDestroy()
+        public void OnDestroyRelease()
         {
             _timers.Clear();
             _clockEvent.Dispose();
         }
+
+        public void OnGui() { }
     }
 }

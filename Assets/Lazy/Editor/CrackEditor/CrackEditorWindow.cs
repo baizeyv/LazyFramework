@@ -79,7 +79,7 @@ namespace Lazy.Editor.CrackEditor
                             out _totalLen
                         );
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         EditorUtility.DisplayDialog("Error", "ValueType Error", "OK");
                     }
