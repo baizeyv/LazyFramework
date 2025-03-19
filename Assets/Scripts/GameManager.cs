@@ -5,6 +5,7 @@ using System.Net.Http;
 using DG.Tweening.Core;
 using Lazy;
 using Lazy.Log;
+using Lazy.Serializer;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +26,7 @@ namespace DefaultNamespace
 
         private void OnStart()
         {
+            StorageManager.Instance.Set("test", 5);
             Log.MsgD("START APP GAME !");
             App.Timer.SubscribeClock(
                 9,

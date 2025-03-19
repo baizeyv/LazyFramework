@@ -4,6 +4,7 @@ using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
 using Lazy.Res;
+using Lazy.Serializer;
 using Lazy.Timer;
 
 namespace Lazy
@@ -80,6 +81,14 @@ namespace Lazy
         {
             get { return _audioManager ??= ManagerCenter.CreateMono(() => AudioManager.Instance); }
             set => _audioManager ??= value;
+        }
+
+        private static StorageManager _storageManager;
+
+        public static StorageManager Storage
+        {
+            get { return _storageManager ??= ManagerCenter.Create(() => StorageManager.Instance); }
+            set => _storageManager ??= value;
         }
     }
 }

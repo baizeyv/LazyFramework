@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lazy.Manage;
+using Lazy.Serializer;
 using Lazy.Singleton;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -30,7 +31,7 @@ namespace Lazy.Audio
         /// <summary>
         /// * 每个通道对应的开关
         /// </summary>
-        private Dictionary<string, bool> _switcherChannels = new();
+        private Dictionary<string, bool> _channelSwitchers = new();
 
         /// <summary>
         /// * 一次性特效音效
@@ -54,6 +55,11 @@ namespace Lazy.Audio
 
         private AudioMixer _audioMixer;
 
+        private const string VolumeKey = "Volume";
+        private const string SwitcherKey = "Switcher";
+        private const string EffectVolumeKey = "EffectVolume";
+        private const string EffectSwitcherKey = "EffectSwitcher";
+
         private AudioManager() { }
 
         public override void OnSingletonInitialize()
@@ -67,9 +73,16 @@ namespace Lazy.Audio
 
             // # 初始化一次性特效
             _audioEffect3D = new AudioEffect();
-            _volumeAudioEffect = 1f;
-            _switcherAudioEffect = true;
-            // TODO: 从本地读取音量以及开关值,例如使用 PlayersPref
+            _volumeAudioEffect = StorageManager.Instance.GetFloat(EffectVolumeKey, 1f);
+            _switcherAudioEffect = StorageManager.Instance.Get(EffectSwitcherKey, true);
+            // # 从本地读取音量以及开关值,例如使用 PlayersPref
+            foreach (var item in _channelSwitchers.Keys)
+            {
+                var val = StorageManager.Instance.Get<bool>(item + SwitcherKey);
+                _channelSwitchers[item] = val;
+                var vol = StorageManager.Instance.GetFloat(item + VolumeKey);
+                _channelVolumes[item] = vol;
+            }
         }
 
         /// <summary>
@@ -99,7 +112,7 @@ namespace Lazy.Audio
                 ];
             _channels.Add(channelName, tmpSfx);
             _channelVolumes.Add(channelName, 1f);
-            _switcherChannels.Add(channelName, true);
+            _channelSwitchers.Add(channelName, true);
         }
 
         /// <summary>
@@ -151,7 +164,7 @@ namespace Lazy.Audio
                 return;
             if (!_channels.TryGetValue(channel, out var sfx))
                 return;
-            if (!_switcherChannels[channel])
+            if (!_channelSwitchers[channel])
                 return;
             if (priority < sfx.Priority)
                 return;
@@ -217,7 +230,8 @@ namespace Lazy.Audio
                 return;
             if (_channelVolumes.TryGetValue(channelName, out _))
                 _channelVolumes[channelName] = volume;
-            // TODO: PlayersPref 保存
+            // # PlayersPref 保存
+            StorageManager.Instance.SetFloat(channelName + VolumeKey, volume);
         }
 
         public void SetAllVolume(float volume)
@@ -225,6 +239,7 @@ namespace Lazy.Audio
             foreach (var nm in _channels.Keys)
                 SetVolume(nm, volume);
             _volumeAudioEffect = volume;
+            StorageManager.Instance.SetFloat(EffectVolumeKey, volume);
         }
 
         /// <summary>
@@ -236,7 +251,7 @@ namespace Lazy.Audio
         {
             if (string.IsNullOrEmpty(channelName))
                 return true;
-            return _switcherChannels.GetValueOrDefault(channelName, true);
+            return _channelSwitchers.GetValueOrDefault(channelName, true);
         }
 
         /// <summary>
@@ -250,10 +265,12 @@ namespace Lazy.Audio
                 return;
             if (_channelVolumes.TryGetValue(channelName, out _))
             {
-                _switcherChannels[channelName] = switcher;
+                _channelSwitchers[channelName] = switcher;
                 _channels[channelName].Source.Stop();
             }
-            // TODO: PlayersPref 保存
+
+            // # PlayersPref 保存
+            StorageManager.Instance.Set(channelName + SwitcherKey, switcher);
         }
 
         public void SetAllSwitcher(bool switcher)
@@ -262,6 +279,7 @@ namespace Lazy.Audio
                 SetSwitcher(nm, switcher);
 
             _switcherAudioEffect = switcher;
+            StorageManager.Instance.Set(EffectSwitcherKey, switcher);
         }
 
         /// <summary>

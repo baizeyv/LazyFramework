@@ -6,6 +6,7 @@ using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
 using Lazy.Res;
+using Lazy.Serializer;
 using Lazy.Singleton;
 using Lazy.Timer;
 
@@ -38,6 +39,7 @@ namespace Lazy
         {
             ManagerCenter.Setup(this);
 
+            App.Storage = ManagerCenter.Create(() => StorageManager.Instance);
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
             App.Asset = ManagerCenter.Create(() => AssetManager.Instance);
             App.Download = ManagerCenter.Create(() => DownloadManager.Instance);

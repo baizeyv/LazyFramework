@@ -56,9 +56,7 @@ namespace Lazy.FSM
         public SimpleState DefineState(TState stateKey)
         {
             if (_states.TryGetValue(stateKey, out var val))
-            {
                 return val as SimpleState;
-            }
 
             var simpleState = new SimpleState();
             _states.Add(stateKey, simpleState);
@@ -98,7 +96,6 @@ namespace Lazy.FSM
                 return;
 
             if (_states.TryGetValue(stateKey, out var state))
-            {
                 if (_currentState != null && state.Condition())
                 {
                     // # 退出当前状态
@@ -112,7 +109,6 @@ namespace Lazy.FSM
                     SecondsOfCurrentState = 0.0f;
                     _currentState.Enter();
                 }
-            }
         }
 
         public void AddStateToggleEvent(Action<TState, TState> action)
