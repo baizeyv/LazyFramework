@@ -6,7 +6,7 @@ namespace Lazy.Event
 {
     public class IntEvent : IDisposable
     {
-        private Dictionary<int, ISimpleEvent> _events = new();
+        private readonly Dictionary<int, ISimpleEvent> _events = new();
 
         private readonly object _gate = new();
 
@@ -77,13 +77,25 @@ namespace Lazy.Event
             if (_events.TryGetValue(intEvent, out var evt))
             {
                 var simpleEvent = evt as SimpleEvent<T>;
-                return simpleEvent?.Subscribe(observer);
+                return simpleEvent?.Subscribe(
+                    new AnonymousObserver<T>(
+                        observer.OnNext,
+                        observer.OnError,
+                        observer.OnCompleted
+                    )
+                );
             }
             else
             {
                 var simpleEvent = new SimpleEvent<T>();
                 _events.Add(intEvent, simpleEvent);
-                return simpleEvent.Subscribe(observer);
+                return simpleEvent?.Subscribe(
+                    new AnonymousObserver<T>(
+                        observer.OnNext,
+                        observer.OnError,
+                        observer.OnCompleted
+                    )
+                );
             }
         }
 

@@ -80,51 +80,10 @@ namespace Lazy.Editor.ExcelImporter
             return sheetNames;
         }
 
-        /// <summary>
-        /// * 获取脚本代码模板
-        /// </summary>
-        /// <returns></returns>
-        private static string GetScriptTemplateString()
-        {
-            // # 当前目录
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var filePath = Directory.GetFiles(
-                currentDirectory,
-                ScriptTemplateName,
-                SearchOption.AllDirectories
-            );
-            if (filePath.Length == 0)
-                throw new FileNotFoundException("Script template not found.");
-
-            var templateString = File.ReadAllText(filePath[0]);
-            return templateString;
-        }
-
-        /// <summary>
-        /// * 获取字段代码模板
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="FileNotFoundException"></exception>
-        private static string GetFieldTemplateString()
-        {
-            // # 当前目录
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var filePath = Directory.GetFiles(
-                currentDirectory,
-                FieldTemplateName,
-                SearchOption.AllDirectories
-            );
-            if (filePath.Length == 0)
-                throw new FileNotFoundException("Field template not found.");
-
-            var templateString = File.ReadAllText(filePath[0]);
-            return templateString;
-        }
-
         private static string BuildScriptString(string excelName, List<string> sheetNames)
         {
-            var scriptString = GetScriptTemplateString();
-            var fieldStringTemplate = GetFieldTemplateString();
+            var scriptString = TemplateUtility.GetScriptTemplateString(ScriptTemplateName);
+            var fieldStringTemplate = TemplateUtility.GetScriptTemplateString(FieldTemplateName);
 
             scriptString = scriptString.Replace("#ASSETSCRIPTNAME#", excelName);
 

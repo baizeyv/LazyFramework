@@ -496,7 +496,9 @@ namespace Lazy.Res.Loader
             _resourcePath = "";
             _subAssetName = "";
             if (ResourceObject != null)
-                Resources.UnloadAsset(ResourceObject);
+                if (ResourceObject is not GameObject)
+                    Resources.UnloadAsset(ResourceObject);
+
             foreach (var item in _resourceObjects.Values)
                 if (item != null)
                     Resources.UnloadAsset(item);

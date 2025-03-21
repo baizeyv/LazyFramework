@@ -9,6 +9,7 @@ using Lazy.Res;
 using Lazy.Serializer;
 using Lazy.Singleton;
 using Lazy.Timer;
+using Lazy.UI;
 
 namespace Lazy
 {
@@ -49,6 +50,7 @@ namespace Lazy
             App.Timer = ManagerCenter.Create(() => TimerManager.Instance);
             App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
             App.Audio = ManagerCenter.CreateMono(() => AudioManager.Instance);
+            App.UI = ManagerCenter.CreateMono(() => UIManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 #endif

@@ -10,37 +10,37 @@ namespace Lazy.Utility
     {
         [HideInInspector]
         [SerializeField]
-        SequenceAnimation[] m_Sequence;
+        private SequenceAnimation[] m_Sequence;
 
         [SerializeField]
-        bool m_PlayOnAwake = false;
+        private bool m_PlayOnAwake = false;
 
         [SerializeField]
-        float m_Delay = 0;
+        private float m_Delay = 0;
 
         [SerializeField]
-        DG.Tweening.Ease m_Ease = DG.Tweening.Ease.OutQuad;
+        private DG.Tweening.Ease m_Ease = DG.Tweening.Ease.OutQuad;
 
         [SerializeField]
-        int m_Loops = 1;
+        private int m_Loops = 1;
 
         [SerializeField]
-        LoopType m_LoopType = LoopType.Restart;
+        private LoopType m_LoopType = LoopType.Restart;
 
         [SerializeField]
-        UpdateType m_UpdateType = UpdateType.Normal;
+        private UpdateType m_UpdateType = UpdateType.Normal;
 
         [SerializeField]
-        bool m_IgnoreTimeScale = false;
+        private bool m_IgnoreTimeScale = false;
 
         [SerializeField]
-        UnityEvent m_OnPlay = null;
+        private UnityEvent m_OnPlay = null;
 
         [SerializeField]
-        UnityEvent m_OnUpdate = null;
+        private UnityEvent m_OnUpdate = null;
 
         [SerializeField]
-        UnityEvent m_OnComplete = null;
+        private UnityEvent m_OnComplete = null;
 
         private Tween m_Tween;
 
@@ -49,6 +49,11 @@ namespace Lazy.Utility
             InitTween();
             if (m_PlayOnAwake)
                 DOPlay();
+        }
+
+        public void SetNoPlayOnAwake()
+        {
+            m_PlayOnAwake = false;
         }
 
         private void InitTween()
@@ -129,22 +134,22 @@ namespace Lazy.Utility
                     }
                     case DOTweenType.DOColor:
                     {
-                        (targetCom as UnityEngine.UI.Graphic).color = resetValue;
+                        (targetCom as Graphic).color = resetValue;
                         break;
                     }
                     case DOTweenType.DOFade:
                     {
-                        (targetCom as UnityEngine.UI.Graphic).SetColorAlpha(resetValue.x);
+                        (targetCom as Graphic).SetColorAlpha(resetValue.x);
                         break;
                     }
                     case DOTweenType.DOCanvasGroupFade:
                     {
-                        (targetCom as UnityEngine.CanvasGroup).alpha = resetValue.x;
+                        (targetCom as CanvasGroup).alpha = resetValue.x;
                         break;
                     }
                     case DOTweenType.DOValue:
                     {
-                        (targetCom as UnityEngine.UI.Slider).value = resetValue.x;
+                        (targetCom as Slider).value = resetValue.x;
                         break;
                     }
                     case DOTweenType.DOSizeDelta:
@@ -154,7 +159,7 @@ namespace Lazy.Utility
                     }
                     case DOTweenType.DOFillAmount:
                     {
-                        (targetCom as UnityEngine.UI.Image).fillAmount = resetValue.x;
+                        (targetCom as Image).fillAmount = resetValue.x;
                         break;
                     }
                     case DOTweenType.DOFlexibleSize:
@@ -209,13 +214,10 @@ namespace Lazy.Utility
         private Tween CreateTween(bool reverse = false)
         {
             if (m_Sequence == null || m_Sequence.Length == 0)
-            {
                 return null;
-            }
             var sequence = DOTween.Sequence();
             if (reverse)
-            {
-                for (int i = m_Sequence.Length - 1; i >= 0; i--)
+                for (var i = m_Sequence.Length - 1; i >= 0; i--)
                 {
                     var item = m_Sequence[i];
                     var tweener = item.CreateTween(reverse);
@@ -229,6 +231,7 @@ namespace Lazy.Utility
                         );
                         continue;
                     }
+
                     switch (item.AddType)
                     {
                         case AddType.Append:
@@ -239,10 +242,8 @@ namespace Lazy.Utility
                             break;
                     }
                 }
-            }
             else
-            {
-                for (int i = 0; i < m_Sequence.Length; i++)
+                for (var i = 0; i < m_Sequence.Length; i++)
                 {
                     var item = m_Sequence[i];
                     var tweener = item.CreateTween(reverse);
@@ -256,6 +257,7 @@ namespace Lazy.Utility
                         );
                         continue;
                     }
+
                     switch (item.AddType)
                     {
                         case AddType.Append:
@@ -266,7 +268,7 @@ namespace Lazy.Utility
                             break;
                     }
                 }
-            }
+
             sequence
                 .SetEase(m_Ease)
                 .SetUpdate(m_UpdateType, m_IgnoreTimeScale)
@@ -425,9 +427,7 @@ namespace Lazy.Utility
                                 : ToValue;
                             Vector3 startValue = UseFromValue ? FromValue : transform.position;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
 
                             transform.position = startValue;
                             if (SpeedBased)
@@ -444,13 +444,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : transform.position.x;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.SetPositionX(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = transform.DOMoveX(targetValue, duration, Snapping);
                         }
                         break;
@@ -462,13 +459,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : transform.position.y;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.SetPositionY(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = transform.DOMoveY(targetValue, duration, Snapping);
                         }
                         break;
@@ -480,13 +474,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : transform.position.z;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.SetPositionZ(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = transform.DOMoveZ(targetValue, duration, Snapping);
                         }
                         break;
@@ -500,14 +491,11 @@ namespace Lazy.Utility
                                 ? (Vector3)FromValue
                                 : transform.localPosition;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.localPosition = startValue;
                             if (SpeedBased)
                                 duration =
-                                    Vector3.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector3.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = transform.DOLocalMove(targetValue, duration, Snapping);
                         }
                         break;
@@ -519,13 +507,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : transform.localPosition.x;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.SetLocalPositionX(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = transform.DOLocalMoveX(targetValue, duration, Snapping);
                         }
                         break;
@@ -537,13 +522,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : transform.localPosition.y;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.SetLocalPositionY(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = transform.DOLocalMoveY(targetValue, duration, Snapping);
                         }
                         break;
@@ -555,13 +537,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : transform.localPosition.z;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.SetLocalPositionZ(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = transform.DOLocalMoveZ(targetValue, duration, Snapping);
                         }
                         break;
@@ -573,14 +552,11 @@ namespace Lazy.Utility
                                 : (Vector3)ToValue;
                             var startValue = UseFromValue ? (Vector3)FromValue : com.localScale;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.localScale = startValue;
                             if (SpeedBased)
                                 duration =
-                                    Vector3.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector3.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = com.DOScale(targetValue, duration);
                         }
                         break;
@@ -592,13 +568,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.localScale.x;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetLocalScaleX(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOScaleX(targetValue, duration);
                         }
                         break;
@@ -610,13 +583,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.localScale.y;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetLocalScaleY(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOScaleY(targetValue, duration);
                         }
                         break;
@@ -628,13 +598,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.localScale.z;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetLocalScaleZ(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOScaleZ(targetValue, duration);
                         }
                         break;
@@ -648,14 +615,11 @@ namespace Lazy.Utility
                                 ? (Vector3)FromValue
                                 : transform.eulerAngles;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.eulerAngles = startValue;
                             if (SpeedBased)
                                 duration =
-                                    GetEulerAnglesAngle(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    GetEulerAnglesAngle(targetValue, startValue) / DurationOrSpeed;
                             result = transform.DORotate(
                                 targetValue,
                                 duration,
@@ -673,14 +637,11 @@ namespace Lazy.Utility
                                 ? (Vector3)FromValue
                                 : transform.localEulerAngles;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             transform.localEulerAngles = startValue;
                             if (SpeedBased)
                                 duration =
-                                    GetEulerAnglesAngle(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    GetEulerAnglesAngle(targetValue, startValue) / DurationOrSpeed;
                             result = transform.DOLocalRotate(
                                 targetValue,
                                 duration,
@@ -698,14 +659,11 @@ namespace Lazy.Utility
                                 ? (Vector2)FromValue
                                 : rectTransform.anchoredPosition;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             rectTransform.anchoredPosition = startValue;
                             if (SpeedBased)
                                 duration =
-                                    Vector2.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector2.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = rectTransform.DOAnchorPos(targetValue, duration, Snapping);
                         }
                         break;
@@ -719,13 +677,10 @@ namespace Lazy.Utility
                                 ? FromValue.x
                                 : rectTransform.anchoredPosition.x;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             rectTransform.SetAnchoredPositionX(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = rectTransform.DOAnchorPosX(targetValue, duration, Snapping);
                         }
                         break;
@@ -739,13 +694,10 @@ namespace Lazy.Utility
                                 ? FromValue.x
                                 : rectTransform.anchoredPosition.y;
                             if (reverse)
-                            {
                                 (startValue, targetValue) = (targetValue, startValue);
-                            }
                             rectTransform.SetAnchoredPositionY(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = rectTransform.DOAnchorPosY(targetValue, duration, Snapping);
                         }
                         break;
@@ -759,13 +711,10 @@ namespace Lazy.Utility
                                 ? FromValue.x
                                 : rectTransform.anchoredPosition3D.z;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             rectTransform.SetAnchoredPosition3DZ(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = rectTransform.DOAnchorPos3DZ(targetValue, duration, Snapping);
                         }
                         break;
@@ -779,14 +728,11 @@ namespace Lazy.Utility
                                 ? (Vector3)FromValue
                                 : rectTransform.anchoredPosition3D;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             rectTransform.anchoredPosition3D = startValue;
                             if (SpeedBased)
                                 duration =
-                                    Vector3.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector3.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = rectTransform.DOAnchorPos3D(targetValue, duration, Snapping);
                         }
                         break;
@@ -800,14 +746,11 @@ namespace Lazy.Utility
                                 ? (Vector2)FromValue
                                 : rectTransform.sizeDelta;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             rectTransform.sizeDelta = startValue;
                             if (SpeedBased)
                                 duration =
-                                    Vector2.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector2.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = rectTransform.DOSizeDelta(targetValue, duration, Snapping);
                         }
                         break;
@@ -819,14 +762,11 @@ namespace Lazy.Utility
                                 : (Color)ToValue;
                             var startValue = UseFromValue ? (Color)FromValue : com.color;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.color = startValue;
                             if (SpeedBased)
                                 duration =
-                                    Vector4.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector4.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = com.DOColor(targetValue, duration);
                         }
                         break;
@@ -836,13 +776,10 @@ namespace Lazy.Utility
                             var targetValue = UseToTarget ? ((Graphic)ToTarget).color.a : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.color.a;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetColorAlpha(startValue);
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOFade(targetValue, duration);
                         }
                         break;
@@ -854,13 +791,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.alpha;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.alpha = startValue;
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOFade(targetValue, duration);
                         }
                         break;
@@ -870,13 +804,10 @@ namespace Lazy.Utility
                             var targetValue = UseToTarget ? ((Slider)ToTarget).value : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.value;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.value = startValue;
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOValue(targetValue, duration, Snapping);
                         }
                         break;
@@ -888,13 +819,10 @@ namespace Lazy.Utility
                                 : ToValue.x;
                             var startValue = UseFromValue ? FromValue.x : com.fillAmount;
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.fillAmount = startValue;
                             if (SpeedBased)
-                                duration =
-                                    Mathf.Abs(targetValue - startValue) / this.DurationOrSpeed;
+                                duration = Mathf.Abs(targetValue - startValue) / DurationOrSpeed;
                             result = com.DOFillAmount(targetValue, duration);
                         }
                         break;
@@ -908,14 +836,11 @@ namespace Lazy.Utility
                                 ? (Vector2)FromValue
                                 : com.GetFlexibleSize();
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetFlexibleSize(startValue);
                             if (SpeedBased)
                                 duration =
-                                    Vector2.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector2.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = com.DOFlexibleSize(targetValue, duration, Snapping);
                         }
                         break;
@@ -927,14 +852,11 @@ namespace Lazy.Utility
                                 : (Vector2)ToValue;
                             var startValue = UseFromValue ? (Vector2)FromValue : com.GetMinSize();
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetMinSize(startValue);
                             if (SpeedBased)
                                 duration =
-                                    Vector2.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector2.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = com.DOMinSize(targetValue, duration, Snapping);
                         }
                         break;
@@ -948,14 +870,11 @@ namespace Lazy.Utility
                                 ? (Vector2)FromValue
                                 : com.GetPreferredSize();
                             if (reverse)
-                            {
                                 (targetValue, startValue) = (startValue, targetValue);
-                            }
                             com.SetPreferredSize(startValue);
                             if (SpeedBased)
                                 duration =
-                                    Vector2.Distance(targetValue, startValue)
-                                    / this.DurationOrSpeed;
+                                    Vector2.Distance(targetValue, startValue) / DurationOrSpeed;
                             result = com.DOPreferredSize(targetValue, duration, Snapping);
                         }
                         break;
@@ -973,9 +892,7 @@ namespace Lazy.Utility
                     if (CustomEase)
                         result.SetEase(EaseCurve);
                     else
-                    {
                         result.SetEase(Ease);
-                    }
 
                     if (OnPlay != null)
                         result.OnPlay(OnPlay.Invoke);
@@ -984,6 +901,7 @@ namespace Lazy.Utility
                     if (OnComplete != null)
                         result.OnComplete(OnComplete.Invoke);
                 }
+
                 return result;
             }
 
@@ -995,7 +913,7 @@ namespace Lazy.Utility
                 delta.y = Mathf.DeltaAngle(euler1.y, euler2.y);
                 delta.z = Mathf.DeltaAngle(euler1.z, euler2.z);
 
-                float angle = Mathf.Sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
+                var angle = Mathf.Sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
                 return (angle + 360) % 360;
             }
         }

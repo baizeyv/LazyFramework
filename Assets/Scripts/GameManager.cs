@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -6,6 +7,7 @@ using DG.Tweening.Core;
 using Lazy;
 using Lazy.Log;
 using Lazy.Serializer;
+using Lazy.UI.Example;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -79,6 +81,14 @@ namespace DefaultNamespace
             //         Log.MsgD("SUCCESS!");
             //     }
             // );
+            App.UI.OpenPanelSync<MyPanel>(prefabName: "MyPanelUUU");
+            // StartCoroutine(TestPanelClose());
+        }
+
+        private IEnumerator TestPanelClose()
+        {
+            yield return new WaitForSeconds(5f);
+            App.UI.Close();
         }
 
         private void Update()

@@ -76,6 +76,8 @@ namespace Lazy.Debugger
         [SerializeField]
         private ProfilerWindow profilerWindow = new();
 
+        private CheatWindowBase _cheatWindow;
+
         private Dictionary<int, WindowWrapper> _windows = new();
 
         /// <summary>
@@ -84,6 +86,28 @@ namespace Lazy.Debugger
         private int _lastHotControl;
 
         private Debugger() { }
+
+        /// <summary>
+        /// * 添加窗口
+        /// </summary>
+        /// <param name="windowName"></param>
+        /// <param name="window"></param>
+        public void AddWindow(string windowName, IDebuggerWindow window)
+        {
+            var id = _windows.Values.Count;
+            _windows.Add(id, new WindowWrapper() { WindowName = windowName, Window = window });
+        }
+
+        /// <summary>
+        /// * 设置作弊窗口
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="args"></param>
+        public void SetCheatWindow(CheatWindowBase window, params object[] args)
+        {
+            _cheatWindow = window;
+            _cheatWindow.Initialize(args);
+        }
 
         public override void OnSingletonInitialize()
         {
@@ -122,6 +146,9 @@ namespace Lazy.Debugger
                 _lastHotControl = 1;
                 return;
             }
+
+            if (showType == DebuggerShowType.Cheat)
+                _cheatWindow?.OnProcess(Time.deltaTime, Time.unscaledTime);
 
             var curHotControl = GUIUtility.hotControl;
             if (curHotControl != _lastHotControl)
@@ -213,6 +240,7 @@ namespace Lazy.Debugger
                 showType = DebuggerShowType.Information;
                 _selectedWindow = consoleWindow;
                 _selectedWindow.OnEnter();
+                // TODO: Show GUIMASK
             }
 
             if (
@@ -222,8 +250,13 @@ namespace Lazy.Debugger
                     GUILayout.Height(40f)
                 )
             )
-                showType = DebuggerShowType.Cheat;
-            // TODO:
+                // TODO: Show GUIMASK
+                if (_cheatWindow != null)
+                {
+                    showType = DebuggerShowType.Cheat;
+                    _cheatWindow.OnEnter();
+                }
+
             GUI.DragWindow();
         }
 
@@ -278,7 +311,13 @@ namespace Lazy.Debugger
 
         private void DrawDebuggerCheat(int windowId)
         {
-            // TODO:
+            _cheatWindow?.OnDraw();
+            GUI.DragWindow();
+        }
+
+        public void SetShowType(DebuggerShowType type)
+        {
+            showType = type;
         }
 
         public static void CopyToClipboard(string text)

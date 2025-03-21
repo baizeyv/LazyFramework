@@ -394,6 +394,7 @@ namespace Lazy.Editor.AssetEditor
         {
             var ai = AssetImporter.GetAtPath(path);
             string bundleName;
+#pragma warning disable CS0162
             if (AppendHashToAssetBundleName)
                 bundleName =
                     Path.ChangeExtension(path, null).Replace(PathSetting.AssetBundlesPath, "")
@@ -402,6 +403,7 @@ namespace Lazy.Editor.AssetEditor
             else
                 bundleName = Path.ChangeExtension(path, null)
                     .Replace(PathSetting.AssetBundlesPath, "");
+#pragma warning restore CS0162
 
             if (ai.assetBundleName.Equals(bundleName))
                 return ai.assetBundleName;
@@ -518,6 +520,7 @@ namespace Lazy.Editor.AssetEditor
                         // It's a file under AssetBundles, record as "Audio/click11"
                         if (removeExtension)
                         {
+#pragma warning disable CS0162
                             if (AppendHashToAssetBundleName)
                                 assetPaths.Add(
                                     FileUtility.FormatToUnityPath(
@@ -540,6 +543,7 @@ namespace Lazy.Editor.AssetEditor
                                             .ToLower()
                                     )
                                 );
+#pragma warning restore CS0162
                         }
                         else
                         {

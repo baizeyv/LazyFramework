@@ -6,6 +6,7 @@ using Lazy.Pool;
 using Lazy.Res;
 using Lazy.Serializer;
 using Lazy.Timer;
+using Lazy.UI;
 
 namespace Lazy
 {
@@ -89,6 +90,14 @@ namespace Lazy
         {
             get { return _storageManager ??= ManagerCenter.Create(() => StorageManager.Instance); }
             set => _storageManager ??= value;
+        }
+
+        private static UIManager _uiManager;
+
+        public static UIManager UI
+        {
+            get { return _uiManager ??= ManagerCenter.CreateMono(() => UIManager.Instance); }
+            set => _uiManager ??= value;
         }
 
         private static Debugger.Debugger _debugger;
