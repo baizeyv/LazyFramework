@@ -1,0 +1,15 @@
+﻿using UnityEngine;
+using Lazy;
+
+namespace #NAMESPACE#
+{
+    public partial class #CLASSNAME# : #INHERIT#
+    {
+        public void Start()
+        {
+            // TODO: Please Code Here ! [Generate By Lazy]
+        }
+    }
+}
+// Generation Time: #TIME#
+// Generation ID: #GUID#

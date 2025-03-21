@@ -1,0 +1,12 @@
+﻿using UnityEngine;
+using Lazy;
+
+namespace #NAMESPACE#
+{
+    public partial class #CLASSNAME# #INHERIT#
+    {
+#FIELD#
+    }
+}
+// Generation Time: #TIME#
+// Generation ID: #GUID#

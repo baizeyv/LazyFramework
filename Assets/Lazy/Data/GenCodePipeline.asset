@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81019e5d5cc74616ac84ec1aae188627, type: 3}
+  m_Name: GenCodePipeline
+  m_EditorClassIdentifier: 
+  currentTask:
+    status: 1
+    gameObject: {fileID: 0}
+    bindInfos:
+    - typeName: Transform
+      pathToRoot: a
+      memberName: a
+    - typeName: Transform
+      pathToRoot: b
+      memberName: b
+    - typeName: Transform
+      pathToRoot: b/c
+      memberName: c
+    - typeName: A.B.C.D.MyA2
+      pathToRoot: d/a2
+      memberName: a2
+    scriptsFolder: Assets/Scripts/CustomComponents
+    className: TestABCD
+    nameSpace: A.B.C.D
+    mainCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace A.B.C.D\r\n{\r\n   
+      public partial class TestABCD : ViewPresenter\r\n    {\r\n        public void
+      Start()\r\n        {\r\n            // TODO: Please Code Here ! [Generate By
+      Lazy]\r\n        }\r\n    }\r\n}\r\n// Generation Time: Thursday, March 20,
+      2025 3:40:07 PM\r\n// Generation ID: 0b513fe8-8a77-4575-b30e-64cecec77d9e"
+    designerCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace A.B.C.D\r\n{\r\n   
+      public partial class TestABCD \r\n    {\r\n\t\tpublic Transform a;\r\n\t\t///
+      <summary>\r\n\t\t/// AAA\r\n\t\t/// </summary>\r\n\t\tpublic Transform b;\r\n\t\tpublic
+      Transform c;\r\n\t\tpublic A.B.C.D.MyA2 a2;\r\n\r\n\t\tpublic Lazy.IApp App
+      => Lazy.Example.TestApp.Gate;\r\n\r\n    }\r\n}\r\n// Generation Time: Thursday,
+      March 20, 2025 3:40:07 PM\r\n// Generation ID: 77b642f4-a812-43bf-a1a2-e1a547407075"
