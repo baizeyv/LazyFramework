@@ -1,5 +1,4 @@
-﻿using F8Framework.Launcher;
-using Lazy.Rx.Operator;
+﻿using Lazy.Rx.Operator;
 using Lazy.Rx.Variables;
 using R3;
 using UnityEngine;

@@ -81,8 +81,11 @@ namespace DefaultNamespace
             //         Log.MsgD("SUCCESS!");
             //     }
             // );
-            App.UI.OpenPanelSync<MyPanel>(prefabName: "MyPanelUUU");
+            // App.UI.OpenSync<MyPanel>(prefabName: "MyPanelUUU");
             // StartCoroutine(TestPanelClose());
+            App.UI.OpenSync<DialogA>();
+            App.UI.OpenSync<DialogB>();
+            App.UI.OpenSync<DialogC>();
         }
 
         private IEnumerator TestPanelClose()

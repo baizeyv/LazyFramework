@@ -1,7 +1,8 @@
-﻿using Lazy.Utility;
+﻿using System;
+using Lazy.Utility;
 using UnityEngine;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public class UIMonoBehaviour : MonoBehaviour
     {
@@ -63,5 +64,15 @@ namespace Lazy.UI
         }
 
         protected virtual void OnBack() { }
+
+        protected virtual void OnDestroy()
+        {
+            if (Application.isPlaying)
+            {
+                OnBeforeDestroy();
+            }
+        }
+
+        protected virtual void OnBeforeDestroy() { }
     }
 }

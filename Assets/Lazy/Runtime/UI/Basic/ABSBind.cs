@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.UI.Basic
+namespace Lazy
 {
     public abstract class ABSBind : MonoBehaviour, IBind
     {
@@ -53,7 +53,7 @@ namespace Lazy.UI.Basic
                     return componentName;
                 }
 
-                if (markType == BindType.UICustom)
+                if (markType == BindType.UIWidget)
                     return customComponentName;
                 return componentName;
             }

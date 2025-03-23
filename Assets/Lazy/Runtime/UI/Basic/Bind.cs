@@ -1,7 +1,12 @@
-﻿using UnityEngine;
+﻿using Lazy.Pool.Attribute;
+using UnityEngine;
 
-namespace Lazy.UI.Basic
+namespace Lazy
 {
     [AddComponentMenu("Lazy/Bind")]
-    public class Bind : ABSBind { }
+    public class Bind : ABSBind
+    {
+        [ReadOnlyInspectorField]
+        public string propertyName;
+    }
 }

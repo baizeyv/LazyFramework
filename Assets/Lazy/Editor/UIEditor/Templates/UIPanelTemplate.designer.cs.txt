@@ -1,0 +1,30 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using Lazy;
+
+namespace #NAMESPACE#
+{
+    public partial class #CLASSNAME# : #INHERIT#
+    {
+        #region Generation
+        public const string Name = "#CLASSNAME#";
+
+        private readonly #CLASSNAME#Data _defaultData = new();
+
+        protected #CLASSNAME#Data Data => PanelData as #CLASSNAME#Data ?? _defaultData;
+        #endregion
+
+        #region Field
+
+#FIELD#
+        #endregion
+
+        protected override void ClearUIComponents()
+        {
+#CLEAR#
+        }
+    }
+}
+// Generation Time: #TIME#
+// Generation ID: #GUID#

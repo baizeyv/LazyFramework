@@ -1,8 +1,8 @@
-﻿namespace Lazy.UI.Basic
+﻿namespace Lazy
 {
     public enum BindType
     {
         Default,
-        UICustom,
+        UIWidget,
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Lazy.UI
+﻿namespace Lazy
 {
     /// <summary>
     /// * UI界面状态

@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Lazy.UI
+namespace Lazy
 {
     public class UIDialog : UIPanel, IDialog
     {
@@ -17,6 +18,7 @@ namespace Lazy.UI
         }
 
 #if UNITY_EDITOR
+        #pragma warning disable CS0108
         protected void OnValidate()
         {
             var canvas = GetComponent<Canvas>();
@@ -38,7 +40,8 @@ namespace Lazy.UI
                     };
             }
         }
-
+        #pragma warning restore CS0108
 #endif
+        public Action Callback { get; set; }
     }
 }

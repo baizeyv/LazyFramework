@@ -1,6 +1,6 @@
 ﻿using UnityEngine.UI;
 
-namespace Lazy.UI.Common
+namespace Lazy
 {
 	/// <summary>
 	/// 替换空 Image 扩大点击区域，降低 DrawCall。

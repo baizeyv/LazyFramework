@@ -1,0 +1,19 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using Lazy;
+
+namespace #NAMESPACE#
+{
+    public partial class #CLASSNAME#
+    {
+
+        // TODO: Code Here !
+
+        #region Generation Life Cycle
+        protected override void OnUIDestroy() { }
+        #endregion
+    }
+}
+// Generation Time: #TIME#
+// Generation ID: #GUID#

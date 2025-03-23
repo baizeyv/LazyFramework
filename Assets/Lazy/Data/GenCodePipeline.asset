@@ -16,29 +16,23 @@ MonoBehaviour:
     status: 1
     gameObject: {fileID: 0}
     bindInfos:
-    - typeName: Transform
-      pathToRoot: a
-      memberName: a
-    - typeName: Transform
-      pathToRoot: b
-      memberName: b
-    - typeName: Transform
-      pathToRoot: b/c
-      memberName: c
-    - typeName: A.B.C.D.MyA2
-      pathToRoot: d/a2
-      memberName: a2
+    - typeName: UnityEngine.UI.Image
+      pathToRoot: Image (6)
+      memberName: mImage6
+    - typeName: UnityEngine.UI.Image
+      pathToRoot: Image (6)
+      memberName: mImage6a
     scriptsFolder: Assets/Scripts/CustomComponents
-    className: TestABCD
-    nameSpace: A.B.C.D
-    mainCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace A.B.C.D\r\n{\r\n   
-      public partial class TestABCD : ViewPresenter\r\n    {\r\n        public void
+    className: MyTestVP
+    nameSpace: Lazy.Melody
+    mainCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace Lazy.Melody\r\n{\r\n   
+      public partial class MyTestVP : ViewPresenter\r\n    {\r\n        public void
       Start()\r\n        {\r\n            // TODO: Please Code Here ! [Generate By
-      Lazy]\r\n        }\r\n    }\r\n}\r\n// Generation Time: Thursday, March 20,
-      2025 3:40:07 PM\r\n// Generation ID: 0b513fe8-8a77-4575-b30e-64cecec77d9e"
-    designerCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace A.B.C.D\r\n{\r\n   
-      public partial class TestABCD \r\n    {\r\n\t\tpublic Transform a;\r\n\t\t///
-      <summary>\r\n\t\t/// AAA\r\n\t\t/// </summary>\r\n\t\tpublic Transform b;\r\n\t\tpublic
-      Transform c;\r\n\t\tpublic A.B.C.D.MyA2 a2;\r\n\r\n\t\tpublic Lazy.IApp App
-      => Lazy.Example.TestApp.Gate;\r\n\r\n    }\r\n}\r\n// Generation Time: Thursday,
-      March 20, 2025 3:40:07 PM\r\n// Generation ID: 77b642f4-a812-43bf-a1a2-e1a547407075"
+      Lazy]\r\n        }\r\n    }\r\n}\r\n// Generation Time: 2025\u5E743\u670823\u65E5
+      17:29:03\r\n// Generation ID: 02a650f0-78bd-45d9-bb71-99afd3495f73"
+    designerCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace Lazy.Melody\r\n{\r\n   
+      public partial class MyTestVP \r\n    {\r\n\t\tpublic UnityEngine.UI.Image
+      mImage6;\r\n\t\tpublic UnityEngine.UI.Image mImage6a;\r\n\r\n\t\tpublic UnityEngine.CanvasRenderer
+      mImage6b;\r\n\r\n\t\tpublic Lazy.IApp App => Lazy.Example.TestApp.Gate;\r\n\r\n   
+      }\r\n}\r\n// Generation Time: 2025\u5E743\u670823\u65E5 17:29:03\r\n// Generation
+      ID: 3533f2a3-8c5e-428c-ab73-e8f1dc4a9580"

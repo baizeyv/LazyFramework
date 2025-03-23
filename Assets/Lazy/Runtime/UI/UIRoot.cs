@@ -1,12 +1,10 @@
 ﻿using System;
 using Lazy.Res;
-using Lazy.UI.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public sealed class UIRoot : MonoBehaviour
     {

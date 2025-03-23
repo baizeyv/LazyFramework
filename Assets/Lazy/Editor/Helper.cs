@@ -1,5 +1,6 @@
 ﻿using Lazy.Editor.AssetEditor;
 using UnityEditor;
+using UnityEngine;
 
 namespace Lazy.Editor
 {
@@ -10,5 +11,6 @@ namespace Lazy.Editor
         {
             AssetBundleBuildTool.BuildAllAssetBundles();
         }
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using Lazy.Ref;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public class PanelInfo : IReference
     {
@@ -27,7 +27,9 @@ namespace Lazy.UI
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            Data = null;
+            Layer = UILayer.PanelLow;
+            PanelType = null;
         }
     }
 }

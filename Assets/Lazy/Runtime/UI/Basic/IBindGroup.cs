@@ -1,4 +1,4 @@
-﻿namespace Lazy.UI.Basic
+﻿namespace Lazy
 {
     public interface IBindGroup
     {

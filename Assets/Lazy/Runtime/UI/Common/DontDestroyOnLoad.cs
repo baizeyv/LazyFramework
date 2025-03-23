@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Lazy.UI.Common
+namespace Lazy
 {
     public class DontDestroyOnLoad : MonoBehaviour
     {

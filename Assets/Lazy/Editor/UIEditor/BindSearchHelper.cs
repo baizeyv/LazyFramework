@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using Lazy.UI.Basic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Lazy.Editor.UIEditor
@@ -10,7 +12,7 @@ namespace Lazy.Editor.UIEditor
     /// </summary>
     public class BindSearchHelper
     {
-        public static void Search(GenCodeTask task)
+        public static void Search(GenCodeTask task, Dictionary<string, int> propertyNameMap)
         {
             // # 找到当前对象的子元素中的所有 IBindGroup 的 transform
             var bindGroupTransforms = task
@@ -24,20 +26,23 @@ namespace Lazy.Editor.UIEditor
                 .Where(x => x.Transform != task.gameObject.transform);
 
             foreach (var bind in binds)
-                if (
-                    !bindGroupTransforms.Any(x =>
-                        bind.Transform.IsChildOf(x) && bind.Transform != x
-                    )
-                )
-                    task.bindInfos.Add(
-                        new BindInfo()
-                        {
-                            typeName = bind.TypeName,
-                            memberName = bind.Transform.gameObject.name,
-                            bindScript = bind,
-                            pathToRoot = PathToParent(bind.Transform, task.gameObject.name),
-                        }
-                    );
+	            if (
+		            !bindGroupTransforms.Any(x =>
+			            bind.Transform.IsChildOf(x) && bind.Transform != x
+		            )
+	            )
+	            {
+		            var newName = CodeGenUtility.GetPropertyName(bind.Transform.gameObject.name, propertyNameMap);
+		            var bi =
+			            new BindInfo()
+			            {
+				            typeName = bind.TypeName,
+				            memberName = newName,
+				            bindScript = bind,
+				            pathToRoot = PathToParent(bind.Transform, task.gameObject.name),
+			            };
+                    task.bindInfos.Add(bi);
+	            }
         }
 
         private static string PathToParent(Transform trans, string parentName)
@@ -56,5 +61,6 @@ namespace Lazy.Editor.UIEditor
 
             return retValue.ToString();
         }
+
     }
 }

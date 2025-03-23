@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public class OrderedHashSet<T> : ICollection<T>, IReadOnlyCollection<T>
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lazy.Table;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public class PanelTable : ABSTable<IPanel>
     {

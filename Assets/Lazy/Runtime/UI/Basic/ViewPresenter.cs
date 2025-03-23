@@ -1,9 +1,9 @@
 ﻿using System;
-using Lazy.UI.Basic;
 using UnityEngine;
 
 namespace Lazy
 {
+    [DisallowMultipleComponent]
     public class ViewPresenter : MonoBehaviour, IBindGroup
     {
         [HideInInspector]

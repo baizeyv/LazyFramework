@@ -1,0 +1,35 @@
+using UnityEngine;
+using UnityEngine.UI;
+using Lazy;
+
+namespace #NAMESPACE#
+{
+    public class #CLASSNAME#Data : IPanelData { }
+
+    public partial class #CLASSNAME#
+    {
+        #region Life Cycle
+
+        protected override void OnSetup() { }
+
+        protected override void OnOpen() { }
+
+        protected override void OnShow() { }
+
+        protected override void OnHide() { }
+
+        protected override void OnShowTweenEnd() { }
+
+        protected override void OnEndTweenBegin() { }
+
+        protected override void OnClose() { }
+
+        protected override void OnBack() { }
+
+        protected override void OnUIDestroy() { }
+
+        #endregion
+    }
+}
+// Generation Time: #TIME#
+// Generation ID: #GUID#

@@ -1,4 +1,4 @@
-﻿namespace Lazy.UI
+﻿namespace Lazy
 {
     public interface IPanelData
     {

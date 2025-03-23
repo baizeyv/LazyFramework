@@ -388,6 +388,8 @@ namespace Lazy.Utility
 
             public bool SpeedBased = false;
 
+            public bool TweenFrom = false;
+
             public float DurationOrSpeed = 1;
 
             public float Delay = 0;

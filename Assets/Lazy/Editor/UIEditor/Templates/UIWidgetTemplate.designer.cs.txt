@@ -1,0 +1,19 @@
+using Lazy;
+using UnityEngine;
+
+namespace #NAMESPACE#
+{
+    public partial class #CLASSNAME# : UIWidget
+    {
+        public override string TypeName => "#CLASSNAME#";
+
+#FIELD#
+
+        protected override void ClearUIComponents()
+        {
+#CLEAR#
+        }
+    }
+}
+// Generation Time: #TIME#
+// Generation ID: #GUID#

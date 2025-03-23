@@ -1,4 +1,4 @@
-﻿namespace Lazy.UI
+﻿namespace Lazy
 {
     /// <summary>
     /// * UI层级

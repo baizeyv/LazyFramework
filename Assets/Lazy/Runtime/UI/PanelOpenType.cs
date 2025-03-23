@@ -1,4 +1,4 @@
-﻿namespace Lazy.UI
+﻿namespace Lazy
 {
     /// <summary>
     /// * 界面打开类型

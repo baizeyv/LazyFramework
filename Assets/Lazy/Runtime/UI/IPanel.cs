@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public interface IPanel
     {

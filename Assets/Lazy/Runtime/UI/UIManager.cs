@@ -9,9 +9,8 @@ using Lazy.Singleton;
 using Lazy.Utility;
 using UnityEngine;
 
-namespace Lazy.UI
+namespace Lazy
 {
-    // TODO: 弹窗打开队列
     [MonoSingletonPath("Lazy/UI")]
     public class UIManager : MonoSingleton<UIManager>, IManager
     {
@@ -20,14 +19,24 @@ namespace Lazy.UI
         // ! 是界面就放入panelStack, 是弹窗就放入dialogQueue
 
         /// <summary>
-        /// * 界面栈
+        /// * 已打开界面栈
         /// </summary>
         private readonly HashStack<IPanel> _panelStack = new();
 
         /// <summary>
-        /// * 弹窗队列
+        /// * 弹窗等待队列
         /// </summary>
-        private readonly HashQueue<IDialog> _dialogQueue = new();
+        private readonly Queue<Action> _dialogPendingQueue = new();
+
+        /// <summary>
+        /// * 返回的界面栈
+        /// </summary>
+        private readonly Stack<IPanel> _backStack = new();
+
+        /// <summary>
+        /// * 当前显示的dialog
+        /// </summary>
+        private IDialog _currentDialog;
 
         /// <summary>
         /// * 界面表
@@ -58,7 +67,9 @@ namespace Lazy.UI
 
         private WaitForEndOfFrame _waitForEndOfFrame = new();
 
-        private UIManager() { }
+        private UIManager()
+        {
+        }
 
         #region API
 
@@ -70,8 +81,7 @@ namespace Lazy.UI
         /// <param name="layer"></param>
         /// <param name="openType"></param>
         /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T OpenPanelSync<T>(
+        public void OpenSync<T>(
             IPanelData data = null,
             string prefabName = null,
             UILayer layer = UILayer.PanelLow,
@@ -85,22 +95,25 @@ namespace Lazy.UI
             key.Data = data;
             key.PanelType = typeof(T);
             key.GameObjectName = prefabName;
-            var panel = OpenSync(key) as T;
-            key.Free();
-            if (panel is IDialog)
+            if (typeof(IDialog).IsAssignableFrom(typeof(T)))
             {
-                // # 入队
-                _dialogQueue.Enqueue(panel as IDialog);
-                _dialogQueue.Sort(x => x.Order);
+                if (_dialogPendingQueue.Count <= 0 && _currentDialog == null)
+                {
+                    OpenDialogSync(key);
+                }
+                else
+                {
+                    _dialogPendingQueue.Enqueue(() => { OpenDialogSync(key); });
+                }
             }
             else
             {
+                var panel = OpenPanelSync(key) as T;
+                key.Free();
                 // # 入栈
                 _panelStack.Push(panel);
                 _panelStack.Sort(x => x.Order);
             }
-
-            return panel;
         }
 
         /// <summary>
@@ -109,22 +122,30 @@ namespace Lazy.UI
         /// <param name="data"></param>
         /// <param name="prefabName"></param>
         /// <param name="layer"></param>
+        /// <param name="openType"></param>
         /// <typeparam name="T"></typeparam>
-        public void OpenPanelAsync<T>(
+        public void OpenAsync<T>(
             IPanelData data = null,
             string prefabName = null,
-            UILayer layer = UILayer.PanelLow
+            UILayer layer = UILayer.PanelLow,
+            PanelOpenType openType = PanelOpenType.Single
         )
             where T : UIPanel
         {
-            CoroutineCenter.StartCoroutine(OpenPanelCoroutine<T>(data, prefabName, layer));
+            if (typeof(IDialog).IsAssignableFrom(typeof(T)))
+            {
+                Log.Log.MsgE("Dialog 不支持异步打开!");
+                return;
+            }
+
+            CoroutineCenter.StartCoroutine(OpenPanelCoroutine<T>(data, prefabName, layer, openType));
         }
 
         /// <summary>
         /// * 展示指定界面
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public void ShowPanel<T>()
+        public void Show<T>()
             where T : UIPanel
         {
             var key = PanelKey.Obtain();
@@ -138,17 +159,21 @@ namespace Lazy.UI
         /// </summary>
         public void Hide()
         {
-            if (_dialogQueue.Count > 0)
+            // # 存在弹窗
+            if (_currentDialog != null)
             {
-                // # 存在弹窗
-                if (_dialogQueue.TryDequeue(out var dialog))
-                    dialog.Hide();
+                _currentDialog.Hide();
+                _currentDialog.Callback = TryOpenNextDialog;
+                _currentDialog = null;
             }
             else if (_panelStack.Count > 0)
             {
                 // # 不存在弹窗,但存在界面
                 if (_panelStack.TryPop(out var panel))
+                {
                     panel.Hide();
+                    _backStack.Push(panel);
+                }
             }
             else
             {
@@ -161,16 +186,19 @@ namespace Lazy.UI
         /// </summary>
         public void Close()
         {
-            if (_dialogQueue.Count > 0)
+            if (_currentDialog != null)
             {
                 // # 存在弹窗
-                if (_dialogQueue.TryDequeue(out var dialog))
+                _currentDialog.Close(_currentDialog.CloseDestroy);
+                _currentDialog.Callback = TryOpenNextDialog;
+                if (_currentDialog.CloseDestroy)
                 {
-                    dialog.Close(dialog.CloseDestroy);
-                    _table.Remove(dialog);
-                    dialog.Info.Free();
-                    dialog.Info = null;
+                    _table.Remove(_currentDialog);
+                    _currentDialog.Info.Free();
+                    _currentDialog.Info = null;
                 }
+
+                _currentDialog = null;
             }
             else if (_panelStack.Count > 0)
             {
@@ -178,10 +206,14 @@ namespace Lazy.UI
                 if (_panelStack.TryPop(out var panel))
                 {
                     panel.Close(panel.CloseDestroy);
-                    _table.Remove(panel);
-                    panel.Info.Free();
-                    panel.Info = null;
+                    if (panel.CloseDestroy)
+                    {
+                        _table.Remove(panel);
+                        panel.Info.Free();
+                        panel.Info = null;
+                    }
                 }
+                _backStack.Clear();
             }
             else
             {
@@ -189,33 +221,45 @@ namespace Lazy.UI
             }
         }
 
+        /// <summary>
+        /// * 界面返回
+        /// </summary>
         public void Back()
         {
-            // !!!!!!!!!!!!!!!!!!!
-            // TODO: !!!!!!!!!!!!!!!!!!!!!
-            if (_dialogQueue.Count > 0)
+            if (_currentDialog != null)
             {
                 // # 存在弹窗
-                if (_dialogQueue.TryDequeue(out var dialog))
+                _currentDialog.Close(_currentDialog.CloseDestroy);
+                _currentDialog.Back();
+                _currentDialog.Callback = TryOpenNextDialog;
+                if (_currentDialog.CloseDestroy)
                 {
-                    // TODO:
-                    dialog.Close();
-                    _table.Remove(dialog);
-                    dialog.Info.Free();
-                    dialog.Info = null;
+                    _table.Remove(_currentDialog);
+                    _currentDialog.Info.Free();
+                    _currentDialog.Info = null;
                 }
+
+                _currentDialog = null;
             }
             else if (_panelStack.Count > 0)
             {
-                // # 不存在弹窗,但存在界面
-                // TODO: 回到上一个Hide的界面
                 if (_panelStack.TryPop(out var panel))
                 {
-                    // TODO:
-                    panel.Close();
-                    _table.Remove(panel);
-                    panel.Info.Free();
-                    panel.Info = null;
+                    panel.Close(panel.CloseDestroy);
+                    panel.Back();
+                    if (panel.CloseDestroy)
+                    {
+                        _table.Remove(panel);
+                        panel.Info.Free();
+                        panel.Info = null;
+                    }
+                    // # 立即打开要返回的界面
+                    if (_backStack.TryPop(out var backPanel))
+                    {
+                        _panelStack.Push(panel);
+                        _panelStack.Sort(x => x.Order);
+                        backPanel.Show();
+                    }
                 }
             }
             else
@@ -225,6 +269,16 @@ namespace Lazy.UI
         }
 
         #endregion
+
+        private void TryOpenNextDialog()
+        {
+            if (_dialogPendingQueue.Count <= 0)
+                return;
+            if (_dialogPendingQueue.TryDequeue(out var task))
+            {
+                task.Fire();
+            }
+        }
 
         internal void TryDisable(IPanel panel)
         {
@@ -312,31 +366,22 @@ namespace Lazy.UI
             key.PanelType = typeof(T);
             key.GameObjectName = prefabName;
             var loaded = false;
-            OpenAsync(
+            OpenPanelAsync(
                 key,
                 panel =>
                 {
                     loaded = true;
                     key.Free();
-                    if (panel is IDialog)
-                    {
-                        // # 入队
-                        _dialogQueue.Enqueue(panel as IDialog);
-                        _dialogQueue.Sort(x => x.Order);
-                    }
-                    else
-                    {
-                        // # 入栈
-                        _panelStack.Push(panel);
-                        _panelStack.Sort(x => x.Order);
-                    }
+                    // # 入栈
+                    _panelStack.Push(panel);
+                    _panelStack.Sort(x => x.Order);
                 }
             );
             while (!loaded)
                 yield return _waitForEndOfFrame;
         }
 
-        private void OpenAsync(PanelKey key, Action<IPanel> onLoad)
+        private void OpenPanelAsync(PanelKey key, Action<IPanel> onLoad)
         {
             if (key.OpenType == PanelOpenType.Single)
             {
@@ -361,14 +406,62 @@ namespace Lazy.UI
             }
         }
 
-        private IPanel OpenSync(PanelKey key)
+        /// <summary>
+        /// * 同步打开弹窗
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private IDialog OpenDialogSync(PanelKey key)
+        {
+            if (key.OpenType == PanelOpenType.Single)
+            {
+                // # 只能打开一次
+                var dialog = _table.Search(key).FirstOrDefault() as IDialog;
+                if (dialog == null)
+                {
+                    // # 创建新的dialog
+                    dialog = CreateDialogSync(key);
+                }
+                else
+                {
+                    dialog.Open(key.Data);
+                }
+
+                if (dialog.Info != null && dialog.Info.Layer != key.Layer)
+                    _root.SetLayerOfPanel(key.Layer, dialog);
+                key.Free();
+                _currentDialog = dialog;
+                return dialog;
+            }
+            else
+            {
+                // # 可以打开多次
+                var dialog = _table.Search(key).FirstOrDefault(x => x.State == PanelState.Closed) as IDialog;
+                if (dialog == null)
+                {
+                    dialog = CreateDialogSync(key);
+                }
+                else
+                {
+                    dialog.Open(key.Data);
+                }
+
+                if (dialog.Info != null && dialog.Info.Layer != key.Layer)
+                    _root.SetLayerOfPanel(key.Layer, dialog);
+                key.Free();
+                _currentDialog = dialog;
+                return dialog;
+            }
+        }
+
+        private IPanel OpenPanelSync(PanelKey key)
         {
             if (key.OpenType == PanelOpenType.Single)
             {
                 // # 只能打开一次
                 var panel = _table.Search(key).FirstOrDefault();
                 if (panel == null)
-                    panel = CreateSync(key);
+                    panel = CreatePanelSync(key);
                 else
                     panel.Open(key.Data);
 
@@ -383,7 +476,7 @@ namespace Lazy.UI
                     .Search(key)
                     .FirstOrDefault(item => item.State == PanelState.Closed);
                 if (panel == null)
-                    panel = CreateSync(key);
+                    panel = CreatePanelSync(key);
                 else
                     panel.Open(key.Data);
                 if (panel.Info != null && panel.Info.Layer != key.Layer)
@@ -411,7 +504,21 @@ namespace Lazy.UI
             );
         }
 
-        private IPanel CreateSync(PanelKey key)
+        private IDialog CreateDialogSync(PanelKey key)
+        {
+            var dialog = LoadPanelSync(key) as IDialog;
+            _root.SetLayerOfPanel(key.Layer, dialog);
+            SetDefaultSizeOfPanel(dialog);
+            dialog.Transform.gameObject.name = string.IsNullOrEmpty(key.GameObjectName)
+                ? key.PanelType.Name
+                : key.GameObjectName;
+            dialog.Info = PanelInfo.Obtain(key.Layer, key.Data, key.PanelType);
+            _table.Add(dialog);
+            dialog.Setup(key.Data);
+            return dialog;
+        }
+
+        private IPanel CreatePanelSync(PanelKey key)
         {
             var panel = LoadPanelSync(key);
             _root.SetLayerOfPanel(key.Layer, panel);
@@ -474,18 +581,29 @@ namespace Lazy.UI
             var panel = _table.Search(key).FirstOrDefault();
             if (panel is IDialog)
             {
-                // # 入队
-                _dialogQueue.Enqueue(panel as IDialog);
-                _dialogQueue.Sort(x => x.Order);
+                if (_currentDialog == null && _dialogPendingQueue.Count <= 0)
+                {
+                    // # 立即打开弹窗
+                    panel.Show();
+                    _currentDialog = panel as IDialog;
+                }
+                else
+                {
+                    // # 入队
+                    _dialogPendingQueue.Enqueue(() =>
+                    {
+                        panel.Show();
+                        _currentDialog = panel as IDialog;
+                    });
+                }
             }
             else
             {
                 // # 入栈
                 _panelStack.Push(panel);
                 _panelStack.Sort(x => x.Order);
+                panel?.Show();
             }
-
-            panel?.Show();
         }
 
         private void SetDefaultSizeOfPanel(IPanel panel)
@@ -508,20 +626,31 @@ namespace Lazy.UI
             {
                 _table.Clear();
                 _panelStack.Clear();
-                _dialogQueue.Clear();
+                _dialogPendingQueue.Clear();
                 _playingTweenPanels.Clear();
                 _playingTweenDialogs.Clear();
+                _backStack.Clear();
             };
         }
 
-        public void OnUpdate() { }
+        public void OnUpdate()
+        {
+        }
 
-        public void OnFixedUpdate() { }
+        public void OnFixedUpdate()
+        {
+        }
 
-        public void OnLateUpdate() { }
+        public void OnLateUpdate()
+        {
+        }
 
-        public void OnDestroyRelease() { }
+        public void OnDestroyRelease()
+        {
+        }
 
-        public void OnGui() { }
+        public void OnGui()
+        {
+        }
     }
 }

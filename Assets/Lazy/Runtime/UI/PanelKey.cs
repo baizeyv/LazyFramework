@@ -1,7 +1,7 @@
 ﻿using System;
 using Lazy.Ref;
 
-namespace Lazy.UI
+namespace Lazy
 {
     public class PanelKey : IReference
     {

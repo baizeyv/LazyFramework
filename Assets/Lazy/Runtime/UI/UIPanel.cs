@@ -1,18 +1,17 @@
 ﻿using System;
 using DG.Tweening;
-using Lazy.UI.Common;
 using Lazy.Utility;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Lazy.UI
+namespace Lazy
 {
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
+    [RequireComponent(typeof(CanvasRenderer))]
     [RequireComponent(typeof(Empty4Raycast))] // # 防止界面点击穿透
     [RequireComponent(typeof(DOTweenSequence))]
     public abstract class UIPanel : UIMonoBehaviour, IPanel
@@ -25,7 +24,7 @@ namespace Lazy.UI
         [SerializeField]
         private bool closeDestroy = true;
 
-        protected IPanelData Data;
+        protected IPanelData PanelData;
 
         protected DOTweenSequence ShowTweenSequence;
 
@@ -41,7 +40,7 @@ namespace Lazy.UI
         public virtual void Setup(IPanelData panelData)
         {
             Canvas = GetComponent<Canvas>();
-            Data = panelData;
+            PanelData = panelData;
             State = PanelState.Idle;
             if (hideAnimationIsRewind)
             {
@@ -57,19 +56,20 @@ namespace Lazy.UI
             ShowTweenSequence.SetNoPlayOnAwake();
             HideTweenSequence.SetNoPlayOnAwake();
 
-            OnSetup(Data);
-            Open(Data);
+            OnSetup();
+            Open(PanelData);
         }
 
         public void Open(IPanelData panelData = null)
         {
-            OnOpen(panelData);
+            PanelData = panelData;
+            OnOpen();
             Show();
         }
 
         public override void Close(bool destroy = true)
         {
-            Info.Data = Data;
+            Info.Data = PanelData;
             Hide();
             HideCallback += () =>
             {
@@ -81,16 +81,31 @@ namespace Lazy.UI
 
         public override void Show()
         {
+            gameObject.SetVisible(true);
             State = PanelState.ShowAnimation;
             var showTween = ShowTweenSequence.DOPlay();
             showTween.OnComplete(() =>
             {
-                UIManager.Instance.RemovePlayingTweenPanel(this);
+                if (this is IDialog)
+                {
+                    UIManager.Instance.RemovePlayingTweenDialog(this as IDialog);
+                }
+                else
+                {
+                    UIManager.Instance.RemovePlayingTweenPanel(this);
+                }
                 UIManager.Instance.BlockRaycastState(false);
                 OnShowTweenEnd();
             });
             UIManager.Instance.BlockRaycastState(true);
-            UIManager.Instance.AddPlayingTweenPanel(this);
+            if (this is IDialog)
+            {
+                UIManager.Instance.AddPlayingTweenDialog(this as IDialog);
+            }
+            else
+            {
+                UIManager.Instance.AddPlayingTweenPanel(this);
+            }
             base.Show();
         }
 
@@ -102,22 +117,41 @@ namespace Lazy.UI
                 ? HideTweenSequence.DORewind()
                 : HideTweenSequence.DOPlay();
             UIManager.Instance.BlockRaycastState(true);
-            UIManager.Instance.AddPlayingTweenPanel(this);
+            if (this is IDialog)
+            {
+                UIManager.Instance.AddPlayingTweenDialog(this as IDialog);
+            }
+            else
+            {
+                UIManager.Instance.AddPlayingTweenPanel(this);
+            }
             OnEndTweenBegin();
             hideTween.OnComplete(() =>
             {
-                UIManager.Instance.RemovePlayingTweenPanel(this);
+                if (this is IDialog)
+                {
+                    UIManager.Instance.RemovePlayingTweenDialog(this as IDialog);
+                }
+                else
+                {
+                    UIManager.Instance.RemovePlayingTweenPanel(this);
+                }
                 UIManager.Instance.BlockRaycastState(false);
                 base.Hide();
                 HideCallback.Fire();
                 // # 清空事件
                 HideCallback = null;
+                if (this is IDialog)
+                {
+                    ((IDialog)this).Callback.Fire();
+                    ((IDialog)this).Callback = null;
+                }
             });
         }
 
-        protected virtual void OnSetup(IPanelData panelData = null) { }
+        protected virtual void OnSetup() { }
 
-        protected virtual void OnOpen(IPanelData panelData = null) { }
+        protected virtual void OnOpen() { }
 
         protected override void OnShow() { }
 
@@ -131,6 +165,21 @@ namespace Lazy.UI
 
         protected virtual void OnShowTweenEnd() { }
 
+        protected sealed override void OnDestroy()
+        {
+            base.OnDestroy();
+        }
+
+        protected sealed override void OnBeforeDestroy()
+        {
+            OnUIDestroy();
+            ClearUIComponents();
+        }
+
+        protected virtual void OnUIDestroy() {}
+
+        protected virtual void ClearUIComponents() { }
+
         public PanelState State { get; set; }
         public PanelInfo Info { get; set; }
         public Transform Transform => transform;
@@ -140,7 +189,7 @@ namespace Lazy.UI
             get
             {
                 var canvas = Canvas ?? GetComponent<Canvas>();
-                if (!Canvas.overrideSorting)
+                if (!canvas.overrideSorting)
                     return 0;
                 return canvas.sortingOrder;
             }
@@ -173,7 +222,11 @@ namespace Lazy.UI
                         for (var i = 2; i < seqArray.Length; i++)
                         {
                             var i1 = i;
-                            EditorApplication.delayCall += () => DestroyImmediate(seqArray[i1]);
+                            EditorApplication.delayCall += () =>
+                            {
+                                if (seqArray[i1] != null)
+                                    DestroyImmediate(seqArray[i1], true);
+                            };
                         }
 
                         break;
@@ -184,8 +237,15 @@ namespace Lazy.UI
                 {
                     while (seqArray.Length < 2)
                     {
-                        gameObject.AddComponent<DOTweenSequence>();
-                        seqArray = GetComponents<DOTweenSequence>();
+                        try
+                        {
+                            gameObject.AddComponent<DOTweenSequence>();
+                            seqArray = GetComponents<DOTweenSequence>();
+                        }
+                        catch (Exception)
+                        {
+                            break;
+                        }
                     }
                 };
             }
