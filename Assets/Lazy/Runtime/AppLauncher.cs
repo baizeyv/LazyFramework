@@ -2,6 +2,7 @@
 using System.Collections;
 using Lazy.Audio;
 using Lazy.Download;
+using Lazy.FSM;
 using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
@@ -45,12 +46,14 @@ namespace Lazy
 #endif
             App.Storage = ManagerCenter.Create(() => StorageManager.Instance);
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
+            App.HotUpdate = ManagerCenter.Create(() => HotUpdateManager.Instance);
             App.Asset = ManagerCenter.Create(() => AssetManager.Instance);
             App.Download = ManagerCenter.Create(() => DownloadManager.Instance);
             App.Timer = ManagerCenter.Create(() => TimerManager.Instance);
             App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
             App.Audio = ManagerCenter.CreateMono(() => AudioManager.Instance);
             App.UI = ManagerCenter.CreateMono(() => UIManager.Instance);
+            App.Fsm = ManagerCenter.Create(() => FsmManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 #endif

@@ -41,20 +41,6 @@ namespace Lazy.Editor.UIEditor
         }
 
         /// <summary>
-        /// * 标题风格
-        /// </summary>
-        private readonly Lazy<GUIStyle> _bigTitleStyle =
-            new(
-                () =>
-                    new GUIStyle(GUI.skin.label)
-                    {
-                        fontStyle = FontStyle.Bold,
-                        fontSize = 12,
-                        richText = true,
-                    }
-            );
-
-        /// <summary>
         /// * 当前游戏中存在的IApp类型列表
         /// </summary>
         private Type[] _appTypes;
@@ -103,14 +89,14 @@ namespace Lazy.Editor.UIEditor
         {
             GUILayout.BeginVertical("HelpBox");
             {
-                GUILayout.Label("<color=#7bed9f>Source</color>", _bigTitleStyle.Value);
+                GUILayout.Label("<color=#7bed9f>Source</color>", Styles.BigTitleStyle.Value);
                 DrawPropertiesExcluding(serializedObject, "m_Script");
                 serializedObject.ApplyModifiedProperties();
             }
             GUILayout.EndVertical();
             GUILayout.BeginVertical("HelpBox");
             {
-                GUILayout.Label("<color=#ecb0c1>Generation</color>", _bigTitleStyle.Value);
+                GUILayout.Label("<color=#ecb0c1>Generation</color>", Styles.BigTitleStyle.Value);
                 if (_appTypes != null && _appTypes.Length > 0)
                 {
                     var index = Array.FindIndex(
@@ -178,7 +164,7 @@ namespace Lazy.Editor.UIEditor
 
                 GUILayout.BeginVertical("helpbox");
                 {
-                    GUILayout.Label("<color=#ffbe76>Script</color>", _bigTitleStyle.Value);
+                    GUILayout.Label("<color=#ffbe76>Script</color>", Styles.BigTitleStyle.Value);
                     GUILayout.BeginHorizontal("box");
                     {
                         GUILayout.Label("ScriptFolder", GUILayout.Width(150));
@@ -232,7 +218,7 @@ namespace Lazy.Editor.UIEditor
 
                 GUILayout.BeginVertical("helpbox");
                 {
-                    GUILayout.Label("<color=#ffbe76>Prefab</color>", _bigTitleStyle.Value);
+                    GUILayout.Label("<color=#ffbe76>Prefab</color>", Styles.BigTitleStyle.Value);
                     GUILayout.BeginHorizontal();
                     {
                         ViewPresenter.generatePrefab = GUILayout.Toggle(

@@ -1,5 +1,6 @@
 ﻿using Lazy.Audio;
 using Lazy.Download;
+using Lazy.FSM;
 using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
@@ -35,6 +36,17 @@ namespace Lazy
         {
             get { return _assetManager ??= ManagerCenter.Create(() => AssetManager.Instance); }
             set => _assetManager ??= value;
+        }
+
+        private static HotUpdateManager _hotUpdateManager;
+
+        public static HotUpdateManager HotUpdate
+        {
+            get
+            {
+                return _hotUpdateManager ??= ManagerCenter.Create(() => HotUpdateManager.Instance);
+            }
+            set => _hotUpdateManager ??= value;
         }
 
         private static DownloadManager _downloadManager;
@@ -90,6 +102,14 @@ namespace Lazy
         {
             get { return _storageManager ??= ManagerCenter.Create(() => StorageManager.Instance); }
             set => _storageManager ??= value;
+        }
+
+        private static FsmManager _fsmManager;
+
+        public static FsmManager Fsm
+        {
+            get { return _fsmManager ??= ManagerCenter.Create(() => FsmManager.Instance); }
+            set => _fsmManager ??= value;
         }
 
         private static UIManager _uiManager;

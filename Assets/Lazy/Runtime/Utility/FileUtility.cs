@@ -9,6 +9,30 @@ namespace Lazy.Utility
 {
     public static class FileUtility
     {
+        public static bool SafeCopyFile(string fromFile, string toFile)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fromFile))
+                    return false;
+
+                if (!File.Exists(fromFile))
+                    return false;
+
+                CheckFileAndCreateDirWhenNeeded(toFile);
+                SafeDeleteFile(toFile);
+                File.Copy(fromFile, toFile, true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Log.MsgD(
+                    $"SafeCopyFile failed! formFile = {fromFile}, toFile = {toFile}, with err = {ex.Message}"
+                );
+                return false;
+            }
+        }
+
         public static string SafeReadAllText(string file)
         {
             try
@@ -42,6 +66,26 @@ namespace Lazy.Utility
             catch (Exception ex)
             {
                 Debug.LogError($"SafeDeleteFile failed! path = {filePath} with err: {ex.Message}");
+                return false;
+            }
+        }
+
+        public static bool SafeClearDir(string folderPath, string[] excludeName = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(folderPath))
+                    return true;
+
+                if (Directory.Exists(folderPath))
+                    DeleteDirectory(folderPath, excludeName);
+
+                Directory.CreateDirectory(folderPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Log.MsgE($"SafeClearDir failed! path = {folderPath} with err = {ex.Message}");
                 return false;
             }
         }

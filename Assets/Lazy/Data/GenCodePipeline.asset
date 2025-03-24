@@ -28,11 +28,10 @@ MonoBehaviour:
     mainCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace Lazy.Melody\r\n{\r\n   
       public partial class MyTestVP : ViewPresenter\r\n    {\r\n        public void
       Start()\r\n        {\r\n            // TODO: Please Code Here ! [Generate By
-      Lazy]\r\n        }\r\n    }\r\n}\r\n// Generation Time: 2025\u5E743\u670823\u65E5
-      17:29:03\r\n// Generation ID: 02a650f0-78bd-45d9-bb71-99afd3495f73"
+      Lazy]\r\n        }\r\n    }\r\n}\r\n// Generation Time: Monday, March 24, 2025
+      9:27:12 AM\r\n// Generation ID: 22a67da8-af91-4d55-93ef-3b430f5e816c"
     designerCode: "using UnityEngine;\r\nusing Lazy;\r\n\r\nnamespace Lazy.Melody\r\n{\r\n   
       public partial class MyTestVP \r\n    {\r\n\t\tpublic UnityEngine.UI.Image
-      mImage6;\r\n\t\tpublic UnityEngine.UI.Image mImage6a;\r\n\r\n\t\tpublic UnityEngine.CanvasRenderer
-      mImage6b;\r\n\r\n\t\tpublic Lazy.IApp App => Lazy.Example.TestApp.Gate;\r\n\r\n   
-      }\r\n}\r\n// Generation Time: 2025\u5E743\u670823\u65E5 17:29:03\r\n// Generation
-      ID: 3533f2a3-8c5e-428c-ab73-e8f1dc4a9580"
+      mImage6;\r\n\t\tpublic UnityEngine.UI.Image mImage6a;\r\n\r\n\t\tpublic Lazy.IApp
+      App => Lazy.Example.TestApp.Gate;\r\n\r\n    }\r\n}\r\n// Generation Time:
+      Monday, March 24, 2025 9:27:13 AM\r\n// Generation ID: 154a5c60-677f-40d5-b157-50fe8d1936f1"

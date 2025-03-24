@@ -154,13 +154,9 @@ namespace Lazy.Debugger
             if (curHotControl != _lastHotControl)
             {
                 if (curHotControl != 0)
-                {
-                    // TODO: SHOW GUIMASK
-                }
+                    UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = true;
                 else
-                {
-                    // TODO: HIDE GUIMASK
-                }
+                    UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = false;
             }
         }
 
@@ -240,7 +236,7 @@ namespace Lazy.Debugger
                 showType = DebuggerShowType.Information;
                 _selectedWindow = consoleWindow;
                 _selectedWindow.OnEnter();
-                // TODO: Show GUIMASK
+                UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = true;
             }
 
             if (
@@ -250,12 +246,14 @@ namespace Lazy.Debugger
                     GUILayout.Height(40f)
                 )
             )
-                // TODO: Show GUIMASK
+            {
+                UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = true;
                 if (_cheatWindow != null)
                 {
                     showType = DebuggerShowType.Cheat;
                     _cheatWindow.OnEnter();
                 }
+            }
 
             GUI.DragWindow();
         }

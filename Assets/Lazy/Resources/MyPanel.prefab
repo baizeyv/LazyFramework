@@ -243,6 +243,59 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &905560896553209847
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 913613224359157206}
+  - component: {fileID: 1262232763266091442}
+  m_Layer: 5
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &913613224359157206
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 905560896553209847}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7072165274005541170}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1262232763266091442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 905560896553209847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c67090603720408d8fb091c95902b985, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markType: 0
+  customComment: 
+  customComponentName: GameObject
+  componentName: RectTransform
+  propertyName: 
 --- !u!1 &1431002550063235610
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,7 +308,6 @@ GameObject:
   - component: {fileID: 1489511970424008163}
   - component: {fileID: 4626407500756645664}
   - component: {fileID: 9139383335961921844}
-  - component: {fileID: -1262241989384471027}
   m_Layer: 5
   m_Name: Image (5)
   m_TagString: Untagged
@@ -341,22 +393,6 @@ MonoBehaviour:
   customComponentName: TestWidget
   componentName: UnityEngine.UI.Image
   propertyName: 
---- !u!114 &-1262241989384471027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1431002550063235610}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 495b975f1109e7f4b9aa2be48ba0b28d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mImage6: {fileID: 939758689606624862}
-  mImage7: {fileID: 196991381341781546}
-  mImage8: {fileID: 7753508958219440392}
-  mImage6a: {fileID: 5870769354386125423}
 --- !u!1 &1531820074979338569
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,7 +403,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4941496636053994317}
   - component: {fileID: 5843158545801089908}
-  - component: {fileID: 5220160722542815994}
   m_Layer: 5
   m_Name: GameObject
   m_TagString: Untagged
@@ -419,23 +454,6 @@ MonoBehaviour:
   viewPresenterFullTypeName: 
   mImage6: {fileID: 807177182740317880}
   mImage6a: {fileID: 807177182740317880}
-  mImage6b: {fileID: 2606682704757354033}
---- !u!114 &5220160722542815994
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1531820074979338569}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  binds:
-  - memberName: Image (6)
-    propertyName: mImage6b
-    obj: {fileID: 2606682704757354033}
 --- !u!1 &1708457316757347223
 GameObject:
   m_ObjectHideFlags: 0
@@ -526,7 +544,6 @@ GameObject:
   - component: {fileID: -4912372686059856475}
   - component: {fileID: 6440833408486867443}
   - component: {fileID: -1951240098446247687}
-  - component: {fileID: 1719619926806618701}
   m_Layer: 5
   m_Name: MyPanel
   m_TagString: Untagged
@@ -686,22 +703,6 @@ MonoBehaviour:
   m_OnComplete:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1719619926806618701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2395931355996781295}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c23bba8a159a2164b94fcda597a82ae4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hideAnimationIsRewind: 0
-  closeDestroy: 1
-  mImage1: {fileID: 2581545119686832194}
-  mImage5: {fileID: -1262241989384471027}
 --- !u!1 &2498097512947912309
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,6 +871,62 @@ MonoBehaviour:
   customComponentName: TestWidget
   componentName: UnityEngine.UI.Image
   propertyName: 
+--- !u!1 &3736015485395525579
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7072165274005541170}
+  - component: {fileID: 3578828332889520401}
+  m_Layer: 5
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7072165274005541170
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3736015485395525579}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 913613224359157206}
+  m_Father: {fileID: 8124632862004917798}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3578828332889520401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3736015485395525579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0051ed5a37594607b025fd07d67fbbf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameSpace: Lazy.Melody
+  scriptName: Heel
+  scriptsFolder: Assets/Scripts/CustomComponents
+  generatePrefab: 0
+  prefabFolder: Assets/Prefabs
+  appFullTypeName: 
+  viewPresenterFullTypeName: 
 --- !u!1 &3773184461756316634
 GameObject:
   m_ObjectHideFlags: 0
@@ -1033,7 +1090,6 @@ GameObject:
   - component: {fileID: 7253770774176860058}
   - component: {fileID: 7615029051571102398}
   - component: {fileID: 3866034818019158998}
-  - component: {fileID: 5870769354386125423}
   m_Layer: 5
   m_Name: Image (6)
   m_TagString: Untagged
@@ -1119,20 +1175,6 @@ MonoBehaviour:
   customComponentName: MyNestedWidget
   componentName: UnityEngine.UI.Image
   propertyName: 
---- !u!114 &5870769354386125423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5084479352576270198}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d47ff56dccde2af4480d7934bf57bec3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mImage7: {fileID: 8386234762651685516}
-  mImage8: {fileID: 6305396435033363834}
 --- !u!1 &5879633849300612164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1163,7 +1205,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7072165274005541170}
   m_Father: {fileID: 6859535420677148036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}

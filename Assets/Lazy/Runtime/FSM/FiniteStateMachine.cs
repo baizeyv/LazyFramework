@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy.Pool;
 using UnityEngine;
 
 namespace Lazy.FSM
@@ -7,7 +8,7 @@ namespace Lazy.FSM
     /// <summary>
     /// * 有限状态机
     /// </summary>
-    public class FiniteStateMachine<TState>
+    public class FiniteStateMachine<TState> : IPoolable, IStateMachine
     {
         /// <summary>
         /// * 状态字典
@@ -140,6 +141,15 @@ namespace Lazy.FSM
             _currentState = null;
             _currentStateKey = default;
             _states.Clear();
+            SafeObjectPool<FiniteStateMachine<TState>>.Instance.Free(this);
+        }
+
+        public void Reset()
+        {
+            PreviousStateKey = default;
+            FrameCountOfCurrentState = 1;
+            SecondsOfCurrentState = 0.0f;
+            OnStateToggled = (_, _) => { };
         }
     }
 }

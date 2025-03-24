@@ -110,12 +110,13 @@ namespace Lazy.Editor.UIEditor
                 var referenceBinds = task.gameObject.GetComponent<ExtraBinds>();
                 foreach (var referenceBind in referenceBinds.binds)
                 {
-                    var newName = CodeGenUtility.GetPropertyName(referenceBind.memberName, propertyNameMap);
+                    var newName = CodeGenUtility.GetPropertyName(
+                        referenceBind.memberName,
+                        propertyNameMap
+                    );
                     referenceBind.propertyName = newName;
                     sb.AppendLine();
-                    sb.AppendLine(
-                        $"\t\tpublic {referenceBind.obj.GetType().FullName} {newName};"
-                    );
+                    sb.AppendLine($"\t\tpublic {referenceBind.obj.GetType().FullName} {newName};");
                 }
             }
 

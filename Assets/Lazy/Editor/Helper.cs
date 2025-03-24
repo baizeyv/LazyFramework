@@ -6,7 +6,7 @@ namespace Lazy.Editor
 {
     public static class Helper
     {
-        [MenuItem("Lazy/打包AssetBundles目录资源")]
+        [MenuItem("Lazy/打包AssetBundles目录资源 _F1")]
         public static void BuildAssetBundles()
         {
             AssetBundleBuildTool.BuildAllAssetBundles();
@@ -32,6 +32,7 @@ namespace Lazy.Editor
         {
             // 在Project面板按空格键相当于Show In Explorer
             EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
+            GenCodeSetting.Instance.Save();
         }
 
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)
@@ -42,13 +43,16 @@ namespace Lazy.Editor
                 && selectionRect.Contains(UnityEngine.Event.current.mousePosition)
             )
             {
-                var strPath = AssetDatabase.GUIDToAssetPath(guid);
+                EditorApplication.delayCall += () =>
+                {
+                    var strPath = AssetDatabase.GUIDToAssetPath(guid);
 
-                EditorUtility.RevealInFinder(strPath);
+                    EditorUtility.RevealInFinder(strPath);
 
-                var obj = AssetDatabase.LoadAssetAtPath<Object>(strPath);
-                if (obj != null)
-                    EditorGUIUtility.PingObject(obj);
+                    var obj = AssetDatabase.LoadAssetAtPath<Object>(strPath);
+                    if (obj != null)
+                        EditorGUIUtility.PingObject(obj);
+                };
                 UnityEngine.Event.current.Use();
             }
         }

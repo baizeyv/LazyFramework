@@ -21,8 +21,22 @@ namespace Lazy.Editor
             public static readonly Color Blue = new(138f / 255f, 173f / 255f, 244f / 255f, 1);
             public static readonly Color Lavender = new(183f / 255f, 189f / 255f, 248f / 255f, 1);
             public static readonly Color Text = new(202f / 255f, 211f / 255f, 245f / 255f, 1);
-            public static readonly Color DarkGray = new(0.09f,0.09f,0.09f,1f);
+            public static readonly Color DarkGray = new(0.09f, 0.09f, 0.09f, 1f);
         }
+
+        /// <summary>
+        /// * 标题风格
+        /// </summary>
+        public static readonly System.Lazy<GUIStyle> BigTitleStyle =
+            new(
+                () =>
+                    new GUIStyle(GUI.skin.label)
+                    {
+                        fontStyle = FontStyle.Bold,
+                        fontSize = 12,
+                        richText = true,
+                    }
+            );
 
         private static GUIStyle Icon;
 
@@ -35,8 +49,9 @@ namespace Lazy.Editor
                     Icon = new GUIStyle();
                     Icon.fixedWidth = 15f;
                     Icon.fixedHeight = 15f;
-                    Icon.margin = new(2, 2, 2, 2);
+                    Icon.margin = new RectOffset(2, 2, 2, 2);
                 }
+
                 return Icon;
             }
         }

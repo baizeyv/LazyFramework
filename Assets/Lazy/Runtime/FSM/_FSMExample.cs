@@ -7,32 +7,46 @@ namespace Lazy.FSM
         public enum States
         {
             A,
-            B
+            B,
         }
 
-        public FiniteStateMachine<States> fsm = new();
+        public FiniteStateMachine<States> fsm = FsmManager.Instance.Create<States>();
 
         private void Start()
         {
-            fsm.AddStateToggleEvent((prev, next) => { Debug.Log($"State: {prev} -> {next}"); });
+            fsm.AddStateToggleEvent(
+                (prev, next) =>
+                {
+                    Debug.Log($"State: {prev} -> {next}");
+                }
+            );
 
-            fsm.DefineState(States.A).OnCondition(() => fsm.CurrentStateKey == States.B)
-                .OnEnter(() => { Debug.Log("ENTER A", this); }).OnUpdate(() => { }).OnFixedUpdate(() => { }).OnGUI(() =>
+            fsm.DefineState(States.A)
+                .OnCondition(() => fsm.CurrentStateKey == States.B)
+                .OnEnter(() =>
+                {
+                    Debug.Log("ENTER A", this);
+                })
+                .OnUpdate(() => { })
+                .OnFixedUpdate(() => { })
+                .OnGUI(() =>
                 {
                     GUILayout.Label("State A");
                     if (GUILayout.Button("TO B"))
-                    {
                         fsm.ToggleState(States.B);
-                    }
-                }).OnExit(() => { Debug.Log("EXIT A"); });
-            fsm.DefineState(States.B).OnCondition(() => fsm.CurrentStateKey == States.A).OnGUI(() =>
-            {
-                GUILayout.Label("State B");
-                if (GUILayout.Button("TO A"))
+                })
+                .OnExit(() =>
                 {
-                    fsm.ToggleState(States.A);
-                }
-            });
+                    Debug.Log("EXIT A");
+                });
+            fsm.DefineState(States.B)
+                .OnCondition(() => fsm.CurrentStateKey == States.A)
+                .OnGUI(() =>
+                {
+                    GUILayout.Label("State B");
+                    if (GUILayout.Button("TO A"))
+                        fsm.ToggleState(States.A);
+                });
             fsm.StartState(States.A);
         }
 
@@ -63,16 +77,15 @@ namespace Lazy.FSM
         {
             A,
             B,
-            C
+            C,
         }
 
         public FiniteStateMachine<States> fsm = new();
 
         public class StateA : ABSState<States, FSMExample2>
         {
-            public StateA(FiniteStateMachine<States> fsm, FSMExample2 target) : base(fsm, target)
-            {
-            }
+            public StateA(FiniteStateMachine<States> fsm, FSMExample2 target)
+                : base(fsm, target) { }
 
             protected override bool OnCondition()
             {
@@ -83,29 +96,25 @@ namespace Lazy.FSM
             {
                 GUILayout.Label("State A");
                 if (GUILayout.Button("TO B"))
-                {
                     Fsm.ToggleState(States.B);
-                }
             }
         }
 
         public class StateB : ABSState<States, FSMExample2>
         {
-            public StateB(FiniteStateMachine<States> fsm, FSMExample2 target) : base(fsm, target)
-            {
-            }
+            public StateB(FiniteStateMachine<States> fsm, FSMExample2 target)
+                : base(fsm, target) { }
 
             protected override bool OnCondition()
             {
                 return Fsm.CurrentStateKey == States.A;
             }
+
             protected override void OnGUI()
             {
                 GUILayout.Label("State B");
                 if (GUILayout.Button("TO A"))
-                {
                     Fsm.ToggleState(States.A);
-                }
             }
         }
 

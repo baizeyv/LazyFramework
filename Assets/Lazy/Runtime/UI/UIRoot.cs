@@ -68,6 +68,11 @@ namespace Lazy
         /// </summary>
         public Empty4Raycast raycastBlocker;
 
+        /// <summary>
+        /// * Debugger射线检测阻止器
+        /// </summary>
+        public Empty4Raycast debuggerRaycastBlocker;
+
         private static UIRoot _instance;
 
         public static UIRoot Instance

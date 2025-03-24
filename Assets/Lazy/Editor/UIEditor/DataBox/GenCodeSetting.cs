@@ -22,8 +22,8 @@ namespace Lazy
         // # UI代码生成的默认配置
         [Header("UI代码生成的默认配置")]
         public string uiNamespace = DefaultNameSpace;
-        public string uiScriptDir = "Scripts/UI";
-        public string uiPrefabDir = "Prefabs/UI";
+        public string uiScriptDir = "/Scripts/UI";
+        public string uiPrefabDir = "/Prefabs/UI";
 
         /// ////////////////////////////////////////
 

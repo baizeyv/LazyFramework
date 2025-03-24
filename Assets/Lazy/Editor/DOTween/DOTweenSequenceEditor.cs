@@ -1,5 +1,4 @@
-﻿
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using DG.DOTweenEditor;
 using DG.Tweening;
 using Lazy.Utility;
@@ -47,45 +46,74 @@ namespace Lazy.Editor
         {
             if (!EditorApplication.isPlaying)
             {
-                EditorGUILayout.BeginHorizontal();
+                GUILayout.BeginVertical("HelpBox");
                 {
-                    if (GUILayout.Button(m_PlayBtnContent, m_btnHeight))
+                    GUILayout.Label(
+                        "<color=#7bed9f>DOTween Sequence Operation</color>",
+                        Styles.BigTitleStyle.Value
+                    );
+                    EditorGUILayout.BeginHorizontal();
                     {
-                        if (DOTweenEditorPreview.isPreviewing)
+                        if (GUILayout.Button(m_PlayBtnContent, m_btnHeight))
+                        {
+                            if (DOTweenEditorPreview.isPreviewing)
+                            {
+                                DOTweenEditorPreview.Stop(true, true);
+                                (target as DOTweenSequence).DOKill();
+                            }
+
+                            DOTweenEditorPreview.PrepareTweenForPreview(
+                                (target as DOTweenSequence).DOPlay()
+                            );
+                            DOTweenEditorPreview.Start();
+                        }
+
+                        if (GUILayout.Button(m_RewindBtnContent, m_btnHeight))
+                        {
+                            if (DOTweenEditorPreview.isPreviewing)
+                            {
+                                DOTweenEditorPreview.Stop(true, true);
+                                (target as DOTweenSequence).DOKill();
+                            }
+
+                            DOTweenEditorPreview.PrepareTweenForPreview(
+                                (target as DOTweenSequence).DORewind()
+                            );
+                            DOTweenEditorPreview.Start();
+                        }
+
+                        if (GUILayout.Button(m_ResetBtnContent, m_btnHeight))
                         {
                             DOTweenEditorPreview.Stop(true, true);
                             (target as DOTweenSequence).DOKill();
                         }
-                        DOTweenEditorPreview.PrepareTweenForPreview(
-                            (target as DOTweenSequence).DOPlay()
-                        );
-                        DOTweenEditorPreview.Start();
+
+                        EditorGUILayout.EndHorizontal();
                     }
-                    if (GUILayout.Button(m_RewindBtnContent, m_btnHeight))
-                    {
-                        if (DOTweenEditorPreview.isPreviewing)
-                        {
-                            DOTweenEditorPreview.Stop(true, true);
-                            (target as DOTweenSequence).DOKill();
-                        }
-                        DOTweenEditorPreview.PrepareTweenForPreview(
-                            (target as DOTweenSequence).DORewind()
-                        );
-                        DOTweenEditorPreview.Start();
-                    }
-                    if (GUILayout.Button(m_ResetBtnContent, m_btnHeight))
-                    {
-                        DOTweenEditorPreview.Stop(true, true);
-                        (target as DOTweenSequence).DOKill();
-                    }
-                    EditorGUILayout.EndHorizontal();
                 }
+                GUILayout.EndVertical();
             }
 
             serializedObject.Update();
-            m_SequenceList.DoLayoutList();
+            GUILayout.BeginVertical("helpbox");
+            {
+                GUILayout.Label(
+                    "<color=#7bed9f>DOTween Sequence Content</color>",
+                    Styles.BigTitleStyle.Value
+                );
+                m_SequenceList.DoLayoutList();
+            }
+            GUILayout.EndVertical();
+            GUILayout.BeginVertical("helpbox");
+            {
+                GUILayout.Label(
+                    "<color=#7bed9f>DOTween Sequence Properties</color>",
+                    Styles.BigTitleStyle.Value
+                );
+                DrawPropertiesExcluding(serializedObject, "m_Script");
+            }
+            GUILayout.EndVertical();
             serializedObject.ApplyModifiedProperties();
-            base.OnInspectorGUI();
         }
 
         private void OnDrawSequenceHeader(Rect rect)
@@ -111,11 +139,9 @@ namespace Lazy.Editor
             return EditorGUIUtility.singleLineHeight * 11
                 + (
                     property.isExpanded
-                        ? (
-                            EditorGUI.GetPropertyHeight(onPlay)
+                        ? EditorGUI.GetPropertyHeight(onPlay)
                             + EditorGUI.GetPropertyHeight(onUpdate)
                             + EditorGUI.GetPropertyHeight(onComplete)
-                        )
                         : 0
                 );
         }
@@ -167,9 +193,7 @@ namespace Lazy.Editor
                     (DOTweenSequence.DOTweenType)tweenType.enumValueIndex
                 );
                 if (fixedComType != null)
-                {
                     target.objectReferenceValue = fixedComType;
-                }
             }
 
             if (
@@ -194,6 +218,7 @@ namespace Lazy.Editor
                     MessageType.Error
                 );
             }
+
             const float itemWidth = 110;
             const float setBtnWidth = 30;
             //Delay, Snapping
@@ -315,6 +340,7 @@ namespace Lazy.Editor
                     }
                     break;
             }
+
             if (useToTarget.boolValue)
             {
                 toTarget.objectReferenceValue = EditorGUI.ObjectField(
@@ -333,12 +359,12 @@ namespace Lazy.Editor
                     EditorGUI.HelpBox(lastRect, "To target cannot be null.", MessageType.Error);
                 }
             }
+
             horizontalRect.x += horizontalRect.width;
             horizontalRect.width = setBtnWidth;
             if (useFromValue.boolValue && GUI.Button(horizontalRect, "Set"))
-            {
                 SetValueFromTarget(dotweenTp, target, fromValue);
-            }
+
             horizontalRect.x += setBtnWidth;
             horizontalRect.width = itemWidth;
             useFromValue.boolValue = EditorGUI.ToggleLeft(
@@ -350,9 +376,8 @@ namespace Lazy.Editor
             toRect.x += toRect.width;
             toRect.width = setBtnWidth;
             if (!useToTarget.boolValue && GUI.Button(toRect, "Set"))
-            {
                 SetValueFromTarget(dotweenTp, target, toValue);
-            }
+
             toRect.x += setBtnWidth;
             toRect.width = itemWidth;
             useToTarget.boolValue = EditorGUI.ToggleLeft(toRect, "ToTarget", useToTarget.boolValue);
@@ -523,27 +548,27 @@ namespace Lazy.Editor
                 }
                 case DOTweenSequence.DOTweenType.DOColor:
                 {
-                    value.vector4Value = (targetCom as UnityEngine.UI.Graphic).color;
+                    value.vector4Value = (targetCom as Graphic).color;
                     break;
                 }
                 case DOTweenSequence.DOTweenType.DOFade:
                 {
                     var tmpValue = value.vector4Value;
-                    tmpValue.x = (targetCom as UnityEngine.UI.Graphic).color.a;
+                    tmpValue.x = (targetCom as Graphic).color.a;
                     value.vector4Value = tmpValue;
                     break;
                 }
                 case DOTweenSequence.DOTweenType.DOCanvasGroupFade:
                 {
                     var tmpValue = value.vector4Value;
-                    tmpValue.x = (targetCom as UnityEngine.CanvasGroup).alpha;
+                    tmpValue.x = (targetCom as CanvasGroup).alpha;
                     value.vector4Value = tmpValue;
                     break;
                 }
                 case DOTweenSequence.DOTweenType.DOValue:
                 {
                     var tmpValue = value.vector4Value;
-                    tmpValue.x = (targetCom as UnityEngine.UI.Slider).value;
+                    tmpValue.x = (targetCom as Slider).value;
                     value.vector4Value = tmpValue;
                     break;
                 }
@@ -555,7 +580,7 @@ namespace Lazy.Editor
                 case DOTweenSequence.DOTweenType.DOFillAmount:
                 {
                     var tmpValue = value.vector4Value;
-                    tmpValue.x = (targetCom as UnityEngine.UI.Image).fillAmount;
+                    tmpValue.x = (targetCom as Image).fillAmount;
                     value.vector4Value = tmpValue;
                     break;
                 }
@@ -644,18 +669,19 @@ namespace Lazy.Editor
                     return com.gameObject.GetComponent<RectTransform>();
                 case DOTweenSequence.DOTweenType.DOColor:
                 case DOTweenSequence.DOTweenType.DOFade:
-                    return com.gameObject.GetComponent<UnityEngine.UI.Graphic>();
+                    return com.gameObject.GetComponent<Graphic>();
                 case DOTweenSequence.DOTweenType.DOCanvasGroupFade:
-                    return com.gameObject.GetComponent<UnityEngine.CanvasGroup>();
+                    return com.gameObject.GetComponent<CanvasGroup>();
                 case DOTweenSequence.DOTweenType.DOFillAmount:
-                    return com.gameObject.GetComponent<UnityEngine.UI.Image>();
+                    return com.gameObject.GetComponent<Image>();
                 case DOTweenSequence.DOTweenType.DOFlexibleSize:
                 case DOTweenSequence.DOTweenType.DOMinSize:
                 case DOTweenSequence.DOTweenType.DOPreferredSize:
-                    return com.gameObject.GetComponent<UnityEngine.UI.LayoutElement>();
+                    return com.gameObject.GetComponent<LayoutElement>();
                 case DOTweenSequence.DOTweenType.DOValue:
-                    return com.gameObject.GetComponent<UnityEngine.UI.Slider>();
+                    return com.gameObject.GetComponent<Slider>();
             }
+
             return null;
         }
     }
