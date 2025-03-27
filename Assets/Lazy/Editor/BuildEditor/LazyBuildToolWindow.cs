@@ -38,7 +38,6 @@ namespace Lazy.Editor.Build
 
         private void OnEnable()
         {
-            _localBundles = new List<string>() { "ab", "cd" };
             _reorderableBundleList = new ReorderableList(
                 _localBundles,
                 typeof(string),

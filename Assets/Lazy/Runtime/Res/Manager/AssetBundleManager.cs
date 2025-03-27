@@ -646,7 +646,8 @@ namespace Lazy.Res.Manager
             if (assetBundle)
             {
                 _manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-                _manifest.GetAllAssetBundles();
+                // # 也许可以不写这一行,感觉这一行没有意义
+                // _manifest.GetAllAssetBundles();
                 assetBundle.Unload(false);
             }
             else

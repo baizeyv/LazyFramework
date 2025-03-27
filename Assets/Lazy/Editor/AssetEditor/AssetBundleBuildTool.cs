@@ -75,9 +75,74 @@ namespace Lazy.Editor.AssetEditor
             Debug.Log(
                 $"写入资产数据 生成：{nameof(AssetBundleMapping)}.json，生成：{nameof(ResourceMapping)}.json"
             );
+            FileUtility.SafeClearDir(outPath);
+            FileUtility.CheckOrCreateDir(outPath);
+            CopyLocalAssetBundle(assetBundleOutputPathDir, outPath);
             AssetDatabase.Refresh();
 
             Debug.Log("资产打包成功!");
+        }
+
+        /// <summary>
+        /// * 将需要打到包中的AssetBundle复制到Application.StreamingAssetsPath中
+        /// </summary>
+        private static void CopyLocalAssetBundle(string sourcePath, string targetPath)
+        {
+            // TODO: 只复制需要打到本地包中的AssetBundle及Manifest
+            if (LazyBuildTool.EnableHotUpdate)
+            {
+                // # 需要热更的情况只把需要打到包中的AssetBundle复制过去
+                var localBundles = EditorPrefs.GetString(EditorConstant.LocalAssetBundlesKey, "");
+                if (string.IsNullOrEmpty(localBundles)) // # 不需要将任何AssetBundle打入包中
+                    return;
+                var locals = localBundles.Split(';');
+                Stack<string> stack = new();
+                stack.Push(sourcePath);
+                while (stack.Count > 0)
+                {
+                    var currentPath = stack.Pop();
+                    // # 检查目录
+                    var directories = Directory.GetDirectories(currentPath);
+                    foreach (var directory in directories)
+                        stack.Push(directory);
+                    // # 检查文件
+                    var files = Directory.GetFiles(currentPath);
+                    foreach (var file in files)
+                    {
+                        var extension = Path.GetExtension(file).ToLower();
+                        if (
+                            extension != ".meta"
+                            && extension != ".manifest"
+                            && extension != ".ds_store"
+                        )
+                        {
+                            var filename = Path.GetFileNameWithoutExtension(file);
+                            if (
+                                locals.Contains(filename)
+                                || filename.Equals("Windows")
+                                || filename.Equals("macOS")
+                                || filename.Equals("Linux")
+                                || filename.Equals("Android")
+                                || filename.Equals("iOS")
+                                || filename.Equals("WebGL")
+                                || filename.Equals("Unknown")
+                            )
+                            {
+                                FileUtility.SafeCopyFile(file, targetPath + "/" + filename);
+                                FileUtility.SafeCopyFile(
+                                    file + ".manifest",
+                                    targetPath + "/" + filename + ".manifest"
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // # 不需要热更的情况就全量复制AssetBundle
+                FileUtility.SafeCopyDirectory(sourcePath, targetPath, true);
+            }
         }
 
         /// <summary>
