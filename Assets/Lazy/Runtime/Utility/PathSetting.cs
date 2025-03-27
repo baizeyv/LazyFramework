@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Lazy.Res;
+using Lazy.Res.HotUpdate;
+using UnityEngine;
 
 namespace Lazy
 {
@@ -22,8 +24,34 @@ namespace Lazy
         public static string StreamingAssetsPath =>
             $"{Application.streamingAssetsPath}/{AssetBundlesName}/{GetPlatformName()}/";
 
+        public static string HotUpdatePath =>
+            Application.persistentDataPath
+            + HotUpdateManager.HotUpdateDirName
+            + "/"
+            + AssetBundlesName
+            + "/"
+            + GetPlatformName()
+            + "/";
+
+        public static string PackagePath =>
+            Application.persistentDataPath
+            + HotUpdateManager.PackageDirName
+            + "/"
+            + AssetBundlesName
+            + "/"
+            + GetPlatformName()
+            + "/";
+
+        public static string RemoteAddress =>
+            AppConfig.LocalVersion.AssetRemoteAddress
+            + "/"
+            + AssetBundlesName
+            + "/"
+            + GetPlatformName()
+            + "/";
+
         public static string AssetBundlesOutPath =>
-            $"{Application.dataPath}/StreamingAssets/{AssetBundlesName}/{GetPlatformName()}";
+            $"{Application.dataPath}/../Bundles/{AssetBundlesName}/{GetPlatformName()}";
 
         public static string AssetBundlesFolder => $"{Application.dataPath}/{AssetBundlesName}";
 

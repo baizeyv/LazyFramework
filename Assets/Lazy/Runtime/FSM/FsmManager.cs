@@ -25,8 +25,9 @@ namespace Lazy.FSM
             }
             else
             {
-                _machines[typeof(T)] = new List<IStateMachine>();
-                _machines.Add(typeof(T), _machines[typeof(T)]);
+                var list = new List<IStateMachine>();
+                list.Add(fsm);
+                _machines.Add(typeof(T), list);
             }
 
             return fsm;

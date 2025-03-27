@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Lazy.Editor.Build;
 using Lazy.Res;
 using Lazy.Utility;
 using Newtonsoft.Json;
@@ -61,13 +62,20 @@ namespace Lazy.Editor.AssetEditor
             // # 清理多余文件夹和ab
             DeleteRemovedAssetBundles();
 
+            // 复制AssetBundle到Stream打包目录
+            var outPath = PathSetting.StreamingAssetsPath;
+            FileUtility.SafeClearDir(outPath);
+            FileUtility.CheckOrCreateDir(outPath);
+            FileUtility.SafeCopyDirectory(assetBundleOutputPathDir, outPath, true);
+            AssetDatabase.Refresh();
+
             // # 等待AB打包完成，再写入数据
             GenerateAssetNames(true);
             GenerateResourceNames(true);
-            AssetDatabase.Refresh();
             Debug.Log(
                 $"写入资产数据 生成：{nameof(AssetBundleMapping)}.json，生成：{nameof(ResourceMapping)}.json"
             );
+            AssetDatabase.Refresh();
 
             Debug.Log("资产打包成功!");
         }
@@ -156,7 +164,7 @@ namespace Lazy.Editor.AssetEditor
                             new AssetMapping(
                                 abName.ToLower(),
                                 assetPathsForAbName.ToArray(),
-                                "",
+                                LazyBuildTool.ToVersion,
                                 FileUtility.GetFileSize(
                                     AssetBundlePathHelper.GetAssetBundleFullName(abName.ToLower())
                                 ),
@@ -203,7 +211,15 @@ namespace Lazy.Editor.AssetEditor
 
                         _assetMapping.Add(
                             filenameWithoutExtension,
-                            new AssetMapping("", assetNameDir, "", 0, "", "", false)
+                            new AssetMapping(
+                                "",
+                                assetNameDir,
+                                LazyBuildTool.ToVersion,
+                                0,
+                                "",
+                                "",
+                                false
+                            )
                         );
                     }
                 }
@@ -222,7 +238,7 @@ namespace Lazy.Editor.AssetEditor
                             new AssetMapping(
                                 PathSetting.GetPlatformName(),
                                 new string[] { },
-                                "",
+                                LazyBuildTool.ToVersion,
                                 FileUtility.GetFileSize(
                                     AssetBundlePathHelper.GetAssetBundleFullName(
                                         PathSetting.GetPlatformName()

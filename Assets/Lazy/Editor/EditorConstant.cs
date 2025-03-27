@@ -22,5 +22,12 @@
         public const string BuildPathKey = "LazyBuildPath";
         public const string ExportCurrentPlatformKey = "LazyExportCurrentPlatform";
         public const string ExportPlatformKey = "LazyExportPlatform";
+        public const string ExportAndroidProject = "LazyExportAndroidProject";
+        public const string ExportAndroidPath = "LazyExportAndroidPath";
+
+        /// <summary>
+        /// # 要在本地存一份的AssetBundle列表,  ;分割
+        /// </summary>
+        public const string LocalAssetBundlesKey = "LazyLocalAssetBundles";
     }
 }

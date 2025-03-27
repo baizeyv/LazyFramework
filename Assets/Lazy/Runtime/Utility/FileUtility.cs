@@ -90,6 +90,64 @@ namespace Lazy.Utility
             }
         }
 
+        public static bool SafeCopyDirectory(
+            string sourceDirName,
+            string destDirName,
+            bool copySubDirs,
+            string[] excludeName = null
+        )
+        {
+            try
+            {
+                var dir = new DirectoryInfo(sourceDirName);
+                if (dir.Exists == false)
+                    throw new DirectoryNotFoundException(
+                        "Source directory does not exist or could not be found: " + sourceDirName
+                    );
+
+                var dirs = dir.GetDirectories();
+                if (Directory.Exists(destDirName) == false)
+                    Directory.CreateDirectory(destDirName);
+
+                var files = dir.GetFiles();
+                foreach (var file in files)
+                {
+                    var copy = true;
+                    if (excludeName != null)
+                        foreach (var s in excludeName)
+                            if (file.Name.EndsWith(s))
+                                copy = false;
+
+                    if (copy)
+                    {
+                        var temppath = Path.Combine(destDirName, file.Name);
+                        file.CopyTo(temppath, true);
+                    }
+                }
+
+                if (copySubDirs == true)
+                    foreach (var subdir in dirs)
+                    {
+                        var temppath = Path.Combine(destDirName, subdir.Name);
+                        SafeCopyDirectory(subdir.FullName, temppath, copySubDirs);
+                    }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Log.MsgE(
+                    string.Format(
+                        "SafeCopyDirectory failed! sourceDirName = {0}, destDirName = {1}, with err = {2}",
+                        sourceDirName,
+                        destDirName,
+                        ex.Message
+                    )
+                );
+                return false;
+            }
+        }
+
         public static bool SafeDeleteDir(string folderPath, string[] excludeName = null)
         {
             try

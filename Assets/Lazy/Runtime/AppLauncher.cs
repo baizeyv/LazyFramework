@@ -41,6 +41,7 @@ namespace Lazy
         {
             ManagerCenter.Setup(this);
 
+            // ! 这里的顺序不能改变
 #if DEBUG
             App.Debugger = ManagerCenter.CreateMono(() => Debugger.Debugger.Instance);
 #endif

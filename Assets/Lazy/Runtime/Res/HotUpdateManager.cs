@@ -31,7 +31,7 @@ namespace Lazy.Res
         /// <summary>
         /// * 远程目录名称
         /// </summary>
-        public static string RemoteDirName = "/" + PathSetting.GetPlatformName();
+        public static string RemoteDirName = "/Remote/" + PathSetting.GetPlatformName();
 
         /// <summary>
         /// * 热更目录名称
@@ -478,7 +478,28 @@ namespace Lazy.Res
             completed?.Invoke();
         }
 
-        public IEnumerator Do(
+        public void Launch(
+            Action hotUpdateCompleted = null,
+            Action hotUpdateFailed = null,
+            Action<float> hotUpdateProgress = null,
+            Action packageCompleted = null,
+            Action packageFailed = null,
+            Action<float> packageProgress = null
+        )
+        {
+            CoroutineCenter.StartCoroutine(
+                Do(
+                    hotUpdateCompleted,
+                    hotUpdateFailed,
+                    hotUpdateProgress,
+                    packageCompleted,
+                    packageFailed,
+                    packageProgress
+                )
+            );
+        }
+
+        private IEnumerator Do(
             Action hotUpdateCompleted = null,
             Action hotUpdateFailed = null,
             Action<float> hotUpdateProgress = null,

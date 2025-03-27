@@ -83,9 +83,15 @@ namespace DefaultNamespace
             // );
             // App.UI.OpenSync<MyPanel>(prefabName: "MyPanelUUU");
             // StartCoroutine(TestPanelClose());
-            App.UI.OpenSync<DialogA>();
-            App.UI.OpenSync<DialogB>();
-            App.UI.OpenSync<DialogC>();
+            // App.UI.OpenSync<DialogA>();
+            // App.UI.OpenSync<DialogB>();
+            // App.UI.OpenSync<DialogC>();
+
+            App.HotUpdate.Launch(() =>
+            {
+                var prefab = App.Asset.LoadSync<GameObject>("Image");
+                Instantiate(prefab, UIRoot.Instance.transform);
+            });
         }
 
         private IEnumerator TestPanelClose()
