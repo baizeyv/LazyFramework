@@ -1,11 +1,1 @@
-{
-  "Version": "1.0.0",
-  "AssetRemoteAddress": "http://127.0.0.1:7373/Remote/Windows",
-  "HotUpdateVersions": [],
-  "SubPackages": [
-    "0",
-    "1",
-    "2",
-    "3"
-  ]
-}
+{"Version":"1.0.0","AssetRemoteAddress":"http://127.0.0.1:7373/Remote/Windows","EnableHotUpdate":true,"HotUpdateVersions":[],"SubPackages":["0","1","2","3"]}

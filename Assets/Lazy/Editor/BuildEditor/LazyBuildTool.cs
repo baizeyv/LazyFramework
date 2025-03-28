@@ -288,7 +288,72 @@ namespace Lazy.Editor.Build
                 }
             }
 
+            CopyRemoteBundleToBuildPath();
             AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// * 第一次构建游戏时将不需要存在本地的放到导出目录中
+        /// </summary>
+        private static void CopyRemoteBundleToBuildPath()
+        {
+            var allLocalBundles = EditorPrefs.GetString(EditorConstant.LocalAssetBundlesKey, "");
+            // # 项目 Resources 中的 AssetBundleMapping.json (最完整的AssetBundleMapping.json)
+            var resAssetBundleMappings = JsonConvert.DeserializeObject<
+                Dictionary<string, AssetMapping>
+            >(Resources.Load<TextAsset>(nameof(AssetBundleMapping)).text, Constant.JsonSetting);
+            // # 热更新资源文件夹路径 For Example:foo/bar/HotUpdate_1.0.1
+            var hotUpdatePath =
+                BuildPath
+                + HotUpdateManager.RemoteDirName
+                + HotUpdateManager.HotUpdateDirName
+                + HotUpdateManager.Separator
+                + ToVersion;
+            if (string.IsNullOrEmpty(allLocalBundles))
+            {
+                // # 没有存在本地的,全部复制到导出目录
+                CopyHotUpdateAssetBundle(
+                    PathSetting.AssetBundlesOutPath,
+                    resAssetBundleMappings,
+                    hotUpdatePath
+                );
+                return;
+            }
+
+            var localBundleArray = allLocalBundles.Split(';');
+            var generateAssetBundleMappings = new Dictionary<string, AssetMapping>();
+            foreach (
+                var resAssetMapping in from resAssetMapping in resAssetBundleMappings
+                let bundleName = resAssetMapping.Value.AssetBundleName
+                where !localBundleArray.Contains(bundleName)
+                select resAssetMapping
+            )
+                generateAssetBundleMappings.TryAdd(resAssetMapping.Key, resAssetMapping.Value);
+
+            // # 若文件夹不存在则创建文件夹
+            FileUtility.CheckOrCreateDir(hotUpdatePath);
+            // # 清空文件夹
+            FileUtility.SafeClearDir(hotUpdatePath);
+            CopyHotUpdateAssetBundle(
+                PathSetting.AssetBundlesOutPath,
+                generateAssetBundleMappings,
+                hotUpdatePath
+            );
+            // # 导出的热更资源 HotUpdate_AssetBundleMapping.json 的路径
+            var hotUpdateMapPath =
+                BuildPath
+                + HotUpdateManager.RemoteDirName
+                + "/HotUpdate"
+                + HotUpdateManager.Separator
+                + nameof(AssetBundleMapping)
+                + ".json";
+            FileUtility.SafeCopyFile(
+                Application.dataPath
+                    + "/Lazy/AssetMap/Resources/"
+                    + nameof(AssetBundleMapping)
+                    + ".json",
+                hotUpdateMapPath
+            );
         }
 
         /// <summary>
@@ -324,7 +389,7 @@ namespace Lazy.Editor.Build
 
             JsonSerializerSettings settings =
                 new() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate };
-            // # 项目 Resources 中的 AssetBundleMapping.json
+            // # 项目 Resources 中的 AssetBundleMapping.json (最完整的AssetBundleMapping.json)
             var resAssetBundleMappings = JsonConvert.DeserializeObject<
                 Dictionary<string, AssetMapping>
             >(Resources.Load<TextAsset>(nameof(AssetBundleMapping)).text, settings);
