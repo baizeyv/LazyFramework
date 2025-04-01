@@ -1,4 +1,5 @@
 ﻿using System;
+using Lazy.Editor.EditorRes;
 using UnityEditor;
 using UnityEngine;
 
@@ -58,7 +59,12 @@ namespace Lazy.Editor.CaptureEditor
             }
 
             GUILayout.Space(5);
-            if (GUILayout.Button("Capture"))
+            var cameraContent = new GUIContent(
+                " Capture",
+                EditorImageManager.CameraCapture,
+                "Capture Now"
+            );
+            if (GUILayout.Button(cameraContent, GUILayout.Height(25)))
             {
                 var resolution = GetMainGameViewSize();
                 var x = (int)resolution.x;

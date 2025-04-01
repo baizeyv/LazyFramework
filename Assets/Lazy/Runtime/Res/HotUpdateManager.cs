@@ -222,6 +222,12 @@ namespace Lazy.Res
                             == resAssetMapping.Value.MD5
                     )
                         continue;
+                    if (
+                        AssetBundleMapping.Mappings.TryGetValue(resAssetMapping.Key, out var am)
+                        && am != null
+                        && am.MD5 == resAssetMapping.Value.MD5
+                    )
+                        continue;
                     allSize += resAssetMapping.Value.Size;
                     hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, abPath);
                 }
@@ -282,6 +288,12 @@ namespace Lazy.Res
                         File.Exists(persistentAbPath)
                         && FileUtility.CreateMD5ForFile(persistentAbPath)
                             == resAssetMapping.Value.MD5
+                    )
+                        continue;
+                    if (
+                        AssetBundleMapping.Mappings.TryGetValue(resAssetMapping.Key, out var am)
+                        && am != null
+                        && am.MD5 == resAssetMapping.Value.MD5
                     )
                         continue;
 
@@ -735,11 +747,9 @@ namespace Lazy.Res
 
         public override void OnSingletonInitialize()
         {
-            JsonSerializerSettings jsonSettings =
-                new() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate };
             var appVersion = JsonConvert.DeserializeObject<AppVersion>(
                 Resources.Load<TextAsset>(nameof(AppVersion)).ToString(),
-                jsonSettings
+                Constant.JsonSetting
             );
             AppConfig.LocalVersion = appVersion;
         }

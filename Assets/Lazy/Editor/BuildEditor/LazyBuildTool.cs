@@ -106,7 +106,6 @@ namespace Lazy.Editor.Build
 
         public static void Build()
         {
-            // TODO: 分成保存本地的和不保存本地的, 此处的保存本地的意思的是否打入包中
             var appName = Application.productName;
             var buildPath = BuildPath;
             var enumValues = Enum.GetValues(typeof(BuildTarget));
@@ -229,7 +228,7 @@ namespace Lazy.Editor.Build
                 {
                     // # 设置输出路径 (将生成 Android 工程文件)
                     // var outputPath = "Builds/AndroidProject";
-                    var outputPath = string.Empty;
+                    string outputPath;
                     if (ExportAndroidProject)
                         outputPath = ExportAndroidPath;
                     else
@@ -614,6 +613,33 @@ namespace Lazy.Editor.Build
         }
 
         /// <summary>
+        /// * 对于在本地存有 AssetBundle 的,进行包内的AppVersion覆写,改为-x.-y.-z
+        /// </summary>
+        public static void OverrideAppVersion()
+        {
+            var allLocalBundles = EditorPrefs.GetString(EditorConstant.LocalAssetBundlesKey, "");
+            if (string.IsNullOrEmpty(allLocalBundles))
+                // # 没有存在本地的,不需要覆盖包内版本
+                return;
+            var appVersionResourcesPath =
+                Application.dataPath + "/Lazy/AssetMap/Resources/" + nameof(AppVersion) + ".json";
+            var json = FileUtility.SafeReadAllText(appVersionResourcesPath);
+            var appVersion = JsonConvert.DeserializeObject<AppVersion>(json, Constant.JsonSetting);
+            var arr = appVersion.Version.Split(".");
+            for (var i = 0; i < arr.Length; i++)
+                arr[i] = (Convert.ToInt32(arr[i]) * -1).ToString();
+
+            var version = string.Join(".", arr);
+            appVersion.Version = version;
+            FileUtility.SafeDeleteFile(appVersionResourcesPath);
+            FileUtility.SafeDeleteFile(appVersionResourcesPath + ".meta");
+            AssetDatabase.Refresh();
+            var newJson = JsonConvert.SerializeObject(appVersion, Constant.JsonSetting);
+            FileUtility.SafeWriteAllText(appVersionResourcesPath, newJson);
+            AssetDatabase.Refresh();
+        }
+
+        /// <summary>
         /// * 写入 App Version
         /// </summary>
         public static void WriteAppVersion()
@@ -655,9 +681,7 @@ namespace Lazy.Editor.Build
             var appVersionResourcesPath =
                 Application.dataPath + "/Lazy/AssetMap/Resources/" + nameof(AppVersion) + ".json";
             // # 序列化对象
-            JsonSerializerSettings settings =
-                new() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate };
-            var json = JsonConvert.SerializeObject(appVersion, settings);
+            var json = JsonConvert.SerializeObject(appVersion, Constant.JsonSetting);
             FileUtility.SafeDeleteFile(appVersionResourcesPath);
             FileUtility.SafeDeleteFile(appVersionResourcesPath + ".meta");
             AssetDatabase.Refresh();

@@ -396,6 +396,7 @@ namespace Lazy.Editor.Build
                             AssetBundleBuildTool.BuildAllAssetBundles();
                             LazyBuildTool.Build();
                             LazyBuildTool.WriteAssetVersion();
+                            LazyBuildTool.OverrideAppVersion();
                         };
                     }
 

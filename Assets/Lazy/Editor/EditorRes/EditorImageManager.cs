@@ -15,9 +15,7 @@ namespace Lazy.Editor.EditorRes
         private static string GetAssetDir()
         {
             if (_imageManagerPath != null)
-            {
                 return _imageManagerPath;
-            }
 
             foreach (var assetGuid in AssetDatabase.FindAssets("EditorImageManager"))
             {
@@ -25,18 +23,18 @@ namespace Lazy.Editor.EditorRes
                 var fileName = Path.GetFileName(assetPath);
 
                 if (fileName.Equals("EditorImageManager.cs"))
-                {
                     if (File.ReadLines(Path.GetFullPath(assetPath)).Any(line => line.Contains(ID)))
                     {
-                        _imageManagerPath = Path.GetDirectoryName(assetPath) + Path.DirectorySeparatorChar;
+                        _imageManagerPath =
+                            Path.GetDirectoryName(assetPath) + Path.DirectorySeparatorChar;
                         return _imageManagerPath;
                     }
-                }
             }
 
-            throw new Exception("Cannot find EditorImageManager.cs in the project. Are sure all the files in place?");
+            throw new Exception(
+                "Cannot find EditorImageManager.cs in the project. Are sure all the files in place?"
+            );
         }
-
 
         public static Texture2D GetOsIcon()
         {
@@ -56,11 +54,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (osLinuxIcon == null)
-                {
-                    osLinuxIcon =
-                        (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "os_linux_icon.png",
-                            typeof(Texture2D));
-                }
+                    osLinuxIcon = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "os_linux_icon.png",
+                            typeof(Texture2D)
+                        );
 
                 return osLinuxIcon;
             }
@@ -73,10 +71,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (osWinIcon == null)
-                {
-                    osWinIcon = (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "os_win_icon.png",
-                        typeof(Texture2D));
-                }
+                    osWinIcon = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "os_win_icon.png",
+                            typeof(Texture2D)
+                        );
 
                 return osWinIcon;
             }
@@ -89,10 +88,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (osMacIcon == null)
-                {
-                    osMacIcon = (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "os_mac_icon.png",
-                        typeof(Texture2D));
-                }
+                    osMacIcon = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "os_mac_icon.png",
+                            typeof(Texture2D)
+                        );
 
                 return osMacIcon;
             }
@@ -107,8 +107,10 @@ namespace Lazy.Editor.EditorRes
                 if (spinWheelIcons == null)
                 {
                     spinWheelIcons = new GUIContent[12];
-                    for (int i = 0; i < 12; i++)
-                        spinWheelIcons[i] = EditorGUIUtility.IconContent("WaitSpin" + i.ToString("00"));
+                    for (var i = 0; i < 12; i++)
+                        spinWheelIcons[i] = EditorGUIUtility.IconContent(
+                            "WaitSpin" + i.ToString("00")
+                        );
                 }
 
                 return spinWheelIcons;
@@ -122,10 +124,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (refresh == null)
-                {
-                    refresh = (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "refresh.png",
-                        typeof(Texture2D));
-                }
+                    refresh = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "refresh.png",
+                            typeof(Texture2D)
+                        );
 
                 return refresh;
             }
@@ -138,9 +141,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (trash == null)
-                {
-                    trash = (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "trash.png", typeof(Texture2D));
-                }
+                    trash = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "trash.png",
+                            typeof(Texture2D)
+                        );
 
                 return trash;
             }
@@ -153,10 +158,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (exclamation == null)
-                {
-                    exclamation =
-                        (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "exclamation.png", typeof(Texture2D));
-                }
+                    exclamation = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "exclamation.png",
+                            typeof(Texture2D)
+                        );
 
                 return exclamation;
             }
@@ -169,9 +175,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (info == null)
-                {
-                    info = (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "info.png", typeof(Texture2D));
-                }
+                    info = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "info.png",
+                            typeof(Texture2D)
+                        );
 
                 return info;
             }
@@ -184,10 +192,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (watching == null)
-                {
-                    watching = (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "watching.png",
-                        typeof(Texture2D));
-                }
+                    watching = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "watching.png",
+                            typeof(Texture2D)
+                        );
 
                 return watching;
             }
@@ -200,10 +209,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (notWatching == null)
-                {
-                    notWatching =
-                        (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "not_watching.png", typeof(Texture2D));
-                }
+                    notWatching = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "not_watching.png",
+                            typeof(Texture2D)
+                        );
 
                 return notWatching;
             }
@@ -216,10 +226,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (sortDisabled == null)
-                {
-                    sortDisabled =
-                        (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "sort.png", typeof(Texture2D));
-                }
+                    sortDisabled = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "sort.png",
+                            typeof(Texture2D)
+                        );
 
                 return sortDisabled;
             }
@@ -232,10 +243,11 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (sortAsscending == null)
-                {
-                    sortAsscending =
-                        (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "sort_asc.png", typeof(Texture2D));
-                }
+                    sortAsscending = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "sort_asc.png",
+                            typeof(Texture2D)
+                        );
 
                 return sortAsscending;
             }
@@ -248,10 +260,28 @@ namespace Lazy.Editor.EditorRes
             get
             {
                 if (sortDescending == null)
-                {
-                    sortDescending =
-                        (Texture2D)AssetDatabase.LoadAssetAtPath(GetAssetDir() + "sort_desc.png", typeof(Texture2D));
-                }
+                    sortDescending = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "sort_desc.png",
+                            typeof(Texture2D)
+                        );
+
+                return sortDescending;
+            }
+        }
+
+        private static Texture2D cameraCapture;
+
+        public static Texture2D CameraCapture
+        {
+            get
+            {
+                if (sortDescending == null)
+                    sortDescending = (Texture2D)
+                        AssetDatabase.LoadAssetAtPath(
+                            GetAssetDir() + "camera.png",
+                            typeof(Texture2D)
+                        );
 
                 return sortDescending;
             }
