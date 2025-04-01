@@ -53,10 +53,15 @@ namespace Lazy.Res
         /// </summary>
         private Downloader _packageDownloader;
 
+        /// <summary>
+        /// * 部分热更资源下载器
+        /// </summary>
+        private Downloader _hotUpdatePartDownloader;
+
         private HotUpdateManager() { }
 
         /// <summary>
-        /// * 初始化本地版本
+        /// * 初始化本地版本 AppConfig.LocalVersion
         /// </summary>
         public void InitLocalVersion()
         {
@@ -79,7 +84,7 @@ namespace Lazy.Res
         }
 
         /// <summary>
-        /// * 初始化远程版本
+        /// * 初始化远程版本 AppConfig.RemoteVersion
         /// </summary>
         /// <returns></returns>
         public IEnumerator InitRemoteVersion()
@@ -104,9 +109,10 @@ namespace Lazy.Res
             else
             {
                 var text = request.downloadHandler.text;
-                JsonSerializerSettings settings =
-                    new() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate };
-                var appVersion = JsonConvert.DeserializeObject<AppVersion>(text, settings);
+                var appVersion = JsonConvert.DeserializeObject<AppVersion>(
+                    text,
+                    Constant.JsonSetting
+                );
                 AppConfig.RemoteVersion = appVersion;
             }
 
@@ -168,11 +174,78 @@ namespace Lazy.Res
         }
 
         /// <summary>
-        /// * 检查需要热更的资源
+        /// * 检查指定需要热更的资源
+        /// </summary>
+        /// <param name="allSize"></param>
+        /// <param name="bundles"></param>
+        /// <returns></returns>
+        public Dictionary<string, string> CheckHotUpdate(out long allSize, params string[] bundles)
+        {
+            allSize = 0;
+            Dictionary<string, string> hotUpdateAssetUrl = new();
+            if (!AppConfig.LocalVersion.EnableHotUpdate)
+                // # 未开启资源热更
+                return hotUpdateAssetUrl;
+            if (AppConfig.RemoteAssetBundleMapping.Count <= 0)
+                // # 不存在远程热更资源
+                return hotUpdateAssetUrl;
+            var result = AppConfig.CompareVersion(
+                AppConfig.LocalVersion.Version,
+                AppConfig.RemoteVersion.Version
+            );
+            if (result >= 0)
+                // # 不需要热更
+                return hotUpdateAssetUrl;
+
+            // # 远程的ab包map
+            var resAssetBundleMappings = AppConfig.RemoteAssetBundleMapping;
+            var assetBundleMappings = AssetBundleMapping.Mappings;
+            var specificMappings = resAssetBundleMappings.Where(x =>
+                bundles.Contains(x.Value.AssetBundleName)
+            );
+            foreach (var resAssetMapping in specificMappings)
+            {
+                // # 尝试获取当前需要热更的资源的 AssetMapping
+                assetBundleMappings.TryGetValue(resAssetMapping.Key, out var assetMapping);
+                if (assetMapping == null || resAssetMapping.Value.MD5 != assetMapping.MD5)
+                {
+                    // # 本地没有该资源或本地资源MD5与远程资源的MD5不一致的情况
+                    // # MD5不同，新增资源
+                    var abPath =
+                        $"{resAssetMapping.Value.VersionName}/{PathSetting.AssetBundlesName}/{PathSetting.GetPlatformName()}/{resAssetMapping.Value.AssetBundleName}";
+                    var persistentAbPath =
+                        Application.persistentDataPath + HotUpdateDirName + Separator + abPath;
+                    // # 校验本地热更资源文件MD5
+                    if (
+                        File.Exists(persistentAbPath)
+                        && FileUtility.CreateMD5ForFile(persistentAbPath)
+                            == resAssetMapping.Value.MD5
+                    )
+                        continue;
+                    allSize += resAssetMapping.Value.Size;
+                    hotUpdateAssetUrl.TryAdd(resAssetMapping.Key, abPath);
+                }
+                else if (
+                    AppConfig.CompareVersion(
+                        assetMapping.VersionName,
+                        resAssetMapping.Value.VersionName
+                    ) < 0
+                )
+                {
+                    // # 版本修正
+                    resAssetMapping.Value.VersionName = assetMapping.VersionName;
+                }
+            }
+
+            return hotUpdateAssetUrl;
+        }
+
+        /// <summary>
+        /// * 检查全部需要热更的资源
         /// </summary>
         /// <param name="allSize"></param>
         /// <returns></returns>
-        public Dictionary<string, string> CheckHotUpdate(out long allSize)
+        public Dictionary<string, string> CheckAllHotUpdate(out long allSize)
         {
             allSize = 0;
             Dictionary<string, string> hotUpdateAssetUrl = new();
@@ -231,13 +304,121 @@ namespace Lazy.Res
         }
 
         /// <summary>
-        /// * 开始下载热更资源
+        /// * 开始下载指定的部分热更资源,指定内容已放入 hotUpdateAssetUrl 中
         /// </summary>
         /// <param name="hotUpdateAssetUrl"></param>
         /// <param name="onCompleted"></param>
         /// <param name="onFailed"></param>
         /// <param name="overallProgress"></param>
         public void StartHotUpdate(
+            Dictionary<string, string> hotUpdateAssetUrl,
+            Action onCompleted = null,
+            Action onFailed = null,
+            Action<float> overallProgress = null
+        )
+        {
+            if (!AppConfig.LocalVersion.EnableHotUpdate)
+            {
+                // # 没有启用热更新
+                onCompleted.Fire();
+                return;
+            }
+
+            if (hotUpdateAssetUrl.Count <= 0)
+            {
+                // # 不存在需要热更的资源
+                onCompleted.Fire();
+                return;
+            }
+
+            // # 存在正在下载的,直接取消下载
+            _hotUpdatePartDownloader?.CancelDownload();
+
+            _hotUpdatePartDownloader = DownloadManager.Instance.CreateDownloader(
+                "hotUpdatePartDownloader"
+            );
+            _hotUpdatePartDownloader.OnDownloadSuccess += (evt) =>
+            {
+                Log.Log.MsgD($"获取部分热更资源完成: {evt.DownloadInfo.DownloadURL}");
+            };
+            _hotUpdatePartDownloader.OnDownloadFailure += (evt) =>
+            {
+                Log.Log.MsgD(
+                    $"获取部分热更资源失败: {evt.DownloadInfo.DownloadURL}\n{evt.ErrorMessage}"
+                );
+                onFailed.Fire();
+            };
+            _hotUpdatePartDownloader.OnDownloadStart += (evt) =>
+            {
+                Log.Log.MsgD($"开始获取部分热更资源: {evt.DownloadInfo.DownloadURL}");
+            };
+            _hotUpdatePartDownloader.OnDownloadUpdate += (evt) =>
+            {
+                float currentTaskIndex = evt.CurrentDownloadTaskIndex;
+                float taskCount = evt.DownloadTaskCount;
+                var progress = currentTaskIndex / taskCount * 100f;
+                overallProgress.Fire(progress);
+            };
+            _hotUpdatePartDownloader.OnDownloadTasksCompleted += (evt) =>
+            {
+                Log.Log.MsgD($"指定的所有热更资源获取完成, 用时: {evt.TimeSpan}");
+                foreach (var assetName in hotUpdateAssetUrl.Keys)
+                    if (
+                        AppConfig.RemoteAssetBundleMapping.TryGetValue(
+                            assetName,
+                            out var assetMapping
+                        )
+                    )
+                        if (assetMapping != null)
+                        {
+                            assetMapping.Updated = true;
+                            AssetBundleMapping.Mappings[assetName] = assetMapping;
+                        }
+
+                FileUtility.SafeWriteAllText(
+                    Application.persistentDataPath + "/" + nameof(AssetBundleMapping) + ".json",
+                    JsonConvert.SerializeObject(AssetBundleMapping.Mappings, Constant.JsonSetting)
+                );
+                if (
+                    AssetBundleMapping.Compare(
+                        AssetBundleMapping.Mappings,
+                        AppConfig.RemoteAssetBundleMapping
+                    )
+                )
+                {
+                    AppConfig.LocalVersion.Version = AppConfig.RemoteVersion.Version;
+                    AppConfig.LocalVersion.HotUpdateVersions = new List<string>();
+                    FileUtility.SafeWriteAllText(
+                        Application.persistentDataPath + "/" + nameof(AppVersion) + ".json",
+                        JsonConvert.SerializeObject(AppConfig.LocalVersion, Constant.JsonSetting)
+                    );
+                }
+
+                onCompleted.Fire();
+            };
+
+            // # 添加下载清单
+            foreach (var assetUrl in hotUpdateAssetUrl.Values)
+            {
+                var index = assetUrl.IndexOf("/", StringComparison.Ordinal);
+                var result = assetUrl.Substring(index + 1);
+                _hotUpdatePartDownloader.AddDownload(
+                    $"{AppConfig.LocalVersion.AssetRemoteAddress}{HotUpdateDirName}{Separator}{assetUrl}",
+                    Application.persistentDataPath + "/HotUpdate/" + result
+                );
+            }
+
+            _hotUpdatePartDownloader.StartDownload();
+        }
+
+        /// <summary>
+        /// * 开始下载全部热更资源
+        /// </summary>
+        /// <param name="hotUpdateAssetUrl"></param>
+        /// <param name="onCompleted"></param>
+        /// <param name="onFailed"></param>
+        /// <param name="overallProgress"></param>
+        public void StartAllHotUpdate(
             Dictionary<string, string> hotUpdateAssetUrl,
             Action onCompleted = null,
             Action onFailed = null,
@@ -280,8 +461,7 @@ namespace Lazy.Res
                 var progress = currentTaskIndex / taskCount * 100f;
                 overallProgress.Fire(progress);
             };
-            JsonSerializerSettings jsonSettings =
-                new() { DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate };
+            var jsonSettings = Constant.JsonSetting;
             _hotUpdateDownloader.OnDownloadTasksCompleted += (evt) =>
             {
                 Log.Log.MsgD($"所有热更资源获取完成, 用时: {evt.TimeSpan}");
@@ -488,7 +668,7 @@ namespace Lazy.Res
         )
         {
             CoroutineCenter.StartCoroutine(
-                Do(
+                DoAll(
                     hotUpdateCompleted,
                     hotUpdateFailed,
                     hotUpdateProgress,
@@ -499,7 +679,17 @@ namespace Lazy.Res
             );
         }
 
-        private IEnumerator Do(
+        /// <summary>
+        /// * 检查所有需要热更新的资源并进行下载
+        /// </summary>
+        /// <param name="hotUpdateCompleted"></param>
+        /// <param name="hotUpdateFailed"></param>
+        /// <param name="hotUpdateProgress"></param>
+        /// <param name="packageCompleted"></param>
+        /// <param name="packageFailed"></param>
+        /// <param name="packageProgress"></param>
+        /// <returns></returns>
+        private IEnumerator DoAll(
             Action hotUpdateCompleted = null,
             Action hotUpdateFailed = null,
             Action<float> hotUpdateProgress = null,
@@ -512,11 +702,35 @@ namespace Lazy.Res
             yield return InitRemoteVersion();
             yield return InitAssetVersion();
             // # 检查热更
-            var urlDic = CheckHotUpdate(out var size);
-            StartHotUpdate(urlDic, hotUpdateCompleted, hotUpdateFailed, hotUpdateProgress);
+            var urlDic = CheckAllHotUpdate(out var size);
+            StartAllHotUpdate(urlDic, hotUpdateCompleted, hotUpdateFailed, hotUpdateProgress);
             // # 检查分包
             var subPackages = CheckPackageUpdate(AppConfig.LocalVersion.SubPackages);
             StartPackageUpdate(subPackages, packageCompleted, packageFailed, packageProgress);
+        }
+
+        /// <summary>
+        /// * 热更新指定的一些 AssetBundle
+        /// ! 注意依赖管理
+        /// </summary>
+        /// <param name="bundles"></param>
+        /// <param name="hotUpdateCompleted"></param>
+        /// <param name="hotUpdateFailed"></param>
+        /// <param name="hotUpdateProgress"></param>
+        /// <returns></returns>
+        private IEnumerator Do(
+            Action hotUpdateCompleted = null,
+            Action hotUpdateFailed = null,
+            Action<float> hotUpdateProgress = null,
+            params string[] bundles
+        )
+        {
+            InitLocalVersion();
+            yield return InitRemoteVersion();
+            yield return InitAssetVersion();
+            // # 检查热更
+            var urlDic = CheckHotUpdate(out var size, bundles);
+            StartHotUpdate(urlDic, hotUpdateCompleted, hotUpdateFailed, hotUpdateProgress);
         }
 
         public override void OnSingletonInitialize()
@@ -542,6 +756,8 @@ namespace Lazy.Res
             _hotUpdateDownloader = null;
             _packageDownloader?.CancelDownload();
             _packageDownloader = null;
+            _hotUpdatePartDownloader?.CancelDownload();
+            _hotUpdatePartDownloader = null;
         }
 
         public void OnGui() { }

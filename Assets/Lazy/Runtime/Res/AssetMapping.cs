@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.Scripting;
 
 namespace Lazy.Res
@@ -60,11 +61,33 @@ namespace Lazy.Res
             Package = package;
             Updated = updated;
         }
+
+        public static bool Compare(AssetMapping a, AssetMapping b)
+        {
+            return a.AssetBundleName.Equals(b.AssetBundleName)
+                && a.VersionName.Equals(b.VersionName)
+                && a.Size == b.Size
+                && a.MD5.Equals(b.MD5)
+                && a.Updated == b.Updated
+                && a.Package.Equals(b.Package)
+                && a.AssetPath.SequenceEqual(b.AssetPath);
+        }
     }
 
     public static class AssetBundleMapping
     {
         public static Dictionary<string, AssetMapping> Mappings { get; set; } = new();
+
+        public static bool Compare(
+            Dictionary<string, AssetMapping> a,
+            Dictionary<string, AssetMapping> b
+        )
+        {
+            return a.Count == b.Count
+                && a.All(x =>
+                    b.TryGetValue(x.Key, out var value) && AssetMapping.Compare(value, x.Value)
+                );
+        }
     }
 
     public static class ResourceMapping

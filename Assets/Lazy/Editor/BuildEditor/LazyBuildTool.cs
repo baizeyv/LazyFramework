@@ -460,7 +460,7 @@ namespace Lazy.Editor.Build
         /// <summary>
         /// * 复制热更的AssetBundle到目标目录
         /// </summary>
-        /// <param name="assetBundlesOutput">BuildPipline打包的AssetBundle目录</param>
+        /// <param name="assetBundlesOutput">Build Pipeline 打包的AssetBundle目录</param>
         /// <param name="mappings">有新增或更新的AssetMapping字典</param>
         /// <param name="toPath">要复制到的目录</param>
         private static void CopyHotUpdateAssetBundle(
