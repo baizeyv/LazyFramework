@@ -3,15 +3,31 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Lazy.Log;
 using Lazy.Utility;
 using Newtonsoft.Json;
 using UnityEditor;
+using Log = Lazy.Log.Log;
 
 namespace Editor
 {
     public static class SpiderEditor
     {
+        [MenuItem("Spider/Test Print")]
+        public static void PrintTable()
+        {
+            var header = string.Format("{0,-10} | {1,-10} | {2,-10}", "Name", "Score", "Level");
+            var separator = new string('-', header.Length);
+
+            var row1 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Alice", 1200, 5);
+            var row2 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Bob", 980, 4);
+            var row3 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Charlie", 1500, 6);
+
+            // Log.MsgD("\n" + header + "\n" + separator + "\n" + row1 + "\n" + row2 + "\n" + row3);
+            UnityEngine.Debug.Log(
+                "\n" + header + "\n" + separator + "\n" + row1 + "\n" + row2 + "\n" + row3
+            );
+        }
+
         [MenuItem("Spider/Export Spider ExportOne")]
         public static void ConvertToCsvOne()
         {
