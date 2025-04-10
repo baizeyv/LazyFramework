@@ -44,7 +44,7 @@ namespace Solver
         /// <summary>
         /// * 当前的牌数
         /// </summary>
-        private int _cardCount = 104;
+        public int CardCount = 104;
 
         /// <summary>
         /// * 私有估值
@@ -63,9 +63,9 @@ namespace Solver
 
                 // # 完成一套牌 + 200分
                 var value = FinishedCount * 200;
-                // # 没有翻开的牌值: -10, -9, -8, -7, -6, -5
                 for (var i = 0; i < HiddenGroup.Count; i++)
                 {
+                    // # 没有翻开的牌值: -10, -9, -8, -7, -6, -5
                     // # 未翻开牌减分机制
                     var num = 10;
                     foreach (var _ in HiddenGroup[i])
@@ -117,7 +117,7 @@ namespace Solver
                     }
                 }
 
-                _valuation = value;
+                _valuation = value + FlopValuation;
                 return _valuation;
 
                 void AddValue(int num, int topPoint, ref int result)
@@ -129,13 +129,40 @@ namespace Solver
         }
 
         /// <summary>
+        /// * 翻牌额外估值
+        /// </summary>
+        public int FlopValuation
+        {
+            get
+            {
+                if (PreviousPoker == null)
+                    // # 没有上一步
+                    return 0;
+                var from = History[0].Item1;
+                var count = History[0].Item2;
+                var to = History[0].Item3;
+                if (from < 0 || count < 0 || to < 0)
+                    // # 忽略发牌
+                    return 0;
+                if (
+                    PreviousPoker.VisibleGroup[from].Count == count
+                    && PreviousPoker.HiddenGroup[from].Count != 0
+                )
+                    // # 可以翻出新牌 flop new card
+                    return CheckFlop(this, from);
+
+                return 0;
+            }
+        }
+
+        /// <summary>
         /// * 完成了几套牌了
         /// </summary>
         public int FinishedCount
         {
             get
             {
-                var currentCount = _cardCount / 13;
+                var currentCount = CardCount / 13;
                 return 8 - currentCount;
             }
         }
@@ -143,7 +170,7 @@ namespace Solver
         /// <summary>
         /// * 剩余几套牌
         /// </summary>
-        public int RemainingCount => _cardCount / 13;
+        public int RemainingCount => CardCount / 13;
 
         /// <summary>
         /// * 游戏是否完成
@@ -313,6 +340,67 @@ namespace Solver
             }
         }
 
+        public int CheckFlop(Poker poker, int column)
+        {
+            var result = 0;
+            var value = poker.VisibleGroup[column][0].Value;
+            HashSet<Poker> set = new();
+            for (var i = 0; i < poker.VisibleGroup.Count; i++)
+            {
+                if (i == column)
+                    continue;
+                if (poker.VisibleGroup[i].Count == 0)
+                    // # 向空列移动不加分
+                    continue;
+                if (poker.VisibleGroup[i][0].Value == value + 1)
+                {
+                    // # 可以向其他列移动
+                    var newPoker = SpiderSolver.CreateNewPoker(
+                        poker,
+                        new List<Card>() { poker.VisibleGroup[column][0] },
+                        column,
+                        i
+                    );
+                    set.Add(newPoker);
+                    result += 2;
+                }
+
+                List<Card> moveList = new();
+                for (var x = 0; x < poker.VisibleGroup[i].Count; x++)
+                {
+                    if (x == 0)
+                    {
+                        moveList.Add(poker.VisibleGroup[i][0]);
+                        continue;
+                    }
+
+                    var cur = poker.VisibleGroup[i][x];
+                    if (
+                        cur.GetType() == moveList[^1].GetType()
+                        && cur.Value == moveList[^1].Value + 1
+                    )
+                        moveList.Add(cur);
+                    else
+                        break;
+                }
+
+                if (moveList[^1].Value + 1 == value)
+                {
+                    // # 可以移动到新翻开的牌的位置
+                    var newPoker = SpiderSolver.CreateNewPoker(poker, moveList, i, column);
+                    set.Add(newPoker);
+                    result += 1;
+                }
+            }
+
+            // # 计算额外翻牌分
+            foreach (var item in set)
+                // result += CheckFlop(item, item.History[0].Item1);
+                result += item.FlopValuation;
+
+            return result;
+        }
+
         public bool IsBlank(int index)
         {
             return VisibleGroup[index].Count + HiddenGroup[index].Count == 0;
@@ -343,7 +431,7 @@ namespace Solver
                 collection = true;
                 // # 1-13全了 (收一套牌)
                 VisibleGroup[index] = VisibleGroup[index].Skip(13).ToList();
-                _cardCount -= 13;
+                CardCount -= 13;
                 if (VisibleGroup[index].Count == 0 && HiddenGroup[index].Count > 0)
                 {
                     // # 移动后新的列收牌了,如若没有可见的了则展示新的牌

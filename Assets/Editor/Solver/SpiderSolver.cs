@@ -35,6 +35,24 @@ namespace Solver
                     yield break;
                 }
 
+                /*
+                var his = state.History[0];
+                if (
+                    his.Item1 == 6
+                    && his.Item2 == 1
+                    && his.Item3 == 8
+                    && state.VisibleGroup[8][0]?.Value == 1
+                )
+                    continue;
+                if (
+                    his.Item1 == 7
+                    && his.Item2 == 1
+                    && his.Item3 == 8
+                    && state.VisibleGroup[8][0]?.Value == 1
+                )
+                    continue;
+                    */
+
                 foreach (var item in states)
                     _allStates.Add(item);
                 yield return DepthFirstSearch(state, onCompleted);
@@ -96,6 +114,7 @@ namespace Solver
             {
                 History = new List<(int, int, int, bool)>(poker.History),
                 PreviousPoker = poker,
+                CardCount = poker.CardCount,
             };
             if (fromIndex < 0 || toIndex < 0)
                 return newPoker;
