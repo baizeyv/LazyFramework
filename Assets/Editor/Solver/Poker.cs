@@ -237,6 +237,76 @@ namespace Solver
                 throw new ArgumentException("visibleGroup.Count must be <= 12");
         }
 
+        /// <summary>
+        /// * 二次估值,用于解决在发牌前的很多无效移动 (各种顺子的移动)
+        /// </summary>
+        /// <returns></returns>
+        public bool SecondaryValuation()
+        {
+            if (PreviousPoker == null)
+                return true;
+            var from = History[0].Item1;
+            var count = History[0].Item2;
+            var to = History[0].Item3;
+            var collection = History[0].Item4;
+            if (from < 0 || count < 0 || to < 0)
+                // # 发牌
+                return true;
+            if (PreviousPoker.IsBlank(to))
+                // # 目标列为空
+                return true;
+            if (PreviousPoker.VisibleGroup[from].Count == count || collection)
+                // # 一列全部都移动或收牌了
+                return true;
+            // # 上一步的列的二次估值
+            var previousValue = Calculate(PreviousPoker.VisibleGroup[from]);
+            // # 当前的列的二次估值
+            var currentValue = Calculate(VisibleGroup[to]);
+
+            return currentValue > previousValue;
+
+            int Calculate(List<Card> cards)
+            {
+                var value = 0;
+                var val = 0;
+                for (var i = 1; i < cards.Count; i++)
+                {
+                    var top = cards[i];
+                    var down = cards[i - 1];
+                    // # 点数相差1
+                    if (top.Value == down.Value + 1)
+                    {
+                        if (top.GetType() == down.GetType())
+                        // # 花色相同
+                        {
+                            val++;
+                            if (i + 1 == cards.Count)
+                                // # 一直是顺子到最上一张了
+                                AddValue(val, top.Value, ref value);
+                        }
+                        else
+                        {
+                            AddValue(val, down.Value, ref value);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        AddValue(val, down.Value, ref value);
+                        break;
+                    }
+                }
+
+                return value;
+            }
+
+            void AddValue(int num, int topPoint, ref int result)
+            {
+                if (num != 0)
+                    result += topPoint * num;
+            }
+        }
+
         public bool IsBlank(int index)
         {
             return VisibleGroup[index].Count + HiddenGroup[index].Count == 0;
@@ -335,6 +405,7 @@ namespace Solver
         {
             var result =
                 $"Valuation: <color=green>{Valuation}</color>🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏 Step: <color=green>{History.Count}</color>";
+            result += $" Collection:{FinishedCount}";
             if (PreviousPoker != null)
             {
                 var tuple = History[0];

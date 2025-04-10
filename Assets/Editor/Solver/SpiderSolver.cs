@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lazy.Log;
 using Lazy.Utility;
+using UnityEngine;
 
 namespace Solver
 {
@@ -16,9 +17,12 @@ namespace Solver
         )
         {
             yield return null;
-            UnityEngine.Debug.Log(root);
+            Debug.Log(root);
             // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
-            var states = TakeAStep(root).FindAll(x => !StateExists(allStates, x));
+            var states = TakeAStep(root)
+                .FindAll(x => !StateExists(allStates, x))
+                .FindAll(x => x.SecondaryValuation());
+
             // # 遍历所有没有试过的游戏状态
             foreach (var state in states)
             {
