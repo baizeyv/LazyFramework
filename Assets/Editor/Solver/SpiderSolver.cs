@@ -10,17 +10,18 @@ namespace Solver
 {
     public class SpiderSolver
     {
-        public static IEnumerator DepthFirstSearch(
-            Poker root,
-            List<Poker> allStates,
-            Action onCompleted
-        )
+        // ! 使用HashSet而不用List的原因是在于Contains的查询速度,HashSet为O(1),List为O(n),随着数组越来越大会导致执行效率大幅度下降
+        private readonly HashSet<Poker> _allStates = new();
+
+        private int _calc;
+
+        public IEnumerator DepthFirstSearch(Poker root, Action onCompleted)
         {
-            yield return null;
-            Debug.Log(root);
+            _calc++;
+            Debug.Log(_calc + " || " + root);
             // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
             var states = TakeAStep(root)
-                .FindAll(x => !StateExists(allStates, x))
+                .FindAll(x => !StateExists(_allStates, x))
                 .FindAll(x => x.SecondaryValuation());
 
             // # 遍历所有没有试过的游戏状态
@@ -34,11 +35,9 @@ namespace Solver
                     yield break;
                 }
 
-                yield return DepthFirstSearch(
-                    state,
-                    new List<Poker>(states.AsEnumerable()).Concat(allStates).ToList(),
-                    onCompleted
-                );
+                foreach (var item in states)
+                    _allStates.Add(item);
+                yield return DepthFirstSearch(state, onCompleted);
             }
         }
 
@@ -49,7 +48,7 @@ namespace Solver
         /// <returns>排序后的所有合理的可能走的步骤</returns>
         public static List<Poker> TakeAStep(Poker poker)
         {
-            var results = new List<Poker>();
+            var results = new HashSet<Poker>();
             for (var i = 0; i < poker.VisibleGroup.Count; i++)
             {
                 // # find all the movable cards
@@ -155,7 +154,7 @@ namespace Solver
             Poker poker
         )
         {
-            var result = new List<Poker>();
+            var result = new HashSet<Poker>();
             for (var column = 0; column < poker.VisibleGroup.Count; column++)
             {
                 // # 遍历非自身的每一列
@@ -196,7 +195,7 @@ namespace Solver
                 }
             }
 
-            return result;
+            return result.ToList();
         }
 
         /// <summary>
@@ -205,9 +204,9 @@ namespace Solver
         /// <param name="results"></param>
         /// <param name="newPoker"></param>
         /// <returns></returns>
-        public static bool StateExists(List<Poker> results, Poker newPoker)
+        public static bool StateExists(HashSet<Poker> results, Poker newPoker)
         {
-            return Enumerable.Contains(results, newPoker);
+            return results.Contains(newPoker);
         }
 
         /// <summary>
@@ -216,6 +215,12 @@ namespace Solver
         /// <param name="pokers"></param>
         /// <returns></returns>
         public static List<Poker> Sort(List<Poker> pokers)
+        {
+            // # sorting games in descending order based on Valuation
+            return pokers.OrderByDescending(x => x.Valuation).ToList();
+        }
+
+        public static List<Poker> Sort(HashSet<Poker> pokers)
         {
             // # sorting games in descending order based on Valuation
             return pokers.OrderByDescending(x => x.Valuation).ToList();

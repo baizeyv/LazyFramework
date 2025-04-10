@@ -63,6 +63,18 @@ namespace Solver
         {
             return "♥️" + GetValueString();
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not HeartCard that)
+                return false;
+            return Value == that.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return Value;
+        }
     }
 
     /// <summary>
@@ -76,6 +88,18 @@ namespace Solver
         public override string ToString()
         {
             return "♦️" + GetValueString();
+        }
+
+        public override int GetHashCode()
+        {
+            return Value * 3;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not DiamondCard that)
+                return false;
+            return Value == that.Value;
         }
     }
 
@@ -91,6 +115,18 @@ namespace Solver
         {
             return "♠️" + GetValueString();
         }
+
+        public override int GetHashCode()
+        {
+            return Value * 2;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not SpadeCard that)
+                return false;
+            return Value == that.Value;
+        }
     }
 
     /// <summary>
@@ -104,6 +140,18 @@ namespace Solver
         public override string ToString()
         {
             return "♣️" + GetValueString();
+        }
+
+        public override int GetHashCode()
+        {
+            return Value * 4;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not ClubsCard that)
+                return false;
+            return Value == that.Value;
         }
     }
 }

@@ -34,9 +34,9 @@ namespace Editor
                     var poker = new Poker(v);
                     if (_solverCoroutine != null)
                         _solverCoroutine.Stop();
-                    var solver = Solver.SpiderSolver.DepthFirstSearch(
+                    var ss = new Solver.SpiderSolver();
+                    var solver = ss.DepthFirstSearch(
                         poker,
-                        new List<Poker>(),
                         () =>
                         {
                             if (_solverCoroutine != null)

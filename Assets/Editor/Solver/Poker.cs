@@ -263,6 +263,12 @@ namespace Solver
             // # 当前的列的二次估值
             var currentValue = Calculate(VisibleGroup[to]);
 
+            if (
+                PreviousPoker.VisibleGroup[from].Count > VisibleGroup[to].Count
+                && currentValue == previousValue
+            )
+                return true;
+
             return currentValue > previousValue;
 
             int Calculate(List<Card> cards)
@@ -406,7 +412,7 @@ namespace Solver
             var result =
                 $"Valuation: <color=green>{Valuation}</color>🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏 Step: <color=green>{History.Count}</color>";
             result += $" Collection:{FinishedCount}";
-            if (PreviousPoker != null)
+            if (PreviousPoker != null && false)
             {
                 var tuple = History[0];
                 var from = tuple.Item1;
@@ -647,20 +653,29 @@ namespace Solver
                 // # fast check if not equal
                 if (Deck.Count != that.Deck.Count)
                     return false;
-                // # deep check
-                for (var i = 0; i <= 9; i++)
-                    if (VisibleGroup.Count <= i || that.VisibleGroup.Count <= i)
-                        return VisibleGroup.Count == that.VisibleGroup.Count;
-                    else if (VisibleGroup[i].Count != that.VisibleGroup[i].Count)
+                for (var i = 0; i < VisibleGroup.Count; i++)
+                {
+                    if (VisibleGroup[i].Count != that.VisibleGroup[i].Count)
                         return false;
-                    else
-                        for (var j = 0; j < VisibleGroup[i].Count; j++)
-                            // # if the card number and the suit do not match, the cards are different
-                            if (
-                                VisibleGroup[i][j].Value != that.VisibleGroup[i][j].Value
-                                && VisibleGroup[i][j].GetType() != that.VisibleGroup[i][j].GetType()
-                            )
-                                return false;
+                    if (HiddenGroup[i].Count != that.HiddenGroup[i].Count)
+                        return false;
+                    for (var x = 0; x < VisibleGroup[i].Count; x++)
+                    {
+                        if (VisibleGroup[i][x].GetType() != that.VisibleGroup[i][x].GetType())
+                            return false;
+                        if (VisibleGroup[i][x].Value != that.VisibleGroup[i][x].Value)
+                            return false;
+                    }
+
+                    for (var x = 0; x < HiddenGroup[i].Count; x++)
+                    {
+                        if (HiddenGroup[i][x].GetType() != that.HiddenGroup[i][x].GetType())
+                            return false;
+                        if (HiddenGroup[i][x].Value != that.HiddenGroup[i][x].Value)
+                            return false;
+                    }
+                }
+
                 return true;
             }
 
@@ -669,12 +684,17 @@ namespace Solver
 
         public override int GetHashCode()
         {
-            var state = new List<object>() { Deck, HiddenGroup, VisibleGroup };
-
-            return state.Aggregate(
-                0,
-                (current, obj) => 31 * current + (obj != null ? obj.GetHashCode() : 0)
+            var hash = Deck.Aggregate(
+                17,
+                (current, item) => current * 31 + (item?.GetHashCode() ?? 0)
             );
+            hash = HiddenGroup
+                .SelectMany(item => item)
+                .Aggregate(hash, (current, card) => current * 31 + (card?.GetHashCode() ?? 0));
+            hash = VisibleGroup
+                .SelectMany(item => item)
+                .Aggregate(hash, (current, card) => current * 31 + (card?.GetHashCode() ?? 0));
+            return hash;
         }
 
         /// <summary>
