@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Lazy.Log;
 using Lazy.Utility;
+using Solver.Exporter;
 using UnityEngine;
 
 namespace Solver
@@ -13,12 +15,16 @@ namespace Solver
         // ! 使用HashSet而不用List的原因是在于Contains的查询速度,HashSet为O(1),List为O(n),随着数组越来越大会导致执行效率大幅度下降
         private readonly HashSet<Poker> _allStates = new();
 
-        public readonly Dictionary<Poker, int> FlopValuations = new();
-
         private int _calc;
 
-        public IEnumerator DepthFirstSearch(Poker root, Action onCompleted)
+        public int SuitCount = 1;
+
+        private bool breakFlag;
+
+        public IEnumerator DepthFirstSearch(Poker root, Action onCompleted, string file, int id)
         {
+            if (breakFlag)
+                yield break;
             _calc++;
             Debug.Log(_calc + " || " + root);
             // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
@@ -34,32 +40,24 @@ namespace Solver
                     // # 完成游戏
                     Log.MsgD("Game Completed !!!");
                     onCompleted.Fire();
-                    state.WriteHistory();
+                    // var se = new SpiderExporter(
+                    //     @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv"
+                    // );
+                    var se = new SpiderExporter(file);
+                    se.Export(id, state, SuitCount, _calc);
+                    breakFlag = true;
                     yield break;
                 }
 
-                /*
-                var his = state.History[0];
-                if (
-                    his.Item1 == 6
-                    && his.Item2 == 1
-                    && his.Item3 == 8
-                    && state.VisibleGroup[8][0]?.Value == 1
-                )
-                    continue;
-                if (
-                    his.Item1 == 7
-                    && his.Item2 == 1
-                    && his.Item3 == 8
-                    && state.VisibleGroup[8][0]?.Value == 1
-                )
-                    continue;
-                    */
-
                 foreach (var item in states)
                     _allStates.Add(item);
-                yield return DepthFirstSearch(state, onCompleted);
+                yield return DepthFirstSearch(state, onCompleted, file, id);
+                if (breakFlag)
+                    yield break;
             }
+
+            if (breakFlag)
+                yield break;
         }
 
         /// <summary>
@@ -119,7 +117,8 @@ namespace Solver
                 History = new List<(int, int, int, bool)>(poker.History),
                 PreviousPoker = poker,
                 CardCount = poker.CardCount,
-                CollectionStep = new List<int>(poker.CollectionStep)
+                CollectionStep = new List<int>(poker.CollectionStep),
+                Mark = poker.Mark,
             };
             if (fromIndex < 0 || toIndex < 0)
                 return newPoker;
@@ -199,12 +198,7 @@ namespace Solver
                     }
                     else
                     {
-                        var newPoker = CreateNewPoker(
-                            poker,
-                            movableCards,
-                            fromIndex,
-                            column
-                        );
+                        var newPoker = CreateNewPoker(poker, movableCards, fromIndex, column);
                         if (!StateExists(result, newPoker))
                             result.Add(newPoker);
                     }

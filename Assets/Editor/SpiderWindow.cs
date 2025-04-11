@@ -1,6 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using F8Framework.Core;
+using Lazy;
+using Newtonsoft.Json;
 using Solver;
+using Solver.Exporter;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,6 +22,8 @@ namespace Editor
 
         private string _inputVita;
 
+        private string _outputCsvPath;
+
         private EditorCoroutine _solverCoroutine;
 
         [MenuItem("Spider/Spider Window")]
@@ -23,6 +33,20 @@ namespace Editor
                 GetWindow<SpiderWindow>("Spider").Close();
             else
                 GetWindow<SpiderWindow>("Spider");
+        }
+
+        private IEnumerator _coroutine;
+
+        private IEnumerator VitaColor1()
+        {
+            var json = File.ReadAllText(@"C:\Users\baizeyv\Documents\a\gameColor1.json");
+            var bean = JsonConvert.DeserializeObject<VitaBean>(json, Constant.JsonSetting);
+            foreach (var x in bean.SelectMany(item => item.Value))
+            {
+                var solver = new SpiderSolver() { SuitCount = 1 };
+                var poker = new Poker(x.question);
+                yield return solver.DepthFirstSearch(poker, null, _outputCsvPath, x.id);
+            }
         }
 
         private void OnGUI()
@@ -52,7 +76,9 @@ namespace Editor
                             if (_solverCoroutine != null)
                                 _solverCoroutine.Stop();
                             _solverCoroutine = null;
-                        }
+                        },
+                        @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv",
+                        0
                     );
                     _solverCoroutine = EditorCoroutine.Start(solver);
                 }
@@ -87,9 +113,40 @@ namespace Editor
                             if (_solverCoroutine != null)
                                 _solverCoroutine.Stop();
                             _solverCoroutine = null;
-                        }
+                        },
+                        @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv",
+                        0
                     );
                     _solverCoroutine = EditorCoroutine.Start(solver);
+                }
+
+                GUI.enabled = true;
+            }
+            GUILayout.EndVertical();
+
+            GUILayout.Space(10);
+
+            GUILayout.BeginVertical("helpbox");
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Save Path:", GUILayout.Width(80));
+                    _outputCsvPath = GUILayout.TextArea(_outputCsvPath);
+                }
+                GUILayout.EndHorizontal();
+
+                GUI.enabled = !string.IsNullOrEmpty(_outputCsvPath);
+                if (GUILayout.Button("Export Vita"))
+                {
+                    if (_coroutine == null)
+                    {
+                        _coroutine = VitaColor1();
+                        EditorCoroutine.Start(_coroutine);
+                    }
+                    else
+                    {
+                        Debug.Log("ZZZ");
+                    }
                 }
 
                 GUI.enabled = true;

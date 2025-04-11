@@ -18,6 +18,8 @@ namespace Solver
 
         public const int PadWidth = 30;
 
+        public string Mark = "";
+
         /// <summary>
         /// * 牌堆
         /// </summary>
@@ -191,8 +193,8 @@ namespace Solver
             get
             {
                 return Deck.Count == 0
-                       && !VisibleGroup.SelectMany(x => x).Any()
-                       && !HiddenGroup.SelectMany(x => x).Any();
+                    && !VisibleGroup.SelectMany(x => x).Any()
+                    && !HiddenGroup.SelectMany(x => x).Any();
             }
         }
 
@@ -201,7 +203,10 @@ namespace Solver
         /// </summary>
         public int BlankColumnCount
         {
-            get { return VisibleGroup.Where((t, i) => t.Count + HiddenGroup[i].Count == 0).Count(); }
+            get
+            {
+                return VisibleGroup.Where((t, i) => t.Count + HiddenGroup[i].Count == 0).Count();
+            }
         }
 
         public bool HasHidden => HiddenGroup.Sum(x => x.Count) != 0;
@@ -213,12 +218,14 @@ namespace Solver
         /// <exception cref="ArgumentException"></exception>
         public Poker(int seed)
         {
+            Mark = seed.ToString();
             var deck = GenerateDeck(seed);
             Build(deck);
         }
 
         public Poker(string vitaLevel)
         {
+            Mark = vitaLevel;
             var deck = VitaLevelConvertToPoker(vitaLevel);
             Build(deck);
         }
@@ -268,11 +275,7 @@ namespace Solver
                 throw new ArgumentException("visibleGroup.Count must be <= 12");
         }
 
-        public Poker(
-            List<List<Card>> visibleGroup,
-            List<List<Card>> hiddenGroup,
-            List<Card> deck
-        )
+        public Poker(List<List<Card>> visibleGroup, List<List<Card>> hiddenGroup, List<Card> deck)
         {
             VisibleGroup = visibleGroup;
             HiddenGroup = hiddenGroup;
@@ -339,7 +342,7 @@ namespace Solver
                     if (top.Value == down.Value + 1)
                     {
                         if (top.GetType() == down.GetType())
-                            // # 花色相同
+                        // # 花色相同
                         {
                             val++;
                             if (i + 1 == cards.Count)
@@ -855,19 +858,19 @@ namespace Solver
                     switch (x)
                     {
                         case >= 1
-                            and <= 13:
+                        and <= 13:
                             return BuildCard(2, x);
                         case >= 14
-                            and <= 26:
+                        and <= 26:
                             return BuildCard(1, x);
                         case >= 27
-                            and <= 39:
+                        and <= 39:
                             return BuildCard(4, x);
                         case >= 40
-                            and <= 53:
+                        and <= 53:
                             return BuildCard(3, x);
                         default:
-                            Log.MsgE("Card Pile ERROR !");
+                            // Log.MsgE("Card Pile ERROR !");
                             return BuildCard(999, 999);
                     }
                 })
@@ -890,7 +893,7 @@ namespace Solver
                 2 => new SpadeCard(num),
                 3 => new DiamondCard(num),
                 4 => new ClubsCard(num),
-                _ => new HeartCard(num)
+                _ => new HeartCard(num),
             };
         }
 
@@ -929,19 +932,19 @@ namespace Solver
                 switch (x)
                 {
                     case >= 1
-                        and <= 13:
+                    and <= 13:
                         return BuildCard(2, x);
                     case >= 14
-                        and <= 26:
+                    and <= 26:
                         return BuildCard(1, x);
                     case >= 27
-                        and <= 39:
+                    and <= 39:
                         return BuildCard(4, x);
                     case >= 40
-                        and <= 53:
+                    and <= 53:
                         return BuildCard(3, x);
                     default:
-                        Log.MsgE("Card Pile ERROR !");
+                        // Log.MsgE("Card Pile ERROR !");
                         return BuildCard(999, 999);
                 }
             }
