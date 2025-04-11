@@ -9,8 +9,6 @@ namespace Solver
 {
     public class Poker
     {
-        private SpiderSolver _solver;
-
         // "✅❎❇️";
         // "#️⃣";1️;2️⃣;
         // 3️⃣   4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟
@@ -23,22 +21,27 @@ namespace Solver
         /// <summary>
         /// * 牌堆
         /// </summary>
-        public readonly List<Card> Deck;
+        public List<Card> Deck;
 
         /// <summary>
         /// * 隐藏牌
         /// </summary>
-        public readonly List<List<Card>> HiddenGroup;
+        public List<List<Card>> HiddenGroup;
 
         /// <summary>
         /// * 可见牌
         /// </summary>
-        public readonly List<List<Card>> VisibleGroup;
+        public List<List<Card>> VisibleGroup;
 
         /// <summary>
         /// * 历史记录 (fromColumnIndex, Count, toColumnIndex, 是否收一套牌)
         /// </summary>
         public List<(int, int, int, bool)> History = new();
+
+        /// <summary>
+        /// * 收牌的步骤
+        /// </summary>
+        public List<int> CollectionStep = new();
 
         /// <summary>
         /// * 上一步状态
@@ -142,8 +145,6 @@ namespace Solver
             if (PreviousPoker == null)
                 // # 没有上一步
                 return 0;
-            if (_solver == null)
-                return 0;
             // if (_solver.FlopValuations.TryGetValue(this, out var val))
             //     return val;
             var from = History[0].Item1;
@@ -190,8 +191,8 @@ namespace Solver
             get
             {
                 return Deck.Count == 0
-                    && !VisibleGroup.SelectMany(x => x).Any()
-                    && !HiddenGroup.SelectMany(x => x).Any();
+                       && !VisibleGroup.SelectMany(x => x).Any()
+                       && !HiddenGroup.SelectMany(x => x).Any();
             }
         }
 
@@ -200,10 +201,7 @@ namespace Solver
         /// </summary>
         public int BlankColumnCount
         {
-            get
-            {
-                return VisibleGroup.Where((t, i) => t.Count + HiddenGroup[i].Count == 0).Count();
-            }
+            get { return VisibleGroup.Where((t, i) => t.Count + HiddenGroup[i].Count == 0).Count(); }
         }
 
         public bool HasHidden => HiddenGroup.Sum(x => x.Count) != 0;
@@ -212,12 +210,21 @@ namespace Solver
         /// * Constructor
         /// </summary>
         /// <param name="seed"></param>
-        /// <param name="solver"></param>
         /// <exception cref="ArgumentException"></exception>
-        public Poker(int seed, SpiderSolver solver)
+        public Poker(int seed)
         {
-            _solver = solver;
             var deck = GenerateDeck(seed);
+            Build(deck);
+        }
+
+        public Poker(string vitaLevel)
+        {
+            var deck = VitaLevelConvertToPoker(vitaLevel);
+            Build(deck);
+        }
+
+        private void Build(List<Card> deck)
+        {
             var hidden = deck.GetRange(0, deck.Count - 60);
             var begin4 = deck.GetRange(deck.Count - 54, 4);
             var last6 = deck.GetRange(deck.Count - 60, 6);
@@ -264,11 +271,9 @@ namespace Solver
         public Poker(
             List<List<Card>> visibleGroup,
             List<List<Card>> hiddenGroup,
-            List<Card> deck,
-            SpiderSolver solver
+            List<Card> deck
         )
         {
-            _solver = solver;
             VisibleGroup = visibleGroup;
             HiddenGroup = hiddenGroup;
             Deck = deck;
@@ -334,7 +339,7 @@ namespace Solver
                     if (top.Value == down.Value + 1)
                     {
                         if (top.GetType() == down.GetType())
-                        // # 花色相同
+                            // # 花色相同
                         {
                             val++;
                             if (i + 1 == cards.Count)
@@ -384,7 +389,6 @@ namespace Solver
                     // # 可以向其他列移动
                     var newPoker = SpiderSolver.CreateNewPoker(
                         poker,
-                        _solver,
                         new List<Card>() { poker.VisibleGroup[column][0] },
                         column,
                         i
@@ -415,7 +419,7 @@ namespace Solver
                 if (moveList[^1].Value + 1 == value)
                 {
                     // # 可以移动到新翻开的牌的位置
-                    var newPoker = SpiderSolver.CreateNewPoker(poker, _solver, moveList, i, column);
+                    var newPoker = SpiderSolver.CreateNewPoker(poker, moveList, i, column);
                     setCome.Add(newPoker);
                     result += 1;
                 }
@@ -444,16 +448,20 @@ namespace Solver
         private bool DetectCollection(int index)
         {
             var set = 1;
-            foreach (var card in VisibleGroup[index].Take(13))
-                if (card.Value == set)
-                {
-                    set++;
-                }
-                else
-                {
-                    set = -1;
-                    break;
-                }
+            if (VisibleGroup[index].Count > 0)
+            {
+                var suit = VisibleGroup[index][0].GetType();
+                foreach (var card in VisibleGroup[index].Take(13))
+                    if (card.Value == set && suit == card.GetType()) // # 同色才能收牌
+                    {
+                        set++;
+                    }
+                    else
+                    {
+                        set = -1;
+                        break;
+                    }
+            }
 
             var collection = false;
             if (set == 14)
@@ -462,6 +470,7 @@ namespace Solver
                 // # 1-13全了 (收一套牌)
                 VisibleGroup[index] = VisibleGroup[index].Skip(13).ToList();
                 CardCount -= 13;
+                CollectionStep.Add(History.Count + 1);
                 if (VisibleGroup[index].Count == 0 && HiddenGroup[index].Count > 0)
                 {
                     // # 移动后新的列收牌了,如若没有可见的了则展示新的牌
@@ -846,17 +855,17 @@ namespace Solver
                     switch (x)
                     {
                         case >= 1
-                        and <= 13:
-                            return BuildCard(1, x);
-                        case >= 14
-                        and <= 26:
+                            and <= 13:
                             return BuildCard(2, x);
+                        case >= 14
+                            and <= 26:
+                            return BuildCard(1, x);
                         case >= 27
-                        and <= 39:
-                            return BuildCard(3, x);
-                        case >= 40
-                        and <= 53:
+                            and <= 39:
                             return BuildCard(4, x);
+                        case >= 40
+                            and <= 53:
+                            return BuildCard(3, x);
                         default:
                             Log.MsgE("Card Pile ERROR !");
                             return BuildCard(999, 999);
@@ -881,8 +890,127 @@ namespace Solver
                 2 => new SpadeCard(num),
                 3 => new DiamondCard(num),
                 4 => new ClubsCard(num),
-                _ => new HeartCard(num),
+                _ => new HeartCard(num)
             };
+        }
+
+        private static List<Card> VitaLevelConvertToPoker(string vitaLevel)
+        {
+            var array = vitaLevel.Split(",1;");
+            var deck = string.Empty;
+            // # 牌堆
+            var deckString = array[^1].Substring(0, array[^1].Length - 2); // # -2 是为了去掉最后的,0
+            for (var i = deckString.Length - 1; i >= 0; i--)
+                deck += deckString[i];
+
+            var value = string.Empty;
+            var idx = 0;
+            // # 遍历10列
+            for (var x = 0; x < 6; x++)
+            {
+                for (var i = 0; i < 10; i++)
+                {
+                    var str = array[i];
+                    if (str.Length <= x)
+                        continue;
+                    var c = str[x];
+                    value += c;
+                }
+
+                idx++;
+            }
+
+            var s = value + deck;
+
+            return s.Select(VitaCharToCardValue).Select(GetCard).ToList();
+
+            Card GetCard(int x)
+            {
+                switch (x)
+                {
+                    case >= 1
+                        and <= 13:
+                        return BuildCard(2, x);
+                    case >= 14
+                        and <= 26:
+                        return BuildCard(1, x);
+                    case >= 27
+                        and <= 39:
+                        return BuildCard(4, x);
+                    case >= 40
+                        and <= 53:
+                        return BuildCard(3, x);
+                    default:
+                        Log.MsgE("Card Pile ERROR !");
+                        return BuildCard(999, 999);
+                }
+            }
+        }
+
+        //方片A-K（A-M）
+        //黑桃A-K（N-Z）
+        //梅花A-K（a-m）
+        //红桃A-K（n-z）
+        //Vita Spider 第一关: "TNRSQW,1;RYXOXP,1;WQQWOW,1;ZRXPNZ,1;SVTRP,1;VOXYY,1;NOYZV,1;PUZXO,1;PUWPS,1;WRSYU,1;XYUTNZZOUNSVXVOQPZSVZWRQUTRRQNSQXVUSTWPUTNTNQVYOYT,0",
+        //第一列从下往上是：TNRSQW
+        //排堆的从下往上是：XYUTNZZOUNSVXVOQPZSVZWRQUTRRQNSQXVUSTWPUTNTNQVYOYT可以理解最后一个放在最上面，会最先发下去
+
+        /// <summary>
+        /// * 牌面值转换为字符
+        /// # 黑桃1-13，红桃14-26，梅花27-39，方片40-54
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        private static char CardValueToChar(int x)
+        {
+            if (x < 14)
+                return (char)('N' + (x - 1));
+            if (x < 27)
+                return (char)('n' + (x - 14));
+            if (x < 40)
+                return (char)('a' + (x - 27));
+            return (char)('A' + (x - 40));
+        }
+
+        private static Dictionary<char, int> VitaCharDic;
+
+        /// <summary>
+        /// * Vita的关卡中的牌值转为自己的Poker的值
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private static int VitaCharToCardValue(char c)
+        {
+            if (VitaCharDic == null)
+            {
+                VitaCharDic = new Dictionary<char, int>();
+                for (var i = 1; i <= 54; i++)
+                {
+                    var val = CardValueToChar(i);
+                    VitaCharDic.TryAdd(val, i);
+                }
+            }
+
+            return VitaCharDic[c];
+            /*
+            var v4 = c - 'N' + 1;
+            if (v4 is >= 1 and <= 54)
+                // # 有效值
+                return v4;
+            var v3 = c - 'n' + 14;
+            if (v3 is >= 1 and <= 54)
+                // # 有效值
+                return v3;
+            var v2 = c - 'a' + 27;
+            if (v2 is >= 1 and <= 54)
+                // # 有效值
+                return v2;
+            var v1 = c - 'A' + 40;
+            if (v1 is >= 1 and <= 54)
+                // # 有效值
+                return v1;
+            return 0;
+            */
         }
     }
 }

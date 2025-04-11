@@ -86,7 +86,7 @@ namespace Solver
             }
 
             // # 添加发牌的可能
-            var newPoker = CreateNewPoker(poker, solver);
+            var newPoker = CreateNewPoker(poker);
             var playDeckFlag = newPoker.PlayDeck();
             if (!playDeckFlag)
                 return Sort(results);
@@ -100,14 +100,12 @@ namespace Solver
         /// * 创建新的扑克状态
         /// </summary>
         /// <param name="poker"></param>
-        /// <param name="solver"></param>
         /// <param name="cards"></param>
         /// <param name="fromIndex"></param>
         /// <param name="toIndex"></param>
         /// <returns></returns>
         public static Poker CreateNewPoker(
             Poker poker,
-            SpiderSolver solver,
             List<Card> cards = null,
             int fromIndex = -1,
             int toIndex = -1
@@ -116,11 +114,12 @@ namespace Solver
             var newVisibleGroup = poker.VisibleGroup.Select(x => new List<Card>(x)).ToList();
             var newHiddenGroup = poker.HiddenGroup.Select(x => new List<Card>(x)).ToList();
             var newDeck = new List<Card>(poker.Deck);
-            var newPoker = new Poker(newVisibleGroup, newHiddenGroup, newDeck, solver)
+            var newPoker = new Poker(newVisibleGroup, newHiddenGroup, newDeck)
             {
                 History = new List<(int, int, int, bool)>(poker.History),
                 PreviousPoker = poker,
                 CardCount = poker.CardCount,
+                CollectionStep = new List<int>(poker.CollectionStep)
             };
             if (fromIndex < 0 || toIndex < 0)
                 return newPoker;
@@ -202,7 +201,6 @@ namespace Solver
                     {
                         var newPoker = CreateNewPoker(
                             poker,
-                            solver,
                             movableCards,
                             fromIndex,
                             column
@@ -220,7 +218,7 @@ namespace Solver
                         if (poker.VisibleGroup[column][0].Value == cards.Last().Value + 1)
                         {
                             // # 可以放到目标列 (符合差值为1的条件)
-                            var newPoker = CreateNewPoker(poker, solver, cards, fromIndex, column);
+                            var newPoker = CreateNewPoker(poker, cards, fromIndex, column);
                             if (!StateExists(result, newPoker))
                                 result.Add(newPoker);
                         }

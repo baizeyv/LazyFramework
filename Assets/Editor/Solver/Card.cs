@@ -11,8 +11,12 @@ namespace Solver
 
         protected Card(int value)
         {
-            if (value is <= 0 or > 13)
-                throw new ArgumentException("The number must be non-negative.");
+            if (value is <= 53 and >= 40)
+                value -= 39;
+            else if (value is <= 39 and >= 27)
+                value -= 26;
+            else if (value is <= 26 and >= 14)
+                value -= 13;
             Value = value;
         }
 
@@ -44,7 +48,7 @@ namespace Solver
                 11 => "Ｊ",
                 12 => "Ｑ",
                 13 => "Ｋ",
-                _ => "＃",
+                _ => "＃"
             };
             result += "</color>";
             return result;
@@ -52,12 +56,14 @@ namespace Solver
     }
 
     /// <summary>
-    /// * 红桃牌 1-13
+    /// * 红桃牌 14-26
     /// </summary>
     public sealed class HeartCard : Card
     {
         public HeartCard(int value)
-            : base(value) { }
+            : base(value)
+        {
+        }
 
         public override string ToString()
         {
@@ -78,12 +84,14 @@ namespace Solver
     }
 
     /// <summary>
-    /// * 方片牌 27-39
+    /// * 方片牌 40-54
     /// </summary>
     public sealed class DiamondCard : Card
     {
         public DiamondCard(int value)
-            : base(value) { }
+            : base(value)
+        {
+        }
 
         public override string ToString()
         {
@@ -104,12 +112,14 @@ namespace Solver
     }
 
     /// <summary>
-    /// * 黑桃牌 14-26
+    /// * 黑桃牌 1-13
     /// </summary>
     public sealed class SpadeCard : Card
     {
         public SpadeCard(int value)
-            : base(value) { }
+            : base(value)
+        {
+        }
 
         public override string ToString()
         {
@@ -130,12 +140,14 @@ namespace Solver
     }
 
     /// <summary>
-    /// * 梅花牌 40-53
+    /// * 梅花牌 27-39
     /// </summary>
     public sealed class ClubsCard : Card
     {
         public ClubsCard(int value)
-            : base(value) { }
+            : base(value)
+        {
+        }
 
         public override string ToString()
         {

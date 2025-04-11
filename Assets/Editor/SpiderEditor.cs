@@ -6,7 +6,9 @@ using System.Text;
 using Lazy.Utility;
 using Newtonsoft.Json;
 using UnityEditor;
+using UnityEngine;
 using Log = Lazy.Log.Log;
+using Random = System.Random;
 
 namespace Editor
 {
@@ -15,17 +17,23 @@ namespace Editor
         [MenuItem("Spider/Test Print")]
         public static void PrintTable()
         {
-            var header = string.Format("{0,-10} | {1,-10} | {2,-10}", "Name", "Score", "Level");
-            var separator = new string('-', header.Length);
-
-            var row1 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Alice", 1200, 5);
-            var row2 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Bob", 980, 4);
-            var row3 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Charlie", 1500, 6);
-
-            // Log.MsgD("\n" + header + "\n" + separator + "\n" + row1 + "\n" + row2 + "\n" + row3);
-            UnityEngine.Debug.Log(
-                "\n" + header + "\n" + separator + "\n" + row1 + "\n" + row2 + "\n" + row3
-            );
+            var str = "TNRSQW";
+            for (var i = 0; i < str.Length; i++)
+            {
+                var a = VitaCharToCardValue(str[i]);
+                Debug.Log(a);
+            }
+            // var header = string.Format("{0,-10} | {1,-10} | {2,-10}", "Name", "Score", "Level");
+            // var separator = new string('-', header.Length);
+            //
+            // var row1 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Alice", 1200, 5);
+            // var row2 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Bob", 980, 4);
+            // var row3 = string.Format("{0,-10} | {1,-10} | {2,-10}", "Charlie", 1500, 6);
+            //
+            // // Log.MsgD("\n" + header + "\n" + separator + "\n" + row1 + "\n" + row2 + "\n" + row3);
+            // UnityEngine.Debug.Log(
+            //     "\n" + header + "\n" + separator + "\n" + row1 + "\n" + row2 + "\n" + row3
+            // );
         }
 
         [MenuItem("Spider/Export Spider ExportOne")]
@@ -585,7 +593,7 @@ namespace Editor
                     80303,
                     33744,
                     15345,
-                    75804,
+                    75804
                 };
             List<int> winnable1Suit8Max =
                 new()
@@ -689,7 +697,7 @@ namespace Editor
                     43317,
                     37718,
                     43837,
-                    18482,
+                    18482
                 };
             List<int> winnable1Suit10Max =
                 new()
@@ -793,7 +801,7 @@ namespace Editor
                     81827,
                     43863,
                     41695,
-                    3217,
+                    3217
                 };
             List<int> winnable2Suits =
                 new()
@@ -897,7 +905,7 @@ namespace Editor
                     30151,
                     9229,
                     33865,
-                    7871,
+                    7871
                 };
             List<int> winnable3Suits =
                 new()
@@ -1001,7 +1009,7 @@ namespace Editor
                     53169,
                     19307,
                     97013,
-                    79230,
+                    79230
                 };
             List<int> winnable4Suits =
                 new()
@@ -1055,7 +1063,7 @@ namespace Editor
                     206996,
                     310399,
                     849954,
-                    325192,
+                    325192
                 };
 
             const string winnable1SuitSaveFile = @"C:\Users\baizeyv\Documents\a\winnable1Suit.txt";
@@ -1142,14 +1150,14 @@ namespace Editor
             {
                 var stackStr = "";
                 for (var j = 0; j < stacks[i].Count; j++)
-                    stackStr += TransformPosition(stacks[i][j]);
+                    stackStr += CardValueToChar(stacks[i][j]);
                 vitaCode += stackStr + ",0;";
             }
 
             var deckCards = new List<int>();
             for (var i = result.Count - 1; i >= k; i--)
             {
-                vitaCode += TransformPosition(result[i]);
+                vitaCode += CardValueToChar(result[i]);
                 deckCards.Add(result[i]);
             }
 
@@ -1208,9 +1216,14 @@ namespace Editor
         //第一列从下往上是：TNRSQW
         //排堆的从下往上是：XYUTNZZOUNSVXVOQPZSVZWRQUTRRQNSQXVUSTWPUTNTNQVYOYT可以理解最后一个放在最上面，会最先发下去
 
-        private static char TransformPosition(int x)
+        /// <summary>
+        /// * 牌面值转换为字符
+        /// # 黑桃1-13，红桃14-26，梅花27-39，方片40-54
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        private static char CardValueToChar(int x)
         {
-            //黑桃1-13，红桃14-26，梅花27-39，方片40-54
             if (x < 14)
                 return (char)('N' + (x - 1));
             if (x < 27)
@@ -1218,6 +1231,69 @@ namespace Editor
             if (x < 40)
                 return (char)('a' + (x - 27));
             return (char)('A' + (x - 40));
+        }
+
+        /// <summary>
+        /// * Vita的关卡中的牌值转为自己的Poker的值
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private static int VitaCharToCardValue(char c)
+        {
+            var v4 = c - 'N' + 1;
+            if (v4 is >= 1 and <= 54)
+                // # 有效值
+                return v4;
+            var v3 = c - 'n' + 14;
+            if (v3 is >= 1 and <= 54)
+                // # 有效值
+                return v3;
+            var v2 = c - 'a' + 27;
+            if (v2 is >= 1 and <= 54)
+                // # 有效值
+                return v2;
+            var v1 = c - 'A' + 40;
+            if (v1 is >= 1 and <= 54)
+                // # 有效值
+                return v1;
+            return 0;
+        }
+
+        private static void VitaLevelConvertToPoker(string vitaLevel)
+        {
+            var array = vitaLevel.Split(",1;");
+            var deck = string.Empty;
+            // # 牌堆
+            var deckString = array[^1].Substring(0, array[^1].Length - 2); // # -2 是为了去掉最后的,0
+            for (var i = deckString.Length - 1; i >= 0; i--)
+                deck += deckString[i];
+
+            var value = string.Empty;
+            var idx = 0;
+            // # 遍历10列
+            for (var x = 0; x < 6; x++)
+            {
+                for (var i = 0; i < 10; i++)
+                {
+                    var str = array[i];
+                    if (str.Length <= idx)
+                        continue;
+                    var c = str[str.Length - 1 - idx];
+                    value += c;
+                }
+
+                idx++;
+            }
+
+            var s = value + deck;
+            var output = string.Empty;
+            for (var i = 0; i < s.Length; i++)
+            {
+                var val = VitaCharToCardValue(s[i]);
+                output += val + ",";
+            }
+
+            Debug.Log(output);
         }
     }
 
