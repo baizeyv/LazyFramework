@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Lazy.Log;
+using Lazy.Utility;
 
 namespace Solver
 {
     public class Poker
     {
+        private SpiderSolver _solver;
+
         // "✅❎❇️";
         // "#️⃣";1️;2️⃣;
         // 3️⃣   4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟
@@ -117,7 +121,9 @@ namespace Solver
                     }
                 }
 
-                _valuation = value + FlopValuation;
+                var flop = FlopValuation(6, false);
+                _valuation = value + flop;
+                // _solver.FlopValuations.TryAdd(this, flop);
                 return _valuation;
 
                 void AddValue(int num, int topPoint, ref int result)
@@ -131,28 +137,32 @@ namespace Solver
         /// <summary>
         /// * 翻牌额外估值
         /// </summary>
-        public int FlopValuation
+        private int FlopValuation(int limit, bool divide)
         {
-            get
-            {
-                if (PreviousPoker == null)
-                    // # 没有上一步
-                    return 0;
-                var from = History[0].Item1;
-                var count = History[0].Item2;
-                var to = History[0].Item3;
-                if (from < 0 || count < 0 || to < 0)
-                    // # 忽略发牌
-                    return 0;
-                if (
-                    PreviousPoker.VisibleGroup[from].Count == count
-                    && PreviousPoker.HiddenGroup[from].Count != 0
-                )
-                    // # 可以翻出新牌 flop new card
-                    return CheckFlop(this, from);
-
+            if (PreviousPoker == null)
+                // # 没有上一步
                 return 0;
+            if (_solver == null)
+                return 0;
+            // if (_solver.FlopValuations.TryGetValue(this, out var val))
+            //     return val;
+            var from = History[0].Item1;
+            var count = History[0].Item2;
+            var to = History[0].Item3;
+            if (from < 0 || count < 0 || to < 0)
+                // # 忽略发牌
+                return 0;
+            if (
+                PreviousPoker.VisibleGroup[from].Count == count
+                && PreviousPoker.HiddenGroup[from].Count != 0
+            )
+            {
+                // # 可以翻出新牌 flop new card
+                var depth = 0;
+                return CheckFlop(this, from, ref depth, divide ? limit / 2 : limit);
             }
+
+            return 0;
         }
 
         /// <summary>
@@ -202,9 +212,11 @@ namespace Solver
         /// * Constructor
         /// </summary>
         /// <param name="seed"></param>
+        /// <param name="solver"></param>
         /// <exception cref="ArgumentException"></exception>
-        public Poker(int seed)
+        public Poker(int seed, SpiderSolver solver)
         {
+            _solver = solver;
             var deck = GenerateDeck(seed);
             var hidden = deck.GetRange(0, deck.Count - 60);
             var begin4 = deck.GetRange(deck.Count - 54, 4);
@@ -249,8 +261,14 @@ namespace Solver
                 throw new ArgumentException("visibleGroup.Count must be <= 12");
         }
 
-        public Poker(List<List<Card>> visibleGroup, List<List<Card>> hiddenGroup, List<Card> deck)
+        public Poker(
+            List<List<Card>> visibleGroup,
+            List<List<Card>> hiddenGroup,
+            List<Card> deck,
+            SpiderSolver solver
+        )
         {
+            _solver = solver;
             VisibleGroup = visibleGroup;
             HiddenGroup = hiddenGroup;
             Deck = deck;
@@ -270,6 +288,12 @@ namespace Solver
         /// <returns></returns>
         public bool SecondaryValuation()
         {
+            if (History.Count == 31)
+            {
+                var a = 1;
+                a++;
+            }
+
             if (PreviousPoker == null)
                 return true;
             var from = History[0].Item1;
@@ -290,11 +314,11 @@ namespace Solver
             // # 当前的列的二次估值
             var currentValue = Calculate(VisibleGroup[to]);
 
-            if (
-                PreviousPoker.VisibleGroup[from].Count > VisibleGroup[to].Count
-                && currentValue == previousValue
-            )
-                return true;
+            // if (
+            //     PreviousPoker.VisibleGroup[from].Count > VisibleGroup[to].Count
+            //     && currentValue == previousValue
+            // )
+            //     return true;
 
             return currentValue > previousValue;
 
@@ -340,11 +364,14 @@ namespace Solver
             }
         }
 
-        public int CheckFlop(Poker poker, int column)
+        public int CheckFlop(Poker poker, int column, ref int depth, int limit)
         {
+            if (depth++ > limit)
+                return 0;
             var result = 0;
             var value = poker.VisibleGroup[column][0].Value;
-            HashSet<Poker> set = new();
+            HashSet<Poker> setTo = new();
+            HashSet<Poker> setCome = new();
             for (var i = 0; i < poker.VisibleGroup.Count; i++)
             {
                 if (i == column)
@@ -357,11 +384,12 @@ namespace Solver
                     // # 可以向其他列移动
                     var newPoker = SpiderSolver.CreateNewPoker(
                         poker,
+                        _solver,
                         new List<Card>() { poker.VisibleGroup[column][0] },
                         column,
                         i
                     );
-                    set.Add(newPoker);
+                    setTo.Add(newPoker);
                     result += 2;
                 }
 
@@ -387,16 +415,18 @@ namespace Solver
                 if (moveList[^1].Value + 1 == value)
                 {
                     // # 可以移动到新翻开的牌的位置
-                    var newPoker = SpiderSolver.CreateNewPoker(poker, moveList, i, column);
-                    set.Add(newPoker);
+                    var newPoker = SpiderSolver.CreateNewPoker(poker, _solver, moveList, i, column);
+                    setCome.Add(newPoker);
                     result += 1;
                 }
             }
 
             // # 计算额外翻牌分
-            foreach (var item in set)
-                // result += CheckFlop(item, item.History[0].Item1);
-                result += item.FlopValuation;
+            foreach (var item in setCome)
+                result += item.FlopValuation(limit, true);
+
+            foreach (var item in setTo)
+                result += item.FlopValuation(limit, false);
 
             return result;
         }
@@ -493,6 +523,19 @@ namespace Solver
 
             History.Insert(0, (-1, -1, -1, collection));
             return true;
+        }
+
+        public void WriteHistory(string file = @"C:\Users\baizeyv\Documents\a\History.txt")
+        {
+            FileUtility.CheckFileAndCreateDirWhenNeeded(file);
+            using (StreamWriter writer = new(file))
+            {
+                var step = 0;
+                foreach (var item in History)
+                    writer.WriteLine(
+                        $"Step:{++step}  From:{item.Item1}  To:{item.Item3}  Count:{item.Item2}"
+                    );
+            }
         }
 
         public override string ToString()

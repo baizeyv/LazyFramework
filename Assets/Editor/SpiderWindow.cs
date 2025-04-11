@@ -31,10 +31,10 @@ namespace Editor
                 GUI.enabled = f;
                 if (GUILayout.Button("Try To Solve"))
                 {
-                    var poker = new Poker(v);
                     if (_solverCoroutine != null)
                         _solverCoroutine.Stop();
                     var ss = new Solver.SpiderSolver();
+                    var poker = new Poker(v, ss);
                     var solver = ss.DepthFirstSearch(
                         poker,
                         () =>

@@ -13,6 +13,8 @@ namespace Solver
         // ! 使用HashSet而不用List的原因是在于Contains的查询速度,HashSet为O(1),List为O(n),随着数组越来越大会导致执行效率大幅度下降
         private readonly HashSet<Poker> _allStates = new();
 
+        public readonly Dictionary<Poker, int> FlopValuations = new();
+
         private int _calc;
 
         public IEnumerator DepthFirstSearch(Poker root, Action onCompleted)
@@ -20,7 +22,7 @@ namespace Solver
             _calc++;
             Debug.Log(_calc + " || " + root);
             // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
-            var states = TakeAStep(root)
+            var states = TakeAStep(root, this)
                 .FindAll(x => !StateExists(_allStates, x))
                 .FindAll(x => x.SecondaryValuation());
 
@@ -32,6 +34,7 @@ namespace Solver
                     // # 完成游戏
                     Log.MsgD("Game Completed !!!");
                     onCompleted.Fire();
+                    state.WriteHistory();
                     yield break;
                 }
 
@@ -63,8 +66,9 @@ namespace Solver
         /// * 走一步
         /// </summary>
         /// <param name="poker"></param>
+        /// <param name="solver"></param>
         /// <returns>排序后的所有合理的可能走的步骤</returns>
-        public static List<Poker> TakeAStep(Poker poker)
+        public static List<Poker> TakeAStep(Poker poker, SpiderSolver solver)
         {
             var results = new HashSet<Poker>();
             for (var i = 0; i < poker.VisibleGroup.Count; i++)
@@ -74,7 +78,7 @@ namespace Solver
                 if (movableCards.Count > 0)
                 {
                     // # 尝试移动
-                    var newPokers = MoveMovableCards(movableCards, i, poker);
+                    var newPokers = MoveMovableCards(movableCards, i, poker, solver);
                     foreach (var item in newPokers)
                         if (!StateExists(results, item))
                             results.Add(item);
@@ -82,7 +86,7 @@ namespace Solver
             }
 
             // # 添加发牌的可能
-            var newPoker = CreateNewPoker(poker);
+            var newPoker = CreateNewPoker(poker, solver);
             var playDeckFlag = newPoker.PlayDeck();
             if (!playDeckFlag)
                 return Sort(results);
@@ -96,12 +100,14 @@ namespace Solver
         /// * 创建新的扑克状态
         /// </summary>
         /// <param name="poker"></param>
+        /// <param name="solver"></param>
         /// <param name="cards"></param>
         /// <param name="fromIndex"></param>
         /// <param name="toIndex"></param>
         /// <returns></returns>
         public static Poker CreateNewPoker(
             Poker poker,
+            SpiderSolver solver,
             List<Card> cards = null,
             int fromIndex = -1,
             int toIndex = -1
@@ -110,7 +116,7 @@ namespace Solver
             var newVisibleGroup = poker.VisibleGroup.Select(x => new List<Card>(x)).ToList();
             var newHiddenGroup = poker.HiddenGroup.Select(x => new List<Card>(x)).ToList();
             var newDeck = new List<Card>(poker.Deck);
-            var newPoker = new Poker(newVisibleGroup, newHiddenGroup, newDeck)
+            var newPoker = new Poker(newVisibleGroup, newHiddenGroup, newDeck, solver)
             {
                 History = new List<(int, int, int, bool)>(poker.History),
                 PreviousPoker = poker,
@@ -166,11 +172,13 @@ namespace Solver
         /// <param name="movableCards"></param>
         /// <param name="fromIndex"></param>
         /// <param name="poker"></param>
+        /// <param name="solver"></param>
         /// <returns>所有移动后的状态</returns>
         public static List<Poker> MoveMovableCards(
             List<Card> movableCards,
             int fromIndex,
-            Poker poker
+            Poker poker,
+            SpiderSolver solver
         )
         {
             var result = new HashSet<Poker>();
@@ -192,7 +200,13 @@ namespace Solver
                     }
                     else
                     {
-                        var newPoker = CreateNewPoker(poker, movableCards, fromIndex, column);
+                        var newPoker = CreateNewPoker(
+                            poker,
+                            solver,
+                            movableCards,
+                            fromIndex,
+                            column
+                        );
                         if (!StateExists(result, newPoker))
                             result.Add(newPoker);
                     }
@@ -206,7 +220,7 @@ namespace Solver
                         if (poker.VisibleGroup[column][0].Value == cards.Last().Value + 1)
                         {
                             // # 可以放到目标列 (符合差值为1的条件)
-                            var newPoker = CreateNewPoker(poker, cards, fromIndex, column);
+                            var newPoker = CreateNewPoker(poker, solver, cards, fromIndex, column);
                             if (!StateExists(result, newPoker))
                                 result.Add(newPoker);
                         }
