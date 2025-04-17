@@ -24,7 +24,7 @@ namespace Solver
 
         public int SuitCount = 1;
 
-        private bool breakFlag;
+        private bool _breakFlag;
 
         public IEnumerator DepthFirstSearch(
             Poker root,
@@ -33,7 +33,7 @@ namespace Solver
             int id = 0
         )
         {
-            if (breakFlag)
+            if (_breakFlag)
                 yield break;
             _calc++;
             AllStep.Add(root);
@@ -52,7 +52,7 @@ namespace Solver
                     se.ExportNull(id, root, SuitCount, _calc);
                 }
 
-                breakFlag = true;
+                _breakFlag = true;
                 yield break;
             }
 
@@ -73,18 +73,18 @@ namespace Solver
                         se.Export(id, state, SuitCount, _calc);
                     }
 
-                    breakFlag = true;
+                    _breakFlag = true;
                     yield break;
                 }
 
                 foreach (var item in states)
                     _allStates.Add(item);
                 yield return DepthFirstSearch(state, onCompleted, file, id);
-                if (breakFlag)
+                if (_breakFlag)
                     yield break;
             }
 
-            if (breakFlag)
+            if (_breakFlag)
                 yield break;
         }
 
