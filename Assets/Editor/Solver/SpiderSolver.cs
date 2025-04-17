@@ -15,22 +15,46 @@ namespace Solver
         // ! 使用HashSet而不用List的原因是在于Contains的查询速度,HashSet为O(1),List为O(n),随着数组越来越大会导致执行效率大幅度下降
         private readonly HashSet<Poker> _allStates = new();
 
+        /// <summary>
+        /// * 所有Calc步骤
+        /// </summary>
+        public readonly List<Poker> AllStep = new();
+
         private int _calc;
 
         public int SuitCount = 1;
 
         private bool breakFlag;
 
-        public IEnumerator DepthFirstSearch(Poker root, Action onCompleted, string file, int id)
+        public IEnumerator DepthFirstSearch(
+            Poker root,
+            Action onCompleted,
+            string file = "",
+            int id = 0
+        )
         {
             if (breakFlag)
                 yield break;
             _calc++;
-            Debug.Log(_calc + " || " + root);
+            AllStep.Add(root);
+            root.Calc = _calc;
+            // Debug.Log(_calc + " || " + root);
             // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
             var states = TakeAStep(root, this)
                 .FindAll(x => !StateExists(_allStates, x))
                 .FindAll(x => x.SecondaryValuation());
+
+            if (_calc >= 500000)
+            {
+                if (!string.IsNullOrEmpty(file))
+                {
+                    var se = new SpiderExporter(file);
+                    se.ExportNull(id, root, SuitCount, _calc);
+                }
+
+                breakFlag = true;
+                yield break;
+            }
 
             // # 遍历所有没有试过的游戏状态
             foreach (var state in states)
@@ -43,8 +67,12 @@ namespace Solver
                     // var se = new SpiderExporter(
                     //     @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv"
                     // );
-                    var se = new SpiderExporter(file);
-                    se.Export(id, state, SuitCount, _calc);
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        var se = new SpiderExporter(file);
+                        se.Export(id, state, SuitCount, _calc);
+                    }
+
                     breakFlag = true;
                     yield break;
                 }
@@ -87,11 +115,11 @@ namespace Solver
             var newPoker = CreateNewPoker(poker);
             var playDeckFlag = newPoker.PlayDeck();
             if (!playDeckFlag)
-                return Sort(results);
+                return Sort(results, solver);
             if (!StateExists(results, newPoker))
                 results.Add(newPoker);
 
-            return Sort(results);
+            return Sort(results, solver);
         }
 
         /// <summary>
@@ -239,16 +267,70 @@ namespace Solver
         /// </summary>
         /// <param name="pokers"></param>
         /// <returns></returns>
-        public static List<Poker> Sort(List<Poker> pokers)
+        public static List<Poker> Sort(HashSet<Poker> pokers, SpiderSolver solver)
         {
-            // # sorting games in descending order based on Valuation
-            return pokers.OrderByDescending(x => x.Valuation).ToList();
-        }
+            /*
+            if (solver.SuitCount > 1)
+            {
+                var groups = pokers.GroupBy(x =>
+                {
+                    var (from, count, to, _) = x.History[0];
+                    if (from < 0 || to < 0 || count < 0)
+                        return (to: to, -1, typeof(Card));
+                    var topCard = x.PreviousPoker.VisibleGroup[from][count - 1];
+                    return (to, topCard.Value, topCard.GetType());
+                });
+                foreach (var group in groups)
+                {
+                    // # 最大移动牌数
+                    var maxCount = group.Max(c => c.History[0].Item2);
+                    // # 最大估值
+                    var maxValuation = group.Max(c => c.Valuation);
+                    // # 有几个最大移动牌数的
+                    var cc = group.Count(x => x.History[0].Item2 == maxCount);
+                    if (cc == 1)
+                    {
+                        // # 只有一个
+                        var x = group.FirstOrDefault(x => x.History[0].Item2 == maxCount);
+                        if (x != null)
+                            if (x.Valuation < maxValuation)
+                                x.Valuation = maxValuation + 1;
+                    }
+                    else
+                    {
+                        var list = group.Where(x => x.History[0].Item2 == maxCount);
+                        var od = list.OrderByDescending(x => x.Valuation).ToList();
+                        for (var i = 0; i < od.Count; i++)
+                            if (od[i].Valuation < maxValuation)
+                                od[i].Valuation = maxValuation + i + 1;
+                    }
+                }
+            }
+            */
 
-        public static List<Poker> Sort(HashSet<Poker> pokers)
-        {
             // # sorting games in descending order based on Valuation
-            return pokers.OrderByDescending(x => x.Valuation).ToList();
+            var valuationSortList = pokers.OrderByDescending(x => x.Valuation).ToList();
+            var result = valuationSortList
+                .OrderByDescending(x =>
+                {
+                    if (x.PreviousPoker == null || x.GetSuitCount() <= 1)
+                        return int.MinValue;
+                    var history = x.History;
+                    var from = history[0].Item1;
+                    var count = history[0].Item2;
+                    var to = history[0].Item3;
+                    if (from < 0 || count < 0 || to < 0)
+                        return int.MinValue;
+                    if (
+                        x.PreviousPoker.VisibleGroup[to].Count > 0
+                        && x.PreviousPoker.VisibleGroup[from][0].GetType()
+                            == x.PreviousPoker.VisibleGroup[to][0].GetType()
+                    )
+                        return int.MaxValue;
+                    return int.MinValue;
+                })
+                .ToList();
+            return result;
         }
     }
 }

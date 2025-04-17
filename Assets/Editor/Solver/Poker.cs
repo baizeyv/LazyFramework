@@ -14,11 +14,13 @@ namespace Solver
         // 3️⃣   4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟
         // "♠️"♣️;♠️;♥️;♦️
         // 🔴  ⚫  🟠  🟤   🈳
-        public const string EmptyCard = "🎮<color=#383838>＃</color>";
+        public const string EmptyCard = "🎮<color=#474747>＃</color>";
 
         public const int PadWidth = 30;
 
         public string Mark = "";
+
+        public int Calc = 0;
 
         /// <summary>
         /// * 牌堆
@@ -55,6 +57,10 @@ namespace Solver
         /// </summary>
         public int CardCount = 104;
 
+        private int _suitCount;
+
+        private List<int> _columnValuation = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
         /// <summary>
         /// * 私有估值
         /// </summary>
@@ -83,6 +89,7 @@ namespace Solver
                         num--;
                     }
 
+                    var tmp = value;
                     if (VisibleGroup[i].Count > 0)
                     {
                         var val = 0;
@@ -124,11 +131,13 @@ namespace Solver
 
                         AddValue(val, top.Value, ref value);
                     }
+
+                    _columnValuation[i] = value - tmp;
                 }
 
                 var flop = FlopValuation(6, false);
-                _valuation = value + flop;
-                // _solver.FlopValuations.TryAdd(this, flop);
+                var extra = ExtraValuationMoreSuit();
+                _valuation = value + flop + extra;
                 return _valuation;
 
                 void AddValue(int num, int topPoint, ref int result)
@@ -137,6 +146,87 @@ namespace Solver
                         result += topPoint * num;
                 }
             }
+            set => _valuation = value;
+        }
+
+        /// <summary>
+        /// * 多花色的向空列移动的情况的额外估值 (可以整理牌型)
+        /// </summary>
+        /// <returns></returns>
+        private int ExtraValuationMoreSuit()
+        {
+            if (GetSuitCount() <= 1)
+                return 0;
+            var result = BlankColumnCount * 200; // # 空列加200
+            if (History.Count <= 0)
+                return result;
+            if (PreviousPoker == null)
+                return result;
+            var from = History[0].Item1;
+            var count = History[0].Item2;
+            var to = History[0].Item3;
+            if (from < 0 || count < 0 || to < 0)
+                return result;
+            if (IsBlank(from))
+                return result;
+            if (PreviousPoker.IsBlank(to))
+                // # 向空列移动
+                for (var i = 0; i < PreviousPoker.VisibleGroup.Count; i++)
+                {
+                    if (PreviousPoker.VisibleGroup[i].Count == 0)
+                        continue;
+                    if (i == to)
+                        continue;
+                    List<Card> list = new();
+                    for (var x = 0; x < PreviousPoker.VisibleGroup[i].Count; x++)
+                        if (x == 0)
+                        {
+                            list.Add(PreviousPoker.VisibleGroup[i][0]);
+                        }
+                        else
+                        {
+                            if (
+                                PreviousPoker.VisibleGroup[i][x].GetType() == list[^1].GetType()
+                                && PreviousPoker.VisibleGroup[i][x].Value - 1 == list[^1].Value
+                            )
+                                list.Add(PreviousPoker.VisibleGroup[i][x]);
+                            else
+                                break;
+                        }
+
+                    if (VisibleGroup[from][0].GetType() == list[^1].GetType())
+                    {
+                        // # 同花色
+                        if (list[^1].Value + 1 == VisibleGroup[from][0].Value)
+                        {
+                            result += 100;
+                        }
+                        else
+                        {
+                            List<Card> st = new();
+                            for (var c = 0; c < VisibleGroup[from].Count; c++)
+                                if (c == 0)
+                                {
+                                    st.Add(VisibleGroup[from][0]);
+                                }
+                                else
+                                {
+                                    if (
+                                        VisibleGroup[from][c].GetType() == st[^1].GetType()
+                                        && VisibleGroup[from][c].Value - 1 == st[^1].Value
+                                    )
+                                        st.Add(VisibleGroup[from][c]);
+                                    else
+                                        break;
+                                }
+
+                            if (list[0].Value - 1 == st[^1].Value)
+                                result += 100;
+                        }
+                    }
+                }
+
+            return result;
         }
 
         /// <summary>
@@ -215,11 +305,13 @@ namespace Solver
         /// * Constructor
         /// </summary>
         /// <param name="seed"></param>
+        /// <param name="suitCount"></param>
         /// <exception cref="ArgumentException"></exception>
-        public Poker(int seed)
+        public Poker(int seed, int suitCount)
         {
             Mark = seed.ToString();
-            var deck = GenerateDeck(seed);
+            _suitCount = suitCount;
+            var deck = GenerateDeck(seed, suitCount);
             Build(deck);
         }
 
@@ -228,6 +320,47 @@ namespace Solver
             Mark = vitaLevel;
             var deck = VitaLevelConvertToPoker(vitaLevel);
             Build(deck);
+        }
+
+        public int GetSuitCount()
+        {
+            if (_suitCount > 0)
+                return _suitCount;
+            HashSet<int> values = new();
+            foreach (var x in Deck)
+                values.Add(x.OriginalValue);
+
+            foreach (var c in HiddenGroup.SelectMany(x => x))
+                values.Add(c.OriginalValue);
+            foreach (var c in VisibleGroup.SelectMany(x => x))
+                values.Add(c.OriginalValue);
+
+            if (values.Count == 13)
+            {
+                _suitCount = 1;
+                return 1;
+            }
+
+            if (values.Count == 26)
+            {
+                _suitCount = 2;
+                return 2;
+            }
+
+            if (values.Count == 39)
+            {
+                _suitCount = 3;
+                return 3;
+            }
+
+            if (values.Count == 52)
+            {
+                _suitCount = 4;
+                return 4;
+            }
+
+            _suitCount = 1;
+            return 1;
         }
 
         private void Build(List<Card> deck)
@@ -296,12 +429,6 @@ namespace Solver
         /// <returns></returns>
         public bool SecondaryValuation()
         {
-            if (History.Count == 31)
-            {
-                var a = 1;
-                a++;
-            }
-
             if (PreviousPoker == null)
                 return true;
             var from = History[0].Item1;
@@ -553,9 +680,9 @@ namespace Solver
         public override string ToString()
         {
             var result =
-                $"Valuation: <color=green>{Valuation}</color>🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏 Step: <color=green>{History.Count}</color>";
+                $"Calc: {Calc} Valuation: <color=green>{Valuation}</color>🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏🃏 Step: <color=green>{History.Count}</color>";
             result += $" Collection:{FinishedCount}";
-            if (PreviousPoker != null && false)
+            if (PreviousPoker != null)
             {
                 var tuple = History[0];
                 var from = tuple.Item1;
@@ -594,7 +721,8 @@ namespace Solver
                 {
                     // # 发牌了
                     foreach (var item in VisibleGroup)
-                        item[0]?.Highlight();
+                        if (item.Count > 0)
+                            item[0]?.Highlight();
 
                     for (var i = 0; i < 10; i++)
                         PreviousPoker.Deck[i]?.Highlight();
@@ -843,13 +971,16 @@ namespace Solver
         /// <summary>
         /// * 生成牌堆
         /// </summary>
-        private static List<Card> GenerateDeck(int seed)
+        private static List<Card> GenerateDeck(int seed, int suitCount)
         {
             var random = new Random(seed);
             var cards = new List<int>();
             for (var i = 0; i < 13; i++)
             for (var j = 1; j <= 8; j++)
-                cards.Add(i + 1);
+            {
+                var tmp = j % suitCount;
+                cards.Add(i + 1 + tmp * 13);
+            }
 
             var cardValues = cards.OrderBy(_ => random.Next()).ToList();
             var result = cardValues

@@ -9,8 +9,11 @@ namespace Solver
 
         private bool _highlight;
 
+        public readonly int OriginalValue;
+
         protected Card(int value)
         {
+            OriginalValue = value;
             if (value is <= 53 and >= 40)
                 value -= 39;
             else if (value is <= 39 and >= 27)
@@ -48,7 +51,7 @@ namespace Solver
                 11 => "Ｊ",
                 12 => "Ｑ",
                 13 => "Ｋ",
-                _ => "＃"
+                _ => "＃",
             };
             result += "</color>";
             return result;
@@ -61,9 +64,7 @@ namespace Solver
     public sealed class HeartCard : Card
     {
         public HeartCard(int value)
-            : base(value)
-        {
-        }
+            : base(value) { }
 
         public override string ToString()
         {
@@ -89,9 +90,7 @@ namespace Solver
     public sealed class DiamondCard : Card
     {
         public DiamondCard(int value)
-            : base(value)
-        {
-        }
+            : base(value) { }
 
         public override string ToString()
         {
@@ -117,9 +116,7 @@ namespace Solver
     public sealed class SpadeCard : Card
     {
         public SpadeCard(int value)
-            : base(value)
-        {
-        }
+            : base(value) { }
 
         public override string ToString()
         {
@@ -145,9 +142,7 @@ namespace Solver
     public sealed class ClubsCard : Card
     {
         public ClubsCard(int value)
-            : base(value)
-        {
-        }
+            : base(value) { }
 
         public override string ToString()
         {
