@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Lazy.Log;
 using Lazy.Utility;
 using Solver.Exporter;
+using UnityEditor;
 using UnityEngine;
 
 namespace Solver
@@ -26,6 +27,8 @@ namespace Solver
 
         private bool _breakFlag;
 
+        private bool _threadEndFlag;
+
         public IEnumerator DepthFirstSearch(
             Poker root,
             Action onCompleted,
@@ -44,17 +47,17 @@ namespace Solver
                 .FindAll(x => !StateExists(_allStates, x))
                 .FindAll(x => x.SecondaryValuation());
 
-            if (_calc >= 500000)
-            {
-                if (!string.IsNullOrEmpty(file))
-                {
-                    var se = new SpiderExporter(file);
-                    se.ExportNull(id, root, SuitCount, _calc);
-                }
-
-                _breakFlag = true;
-                yield break;
-            }
+            // if (_calc >= 500000)
+            // {
+            //     if (!string.IsNullOrEmpty(file))
+            //     {
+            //         var se = new SpiderExporter(file);
+            //         se.ExportNull(id, root, SuitCount, _calc);
+            //     }
+            //
+            //     _breakFlag = true;
+            //     yield break;
+            // }
 
             // # 遍历所有没有试过的游戏状态
             foreach (var state in states)
@@ -86,6 +89,59 @@ namespace Solver
 
             if (_breakFlag)
                 yield break;
+        }
+
+        public void ThreadDfs(Poker root, Action onCompleted, string file = "", int id = 0)
+        {
+            if (_threadEndFlag)
+                return;
+            _calc++;
+            AllStep.Add(root);
+            root.Calc = _calc;
+            // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
+            var states = TakeAStep(root, this)
+                .FindAll(x => !StateExists(_allStates, x))
+                .FindAll(x => x.SecondaryValuation());
+
+            if (_calc >= 1000000) // # 百万步
+            {
+                if (!string.IsNullOrEmpty(file))
+                {
+                    var se = new SpiderExporter(file);
+                    se.ExportNull(id, root, SuitCount, _calc);
+                }
+
+                _threadEndFlag = true;
+                return;
+            }
+
+            // # 遍历所有没有试过的游戏状态
+            foreach (var state in states)
+            {
+                if (state.GameCompleted)
+                {
+                    // # 完成游戏
+                    EditorApplication.delayCall += () => Log.MsgD("Game Completed !!!");
+                    onCompleted.Fire();
+                    // var se = new SpiderExporter(
+                    //     @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv"
+                    // );
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        var se = new SpiderExporter(file);
+                        se.Export(id, state, SuitCount, _calc);
+                    }
+
+                    _threadEndFlag = true;
+                    return;
+                }
+
+                foreach (var item in states)
+                    _allStates.Add(item);
+                ThreadDfs(state, onCompleted, file, id);
+                if (_threadEndFlag)
+                    return;
+            }
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using F8Framework.Core;
 using Lazy;
 using Newtonsoft.Json;
@@ -16,6 +17,12 @@ namespace Editor
 {
     public class SpiderWindow : EditorWindow
     {
+        private Thread _thread;
+
+        private Thread _playValveThread;
+
+        private Thread _vitaThread;
+
         private bool _showBase = true;
 
         private bool _showCalculation = true;
@@ -78,8 +85,6 @@ namespace Editor
 
         // ##################################################
 
-        private EditorCoroutine _solverCoroutine;
-
         private EditorCoroutine _playValveEditorCoroutine;
 
         private EditorCoroutine _vitaEditorCoroutine;
@@ -119,6 +124,24 @@ namespace Editor
             }
         }
 
+        private void ThreadVitaColor()
+        {
+            var json = File.ReadAllText(_inputVitaJsonPath);
+            var bean = JsonConvert.DeserializeObject<VitaBean>(json, Constant.JsonSetting);
+
+            _vitaThread = new Thread(() =>
+            {
+                foreach (var x in bean.SelectMany(item => item.Value))
+                {
+                    var solver = new SpiderSolver();
+                    var poker = new Poker(x.question);
+                    solver.SuitCount = poker.GetSuitCount();
+                    solver.ThreadDfs(poker, null, _outputVitaCsvPath, x.id);
+                }
+            });
+            _vitaThread.Start();
+        }
+
         private IEnumerator PlayValveSeed()
         {
             var array = _inputPlayValveSeeds.Split(',');
@@ -129,6 +152,22 @@ namespace Editor
                 var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
                 yield return solver.DepthFirstSearch(poker, null, _outputPlayValveCsvPath, i + 1);
             }
+        }
+
+        private void ThreadPlayValveSeed()
+        {
+            var array = _inputPlayValveSeeds.Split(',');
+            var seeds = array.Select(int.Parse).ToArray();
+            _playValveThread = new Thread(() =>
+            {
+                for (var i = 0; i < seeds.Length; i++)
+                {
+                    var solver = new SpiderSolver() { SuitCount = _playValveSelectedOption + 1 };
+                    var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
+                    solver.ThreadDfs(poker, null, _outputPlayValveCsvPath, i + 1);
+                }
+            });
+            _playValveThread.Start();
         }
 
         private void DrawSolvePlayValve()
@@ -166,21 +205,28 @@ namespace Editor
                 GUI.enabled = f;
                 if (GUILayout.Button("Solve PlayValve", GUILayout.Height(35)))
                 {
-                    if (_solverCoroutine != null)
-                        _solverCoroutine.Stop();
-                    var ss = new SpiderSolver();
-                    var poker = new Poker(v, _selectedOption + 1);
-                    ss.SuitCount = _selectedOption + 1;
-                    _solver = ss;
-                    var solver = ss.DepthFirstSearch(
-                        poker,
-                        () =>
+                    if (_thread == null)
+                    {
+                        _thread = new Thread(() =>
                         {
-                            _solverCoroutine?.Stop();
-                            _solverCoroutine = null;
-                        }
-                    );
-                    _solverCoroutine = EditorCoroutine.Start(solver);
+                            var ss = new SpiderSolver();
+                            var poker = new Poker(v, _selectedOption + 1);
+                            ss.SuitCount = _selectedOption + 1;
+                            _solver = ss;
+                            ss.ThreadDfs(
+                                poker,
+                                () =>
+                                {
+                                    _thread = null;
+                                }
+                            );
+                        });
+                        _thread.Start();
+                    }
+                    else
+                    {
+                        Debug.Log("Thread Running !");
+                    }
                 }
 
                 GUI.enabled = true;
@@ -206,22 +252,28 @@ namespace Editor
                     GUI.enabled = false;
                 if (GUILayout.Button("Solve Vita", GUILayout.Height(35)))
                 {
-                    if (_solverCoroutine != null)
-                        _solverCoroutine.Stop();
-                    var ss = new SpiderSolver();
-                    var poker = new Poker(_inputVita);
-                    ss.SuitCount = poker.GetSuitCount();
-                    _solver = ss;
-                    var solver = ss.DepthFirstSearch(
-                        poker,
-                        () =>
+                    if (_thread == null)
+                    {
+                        _thread = new Thread(() =>
                         {
-                            if (_solverCoroutine != null)
-                                _solverCoroutine.Stop();
-                            _solverCoroutine = null;
-                        }
-                    );
-                    _solverCoroutine = EditorCoroutine.Start(solver);
+                            var ss = new SpiderSolver();
+                            var poker = new Poker(_inputVita);
+                            ss.SuitCount = poker.GetSuitCount();
+                            _solver = ss;
+                            ss.ThreadDfs(
+                                poker,
+                                () =>
+                                {
+                                    _thread = null;
+                                }
+                            );
+                        });
+                        _thread.Start();
+                    }
+                    else
+                    {
+                        Debug.Log("Thread Running !");
+                    }
                 }
 
                 GUI.enabled = true;
@@ -270,25 +322,27 @@ namespace Editor
                     !string.IsNullOrEmpty(_outputPlayValveCsvPath)
                     && !string.IsNullOrEmpty(_inputPlayValveSeeds);
                 if (GUILayout.Button("Export PlayValve", GUILayout.Height(35)))
-                {
-                    if (_playValveCoroutine == null)
-                    {
-                        _playValveCoroutine = PlayValveSeed();
-                        _playValveEditorCoroutine = EditorCoroutine.Start(_playValveCoroutine);
-                    }
-                    else
-                    {
-                        Debug.Log("Exporting PlayValve !");
-                    }
-                }
-
+                    if (_playValveThread == null)
+                        ThreadPlayValveSeed();
+                // if (_playValveCoroutine == null)
+                // {
+                //     _playValveCoroutine = PlayValveSeed();
+                //     _playValveEditorCoroutine = EditorCoroutine.Start(_playValveCoroutine);
+                // }
+                // else
+                // {
+                //     Debug.Log("Exporting PlayValve !");
+                // }
                 GUI.enabled = true;
                 if (GUILayout.Button("Stop Export PlayValve", GUILayout.Height(30)))
-                {
-                    _playValveEditorCoroutine?.Stop();
-                    _playValveEditorCoroutine = null;
-                    _playValveCoroutine = null;
-                }
+                    if (_playValveThread != null)
+                    {
+                        _playValveThread.Abort();
+                        _playValveThread = null;
+                    }
+                // _playValveEditorCoroutine?.Stop();
+                // _playValveEditorCoroutine = null;
+                // _playValveCoroutine = null;
             }
             GUILayout.EndVertical();
         }
@@ -320,25 +374,27 @@ namespace Editor
                     && _inputVitaJsonPath.EndsWith(".json")
                     && File.Exists(_inputVitaJsonPath);
                 if (GUILayout.Button("Export Vita", GUILayout.Height(35)))
-                {
-                    if (_vitaCoroutine == null)
-                    {
-                        _vitaCoroutine = VitaColor();
-                        _vitaEditorCoroutine = EditorCoroutine.Start(_vitaCoroutine);
-                    }
-                    else
-                    {
-                        Debug.Log("Exporting Vita !");
-                    }
-                }
-
+                    if (_vitaThread == null)
+                        ThreadVitaColor();
+                // if (_vitaCoroutine == null)
+                // {
+                //     _vitaCoroutine = VitaColor();
+                //     _vitaEditorCoroutine = EditorCoroutine.Start(_vitaCoroutine);
+                // }
+                // else
+                // {
+                //     Debug.Log("Exporting Vita !");
+                // }
                 GUI.enabled = true;
                 if (GUILayout.Button("Stop Export Vita", GUILayout.Height(30)))
-                {
-                    _vitaEditorCoroutine?.Stop();
-                    _vitaEditorCoroutine = null;
-                    _vitaCoroutine = null;
-                }
+                    if (_vitaThread != null)
+                    {
+                        _vitaThread.Abort();
+                        _vitaThread = null;
+                    }
+                // _vitaEditorCoroutine?.Stop();
+                // _vitaEditorCoroutine = null;
+                // _vitaCoroutine = null;
             }
             GUILayout.EndVertical();
         }
@@ -578,6 +634,15 @@ namespace Editor
             InitializeEditorCardReorderableList();
         }
 
+        private void OnDisable()
+        {
+            if (_thread != null)
+            {
+                _thread.Abort();
+                _thread = null;
+            }
+        }
+
         private void OnGUI()
         {
             GUILayout.BeginHorizontal("helpbox");
@@ -604,11 +669,14 @@ namespace Editor
                     GUILayout.EndHorizontal();
                     GUILayout.Space(5);
                     if (GUILayout.Button("Stop Solve It", GUILayout.Height(35)))
-                    {
-                        if (_solverCoroutine != null)
-                            _solverCoroutine.Stop();
-                        _solverCoroutine = null;
-                    }
+                        if (_thread != null)
+                        {
+                            _thread.Abort();
+                            _thread = null;
+                        }
+                    // if (_solverCoroutine != null)
+                    //     _solverCoroutine.Stop();
+                    // _solverCoroutine = null;
                 }
                 GUILayout.EndVertical();
 

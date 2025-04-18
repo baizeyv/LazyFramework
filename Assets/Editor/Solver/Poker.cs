@@ -59,7 +59,7 @@ namespace Solver
 
         private int _suitCount;
 
-        private List<int> _columnValuation = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        private readonly List<int> _columnValuation = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         /// <summary>
         /// * 私有估值
@@ -137,6 +137,8 @@ namespace Solver
 
                 var flop = FlopValuation(6, false);
                 var extra = ExtraValuationMoreSuit();
+                // var moveMore = MoveValuationMoreSuit(6, false);
+                // _valuation = value + flop + extra + moveMore;
                 _valuation = value + flop + extra;
                 return _valuation;
 
@@ -147,6 +149,134 @@ namespace Solver
                 }
             }
             set => _valuation = value;
+        }
+
+        /// <summary>
+        /// * 多花色的向其他地方移动牌的预测估值
+        /// ! 加上这个之后之前很多可以解出来的变得解不出来了,所以舍去
+        /// </summary>
+        /// <returns></returns>
+        private int MoveValuationMoreSuit(int limit, bool divide)
+        {
+            if (GetSuitCount() <= 1) // # 单花色不执行这个预测估值
+                return 0;
+            if (PreviousPoker == null)
+                // # 没有上一步
+                return 0;
+            var from = History[0].Item1;
+            var count = History[0].Item2;
+            var to = History[0].Item3;
+            if (from < 0 || count < 0 || to < 0)
+                // # 忽略发牌
+                return 0;
+            if (PreviousPoker.VisibleGroup[from].Count != count)
+            {
+                // # 不能翻下边的隐藏牌,这种情况才需要计算这个预测估值
+                var depth = 0;
+                return CheckMoveVal(this, from, ref depth, divide ? limit / 2 : limit);
+            }
+
+            return 0;
+        }
+
+        private int CheckMoveVal(Poker poker, int column, ref int depth, int limit)
+        {
+            var result = 0;
+            if (depth++ > limit)
+                return result;
+            if (poker.IsBlank(column))
+                // # 空列了,不执行这个预测估值
+                return 0;
+
+            List<Card> canMove = new();
+            var low = poker.VisibleGroup[column][0];
+            canMove.Add(low);
+            for (var i = 1; i < poker.VisibleGroup[column].Count; i++)
+                if (
+                    poker.VisibleGroup[column][i].GetType() == canMove[^1].GetType()
+                    && poker.VisibleGroup[column][i].Value - 1 == canMove[^1].Value
+                )
+                    canMove.Add(poker.VisibleGroup[column][i]);
+                else
+                    break;
+
+            for (var i = 0; i < poker.VisibleGroup.Count; i++)
+            {
+                if (i == column)
+                    continue;
+                if (poker.VisibleGroup[i].Count == 0)
+                    // # 向空列移动不加分
+                    continue;
+                if (poker.VisibleGroup[i][0].Value == canMove[^1].Value + 1)
+                {
+                    var newPoker = SpiderSolver.CreateNewPoker(poker, canMove, column, i);
+                    if (!newPoker.InValidMove())
+                    {
+                        // # 可以向其他列完整移动
+                        if (poker.VisibleGroup[i][0].GetType() == canMove[^1].GetType())
+                            // # 相同花色
+                            result += 40;
+                        else
+                            // # 不同花色
+                            result += 20;
+                    }
+                }
+
+                List<Card> moveList = new();
+                for (var x = 0; x < poker.VisibleGroup[i].Count; x++)
+                {
+                    if (x == 0)
+                    {
+                        moveList.Add(poker.VisibleGroup[i][0]);
+                        continue;
+                    }
+
+                    var cur = poker.VisibleGroup[i][x];
+                    if (
+                        cur.GetType() == moveList[^1].GetType()
+                        && cur.Value == moveList[^1].Value + 1
+                    )
+                        moveList.Add(cur);
+                    else
+                        break;
+                }
+
+                if (moveList[^1].Value + 1 == low.Value)
+                {
+                    // # 可以移动到新翻开的位置
+                    var newPoker = SpiderSolver.CreateNewPoker(poker, moveList, i, column);
+                    if (!newPoker.InValidMove())
+                    {
+                        if (moveList[^1].GetType() == low.GetType())
+                            // # 相同花色
+                            result += 30;
+                        else
+                            // # 不同花色
+                            result += 10;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// * 是否是无效移动
+        /// </summary>
+        /// <returns></returns>
+        public bool InValidMove()
+        {
+            if (History.Count < 2)
+                return false;
+            if (History[0].Item1 < 0 || History[0].Item2 < 0 || History[0].Item3 < 0)
+                return false;
+            if (
+                History[0].Item2 == History[1].Item2
+                && History[0].Item1 == History[1].Item3
+                && History[0].Item3 == History[1].Item1
+            )
+                return true;
+            return false;
         }
 
         /// <summary>
@@ -499,7 +629,7 @@ namespace Solver
             }
         }
 
-        public int CheckFlop(Poker poker, int column, ref int depth, int limit)
+        private int CheckFlop(Poker poker, int column, ref int depth, int limit)
         {
             if (depth++ > limit)
                 return 0;
