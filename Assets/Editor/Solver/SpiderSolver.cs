@@ -91,7 +91,8 @@ namespace Solver
                 yield break;
         }
 
-        public void ThreadDfs(Poker root, Action onCompleted, string file = "", int id = 0)
+        public void ThreadDfs(Poker root, Action onCompleted, string file = "", int id = 0, bool exportNull = true,
+            int stepLimit = 1000000)
         {
             if (_threadEndFlag)
                 return;
@@ -103,9 +104,9 @@ namespace Solver
                 .FindAll(x => !StateExists(_allStates, x))
                 .FindAll(x => x.SecondaryValuation());
 
-            if (_calc >= 1000000) // # 百万步
+            if (_calc >= stepLimit && stepLimit > 0) // # 百万步
             {
-                if (!string.IsNullOrEmpty(file))
+                if (!string.IsNullOrEmpty(file) && exportNull)
                 {
                     var se = new SpiderExporter(file);
                     se.ExportNull(id, root, SuitCount, _calc);
@@ -138,7 +139,7 @@ namespace Solver
 
                 foreach (var item in states)
                     _allStates.Add(item);
-                ThreadDfs(state, onCompleted, file, id);
+                ThreadDfs(state, onCompleted, file, id, exportNull, stepLimit);
                 if (_threadEndFlag)
                     return;
             }
@@ -202,7 +203,7 @@ namespace Solver
                 PreviousPoker = poker,
                 CardCount = poker.CardCount,
                 CollectionStep = new List<int>(poker.CollectionStep),
-                Mark = poker.Mark,
+                Mark = poker.Mark
             };
             if (fromIndex < 0 || toIndex < 0)
                 return newPoker;
@@ -224,9 +225,9 @@ namespace Solver
             {
                 if (column.Count == 1)
                     // # 此时只有一张可见的牌,则可移动的也就这一张
-                    return new List<Card>() { column[0] };
+                    return new List<Card> { column[0] };
                 // # 可见牌数>1
-                var result = new List<Card>() { column[0] };
+                var result = new List<Card> { column[0] };
                 var tail = column.Skip(1).ToList();
                 result.AddRange(FindMovableCardInColumn(tail, column[0]));
                 return result;
@@ -239,7 +240,7 @@ namespace Solver
                 && column[0].Value == firstCard.Value + 1
             )
             {
-                var result = new List<Card>() { column[0] };
+                var result = new List<Card> { column[0] };
                 var tail = column.Skip(1).ToList();
                 result.AddRange(FindMovableCardInColumn(tail, column[0]));
                 return result;
@@ -380,7 +381,7 @@ namespace Solver
                     if (
                         x.PreviousPoker.VisibleGroup[to].Count > 0
                         && x.PreviousPoker.VisibleGroup[from][0].GetType()
-                            == x.PreviousPoker.VisibleGroup[to][0].GetType()
+                        == x.PreviousPoker.VisibleGroup[to][0].GetType()
                     )
                         return int.MaxValue;
                     return int.MinValue;

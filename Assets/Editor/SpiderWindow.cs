@@ -23,11 +23,15 @@ namespace Editor
 
         private Thread _vitaThread;
 
-        private bool _showBase = true;
+        private bool _showSolver = true;
 
-        private bool _showCalculation = true;
+        private bool _showExporter;
 
-        private bool _showOutput = true;
+        private bool _showGenerator;
+
+        private bool _showCalculation;
+
+        private bool _showOutput;
 
         // ##################################################
 
@@ -70,6 +74,35 @@ namespace Editor
         /// * PlayValve 的Csv输出文件路径
         /// </summary>
         private string _outputPlayValveCsvPath;
+
+        private List<SpiderGenerator> _generators = new();
+
+        // ##################################################
+
+        /// <summary>
+        /// * 生成关卡的CSV文件路径
+        /// </summary>
+        private string _generationFileCsvPath;
+
+        /// <summary>
+        /// * 生成关卡的花色数量索引
+        /// </summary>
+        private int _generationSuitCountIndex;
+
+        /// <summary>
+        /// * 生成关卡的步骤最大限制, -1为不限制
+        /// </summary>
+        private string _generationStepLimit;
+
+        /// <summary>
+        /// * 生成关卡的最小种子
+        /// </summary>
+        private string _generationMinSeedText;
+
+        /// <summary>
+        /// * 生成关卡的最大种子,-1为int.MaxValue
+        /// </summary>
+        private string _generationMaxSeedText;
 
         // ##################################################
 
@@ -148,7 +181,7 @@ namespace Editor
             var seeds = array.Select(int.Parse).ToArray();
             for (var i = 0; i < seeds.Length; i++)
             {
-                var solver = new SpiderSolver() { SuitCount = _playValveSelectedOption + 1 };
+                var solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1 };
                 var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
                 yield return solver.DepthFirstSearch(poker, null, _outputPlayValveCsvPath, i + 1);
             }
@@ -162,7 +195,7 @@ namespace Editor
             {
                 for (var i = 0; i < seeds.Length; i++)
                 {
-                    var solver = new SpiderSolver() { SuitCount = _playValveSelectedOption + 1 };
+                    var solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1 };
                     var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
                     solver.ThreadDfs(poker, null, _outputPlayValveCsvPath, i + 1);
                 }
@@ -395,6 +428,96 @@ namespace Editor
                 // _vitaEditorCoroutine?.Stop();
                 // _vitaEditorCoroutine = null;
                 // _vitaCoroutine = null;
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void DrawGenerator()
+        {
+            GUILayout.BeginVertical("helpbox");
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Save Path:", GUILayout.Width(80));
+                    _generationFileCsvPath = GUILayout.TextField(_generationFileCsvPath);
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Suit Count:", GUILayout.Width(100));
+                    for (var i = 0; i < _suitOptions.Length; i++)
+                    {
+                        var isSelected = _generationSuitCountIndex == i;
+                        var toggle = GUILayout.Toggle(isSelected, _suitOptions[i], "Radio");
+                        if (toggle && !isSelected)
+                        {
+                            _generationSuitCountIndex = i;
+                            GUI.FocusControl(null); // # 防止连续点击无效
+                        }
+                    }
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Step Limit:", GUILayout.Width(100));
+                    _generationStepLimit = GUILayout.TextField(_generationStepLimit);
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("Seed Range:", GUILayout.Width(100));
+                    GUILayout.Label("Min", GUILayout.Width(30));
+                    _generationMinSeedText = GUILayout.TextField(_generationMinSeedText);
+                    GUILayout.Space(5);
+                    GUILayout.Label("Max", GUILayout.Width(30));
+                    _generationMaxSeedText = GUILayout.TextField(_generationMaxSeedText);
+                }
+                GUILayout.EndHorizontal();
+                // # 步骤限制
+                var stepLimitFlag = int.TryParse(_generationStepLimit, out var stepLimit);
+                // # 最小种子限制
+                var minSeedFlag = int.TryParse(_generationMinSeedText, out var minSeed);
+                // # 最大种子限制
+                var maxSeedFlag = int.TryParse(_generationMaxSeedText, out var maxSeed);
+                GUILayout.BeginHorizontal();
+                {
+                    GUI.enabled =
+                        !string.IsNullOrEmpty(_generationFileCsvPath)
+                        && stepLimitFlag
+                        && minSeedFlag
+                        && maxSeedFlag
+                        && (maxSeed > minSeed || maxSeed == -1);
+                    if (GUILayout.Button("Generate", GUILayout.Height(35)))
+                    {
+                        var generator = new SpiderGenerator();
+                        if (maxSeed == -1)
+                            maxSeed = int.MaxValue;
+                        // # 生成关卡
+                        generator.GenerateLevel(
+                            minSeed,
+                            maxSeed,
+                            _generationSuitCountIndex + 1,
+                            _generationFileCsvPath,
+                            stepLimit
+                        );
+                        _generators.Add(generator);
+                    }
+
+                    GUI.enabled = true;
+                    if (
+                        GUILayout.Button(
+                            "Stop All Generation",
+                            GUILayout.Height(35),
+                            GUILayout.Width(150)
+                        )
+                    )
+                    {
+                        foreach (var generator in _generators)
+                            generator.StopGeneration();
+                        _generators.Clear();
+                    }
+                }
+                GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
         }
@@ -641,13 +764,26 @@ namespace Editor
                 _thread.Abort();
                 _thread = null;
             }
+
+            foreach (var generator in _generators)
+                generator.StopGeneration();
         }
 
         private void OnGUI()
         {
             GUILayout.BeginHorizontal("helpbox");
             {
-                _showBase = GUILayout.Toggle(_showBase, "Show Base", GUILayout.Width(120));
+                _showSolver = GUILayout.Toggle(_showSolver, "Show Solver", GUILayout.Width(100));
+                _showExporter = GUILayout.Toggle(
+                    _showExporter,
+                    "Show Exporter",
+                    GUILayout.Width(110)
+                );
+                _showGenerator = GUILayout.Toggle(
+                    _showGenerator,
+                    "Show Generator",
+                    GUILayout.Width(120)
+                );
                 _showCalculation = GUILayout.Toggle(
                     _showCalculation,
                     "Show Calculation",
@@ -656,7 +792,7 @@ namespace Editor
                 _showOutput = GUILayout.Toggle(_showOutput, "Show Output", GUILayout.Width(120));
             }
             GUILayout.EndHorizontal();
-            if (_showBase)
+            if (_showSolver)
             {
                 GUILayout.BeginVertical("helpbox");
                 {
@@ -679,9 +815,11 @@ namespace Editor
                     // _solverCoroutine = null;
                 }
                 GUILayout.EndVertical();
-
                 GUILayout.Space(15);
+            }
 
+            if (_showExporter)
+            {
                 GUILayout.BeginHorizontal("helpbox");
                 {
                     DrawExportPlayValve();
@@ -692,6 +830,9 @@ namespace Editor
 
                 GUILayout.Space(15);
             }
+
+            if (_showGenerator)
+                DrawGenerator();
 
             if (_showCalculation)
             {
@@ -804,7 +945,7 @@ namespace Editor
                 _hiddenReorderableList[i].onAddCallback = l =>
                 {
                     _hiddenList[finalI]
-                        .Add(new EditorCard() { suitType = SuitType.Heart, value = 1 });
+                        .Add(new EditorCard { suitType = SuitType.Heart, value = 1 });
                 };
                 _hiddenReorderableList[i].onRemoveCallback = l =>
                 {
@@ -861,7 +1002,7 @@ namespace Editor
                 _visibleReorderableList[i].onAddCallback = l =>
                 {
                     _visibleList[finalI]
-                        .Add(new EditorCard() { suitType = SuitType.Heart, value = 1 });
+                        .Add(new EditorCard { suitType = SuitType.Heart, value = 1 });
                 };
                 _visibleReorderableList[i].onRemoveCallback = l =>
                 {

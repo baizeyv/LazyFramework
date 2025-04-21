@@ -9,7 +9,7 @@ namespace Solver.Exporter
     {
         private readonly string _file;
 
-        private static readonly object fileLock = new();
+        private static readonly object FileLock = new();
 
         public SpiderExporter(string file)
         {
@@ -18,7 +18,7 @@ namespace Solver.Exporter
 
         public void Export(int id, Poker poker, int suitCount, int calc)
         {
-            lock (fileLock)
+            lock (FileLock)
             {
                 var data = new LevelData(
                     id,
@@ -44,15 +44,15 @@ namespace Solver.Exporter
 
         public void ExportNull(int id, Poker poker, int suitCount, int calc)
         {
-            lock (fileLock)
+            lock (FileLock)
             {
                 var data = new LevelData(
                     id,
                     poker.Mark,
                     suitCount,
                     calc,
-                    new List<int>() { -1, -1, -1, -1, -1, -1, -1, -1 },
-                    new List<(int, int, int, bool)>() { (-1, -1, -1, false) }
+                    new List<int> { -1, -1, -1, -1, -1, -1, -1, -1 },
+                    new List<(int, int, int, bool)> { (-1, -1, -1, false) }
                 );
                 var content = data.ToString();
                 var filePath = _file;
