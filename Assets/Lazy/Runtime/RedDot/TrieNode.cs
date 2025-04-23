@@ -22,12 +22,12 @@ namespace Lazy.RedDot
         /// <summary>
         /// * 节点值改变回调
         /// </summary>
-        private event Action<int> _onCountChanged;
+        private event Action<int> OnCountChanged;
 
         /// <summary>
         /// * 当前前缀名称
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// * 父节点
@@ -84,7 +84,7 @@ namespace Lazy.RedDot
         {
             Name = name;
             Value = 0;
-            _onCountChanged = null;
+            OnCountChanged = null;
         }
 
         public TrieNode(string name, TrieNode parent)
@@ -101,7 +101,7 @@ namespace Lazy.RedDot
         /// <param name="callback"></param>
         public void AddListener(Action<int> callback)
         {
-            _onCountChanged += callback;
+            OnCountChanged += callback;
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Lazy.RedDot
         /// <param name="callback"></param>
         public void RemoveListener(Action<int> callback)
         {
-            _onCountChanged -= callback;
+            OnCountChanged -= callback;
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Lazy.RedDot
         /// </summary>
         public void RemoveAllListener()
         {
-            _onCountChanged = null;
+            OnCountChanged = null;
         }
 
         #endregion
@@ -157,7 +157,7 @@ namespace Lazy.RedDot
             if (Value == newValue)
                 return;
             Value = newValue;
-            _onCountChanged.Fire(newValue);
+            OnCountChanged.Fire(newValue);
 
             RedDotManager.Instance.NodeValueChangeCallback.Fire(this, Value);
             // # 标记父节点为脏节点
