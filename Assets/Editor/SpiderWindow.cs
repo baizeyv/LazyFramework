@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using F8Framework.Core;
 using Lazy;
 using Newtonsoft.Json;
 using Solver;
@@ -117,12 +116,6 @@ namespace Editor
         // ##################################################
 
         private int _valuation = -99999;
-
-        // ##################################################
-
-        private EditorCoroutine _playValveEditorCoroutine;
-
-        private EditorCoroutine _vitaEditorCoroutine;
 
         // ##################################################
 

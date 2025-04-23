@@ -83,21 +83,27 @@ namespace DefaultNamespace
             // );
             // App.UI.OpenSync<MyPanel>(prefabName: "MyPanelUUU");
             // StartCoroutine(TestPanelClose());
-            // App.UI.OpenSync<DialogA>();
+            App.UI.OpenSync<DialogA>();
             // App.UI.OpenSync<DialogB>();
             // App.UI.OpenSync<DialogC>();
 
+            /*
             App.HotUpdate.Launch(() =>
             {
                 var prefab = App.Asset.LoadSync<GameObject>("Image");
                 Instantiate(prefab, UIRoot.Instance.transform);
             });
+            */
+            StartCoroutine(TestPanelClose());
         }
 
         private IEnumerator TestPanelClose()
         {
             yield return new WaitForSeconds(5f);
-            App.UI.Close();
+            // App.UI.Close();
+            App.RedDot.SetValue("root/test", 1);
+            yield return new WaitForSeconds(2f);
+            App.RedDot.SetValue("root/test", 0);
         }
 
         private void Update()

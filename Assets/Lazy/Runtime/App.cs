@@ -4,6 +4,7 @@ using Lazy.FSM;
 using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
+using Lazy.RedDot;
 using Lazy.Res;
 using Lazy.Serializer;
 using Lazy.Timer;
@@ -118,6 +119,14 @@ namespace Lazy
         {
             get { return _uiManager ??= ManagerCenter.CreateMono(() => UIManager.Instance); }
             set => _uiManager ??= value;
+        }
+
+        private static RedDotManager _redDotManager;
+
+        public static RedDotManager RedDot
+        {
+            get { return _redDotManager ??= ManagerCenter.Create(() => RedDotManager.Instance); }
+            set => _redDotManager ??= value;
         }
 
         private static Debugger.Debugger _debugger;

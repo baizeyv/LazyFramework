@@ -6,6 +6,7 @@ using Lazy.FSM;
 using Lazy.Manage;
 using Lazy.Platform;
 using Lazy.Pool;
+using Lazy.RedDot;
 using Lazy.Res;
 using Lazy.Serializer;
 using Lazy.Singleton;
@@ -55,6 +56,7 @@ namespace Lazy
             App.Audio = ManagerCenter.CreateMono(() => AudioManager.Instance);
             App.UI = ManagerCenter.CreateMono(() => UIManager.Instance);
             App.Fsm = ManagerCenter.Create(() => FsmManager.Instance);
+            App.RedDot = ManagerCenter.Create(() => RedDotManager.Instance);
 #if UNITY_WEBGL
             yield return AssetBundleManager.Instance.LoadAssetBundleManifest();
 #endif

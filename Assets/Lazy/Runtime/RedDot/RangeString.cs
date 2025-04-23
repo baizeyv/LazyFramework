@@ -1,4 +1,5 @@
 ﻿using System;
+using Lazy.Ref;
 
 namespace Lazy.RedDot
 {
@@ -74,8 +75,12 @@ namespace Lazy.RedDot
 
         public override string ToString()
         {
-            // TODO:
-            return base.ToString();
+            RedDotManager.Instance.Cached.Clear();
+            for (var i = _startIndex; i <= _endIndex; i++)
+                RedDotManager.Instance.Cached.Append(_source[i]);
+
+            var str = RedDotManager.Instance.Cached.ToString();
+            return str;
         }
     }
 }
