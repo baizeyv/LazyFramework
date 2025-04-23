@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
+using Lazy;
 using Lazy.Manage;
 using Lazy.Runtime.Utility.Coroutine;
-using Lazy.Utility;
 
 namespace Lazy.Runtime.Utility
 {

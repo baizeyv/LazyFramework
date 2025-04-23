@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     public static class ActionExtensions
     {
@@ -26,12 +26,12 @@ namespace Lazy.Utility
 
         public static T Fire<T>(this Func<T> func)
         {
-            return func != null ? func() ?? default(T) : default(T);
+            return func != null ? func() ?? default(T) : default;
         }
 
         public static TU Fire<T, TU>(this Func<T, TU> func, T arg)
         {
-            return func != null ? func(arg) ?? default(TU) : default(TU);
+            return func != null ? func(arg) ?? default(TU) : default;
         }
     }
 }

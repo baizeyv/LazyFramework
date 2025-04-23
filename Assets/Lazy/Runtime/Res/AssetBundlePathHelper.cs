@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
+using Lazy;
 using Lazy.Res.HotUpdate;
-using Lazy.Utility;
 
 namespace Lazy.Res
 {

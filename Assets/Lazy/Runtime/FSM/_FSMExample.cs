@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lazy.FSM
+namespace Lazy
 {
     public class FSMExample1 : MonoBehaviour
     {

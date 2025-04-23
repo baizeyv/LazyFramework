@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Lazy.Serializer;
+using Newtonsoft.Json;
 
-namespace Lazy.Serializer.CustomSerializers
+namespace Lazy
 {
     /// <summary>
     /// * Json序列化器

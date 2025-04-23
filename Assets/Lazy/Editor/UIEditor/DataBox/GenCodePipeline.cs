@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Lazy.Utility;
+using Lazy;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;

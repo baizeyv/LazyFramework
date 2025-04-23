@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Lazy.Grid
+namespace Lazy
 {
     public class DynamicGrid<T>
     {
@@ -10,17 +10,13 @@ namespace Lazy.Grid
         public void ForEach(Action<int, int, T> each)
         {
             foreach (var kvp in _grid)
-            {
                 each(kvp.Key.Item1, kvp.Key.Item2, kvp.Value);
-            }
         }
 
         public void ForEach(Action<T> each)
         {
             foreach (var kvp in _grid)
-            {
                 each(kvp.Value);
-            }
         }
 
         public void Clear(Action<T> cleanupItem = null)
@@ -29,9 +25,7 @@ namespace Lazy.Grid
             {
                 var values = _grid.Values;
                 foreach (var value in values)
-                {
                     cleanupItem(value);
-                }
             }
 
             _grid.Clear();

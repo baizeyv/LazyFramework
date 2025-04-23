@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Lazy.Grid
+namespace Lazy
 {
     public class SimpleGrid<T>
     {
@@ -21,12 +21,8 @@ namespace Lazy.Grid
         public void Fill(T value)
         {
             for (var x = 0; x < _colCount; x++)
-            {
-                for (var y = 0; y < _rowCount; y++)
-                {
-                    _grid[x, y] = value;
-                }
-            }
+            for (var y = 0; y < _rowCount; y++)
+                _grid[x, y] = value;
         }
 
         public void Fill(Func<int, int, T> onFill)
@@ -34,12 +30,8 @@ namespace Lazy.Grid
             if (onFill == null)
                 throw new ArgumentNullException("OnFill can not be null.");
             for (var x = 0; x < _colCount; x++)
-            {
-                for (var y = 0; y < _rowCount; y++)
-                {
-                    _grid[x, y] = onFill(x, y);
-                }
-            }
+            for (var y = 0; y < _rowCount; y++)
+                _grid[x, y] = onFill(x, y);
         }
 
         public void Resize(int colCount, int rowCount, Func<int, int, T> onAdd)
@@ -48,23 +40,15 @@ namespace Lazy.Grid
             for (var x = 0; x < _colCount; x++)
             {
                 for (var y = 0; y < _rowCount; y++)
-                {
                     newGrid[x, y] = _grid[x, y];
-                }
 
                 for (var y = _rowCount; y < rowCount; y++)
-                {
                     newGrid[x, y] = onAdd(x, y);
-                }
             }
 
             for (var x = _colCount; x < colCount; x++)
-            {
-                for (var y = 0; y < rowCount; y++)
-                {
-                    newGrid[x, y] = onAdd(x, y);
-                }
-            }
+            for (var y = 0; y < rowCount; y++)
+                newGrid[x, y] = onAdd(x, y);
 
             Fill(default(T));
             _colCount = colCount;
@@ -75,34 +59,24 @@ namespace Lazy.Grid
         public void ForEach(Action<int, int, T> each)
         {
             for (var x = 0; x < _colCount; x++)
-            {
-                for (var y = 0; y < _rowCount; y++)
-                {
-                    each(x, y, _grid[x, y]);
-                }
-            }
+            for (var y = 0; y < _rowCount; y++)
+                each(x, y, _grid[x, y]);
         }
 
         public void ForEach(Action<T> each)
         {
             for (var x = 0; x < _colCount; x++)
-            {
-                for (var y = 0; y < _rowCount; y++)
-                {
-                    each(_grid[x, y]);
-                }
-            }
+            for (var y = 0; y < _rowCount; y++)
+                each(_grid[x, y]);
         }
 
         public void Clear(Action<T> cleanupItem = null)
         {
             for (var x = 0; x < _colCount; x++)
+            for (var y = 0; y < _rowCount; y++)
             {
-                for (var y = 0; y < _rowCount; y++)
-                {
-                    cleanupItem?.Invoke(_grid[x, y]);
-                    _grid[x, y] = default;
-                }
+                cleanupItem?.Invoke(_grid[x, y]);
+                _grid[x, y] = default;
             }
 
             _grid = null;
@@ -118,20 +92,20 @@ namespace Lazy.Grid
                 }
                 else
                 {
-                    Debug.Log($"out of bounds [{xIndex}:{yIndex}] in grid[{_colCount}:{_rowCount}]");
+                    Debug.Log(
+                        $"out of bounds [{xIndex}:{yIndex}] in grid[{_colCount}:{_rowCount}]"
+                    );
                     return default;
                 }
             }
             set
             {
                 if (xIndex >= 0 && xIndex < _colCount && yIndex >= 0 && yIndex < _rowCount)
-                {
                     _grid[xIndex, yIndex] = value;
-                }
                 else
-                {
-                    Debug.Log($"out of bounds [{xIndex}:{yIndex}] in grid[{_colCount}:{_rowCount}]");
-                }
+                    Debug.Log(
+                        $"out of bounds [{xIndex}:{yIndex}] in grid[{_colCount}:{_rowCount}]"
+                    );
             }
         }
     }

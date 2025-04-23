@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Lazy.Download.Args;
+using Lazy;
 using Lazy.Runtime.Utility;
-using Lazy.Utility;
 using UnityEngine.Networking;
 
-namespace Lazy.Download
+namespace Lazy
 {
     public class Downloader
     {

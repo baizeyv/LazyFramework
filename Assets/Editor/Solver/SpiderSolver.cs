@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Lazy;
 using Lazy.Log;
-using Lazy.Utility;
 using Solver.Exporter;
 using UnityEditor;
 using UnityEngine;
@@ -91,8 +91,14 @@ namespace Solver
                 yield break;
         }
 
-        public void ThreadDfs(Poker root, Action onCompleted, string file = "", int id = 0, bool exportNull = true,
-            int stepLimit = 1000000)
+        public void ThreadDfs(
+            Poker root,
+            Action onCompleted,
+            string file = "",
+            int id = 0,
+            bool exportNull = true,
+            int stepLimit = 1000000
+        )
         {
             if (_threadEndFlag)
                 return;
@@ -203,7 +209,7 @@ namespace Solver
                 PreviousPoker = poker,
                 CardCount = poker.CardCount,
                 CollectionStep = new List<int>(poker.CollectionStep),
-                Mark = poker.Mark
+                Mark = poker.Mark,
             };
             if (fromIndex < 0 || toIndex < 0)
                 return newPoker;
@@ -381,7 +387,7 @@ namespace Solver
                     if (
                         x.PreviousPoker.VisibleGroup[to].Count > 0
                         && x.PreviousPoker.VisibleGroup[from][0].GetType()
-                        == x.PreviousPoker.VisibleGroup[to][0].GetType()
+                            == x.PreviousPoker.VisibleGroup[to][0].GetType()
                     )
                         return int.MaxValue;
                     return int.MinValue;

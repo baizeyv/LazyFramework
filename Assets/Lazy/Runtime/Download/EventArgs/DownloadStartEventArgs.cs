@@ -1,7 +1,8 @@
-﻿using Lazy.Pool;
+﻿using Lazy;
+using Lazy.Pool;
 using Lazy.Ref;
 
-namespace Lazy.Download.Args
+namespace Lazy
 {
     public class DownloadStartEventArgs : IReference
     {

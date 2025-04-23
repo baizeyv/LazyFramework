@@ -1,6 +1,6 @@
 using Lazy.Rx;
 
-namespace Lazy.Example
+namespace Lazy
 {
     public interface ITestModel : IModel
     {

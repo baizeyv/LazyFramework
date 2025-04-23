@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Lazy;
 using Lazy.Res;
 using Lazy.Res.HotUpdate;
 using Lazy.Runtime.Utility;
-using Lazy.Utility;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.Build;
@@ -246,7 +246,7 @@ namespace Lazy.Editor.Build
                     PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel23;
                     PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel35;
                     // # 构建选项: 生成工程而非APK,允许二次开发
-                    var options = new BuildPlayerOptions()
+                    var options = new BuildPlayerOptions
                     {
                         scenes = scenePaths,
                         locationPathName = outputPath,

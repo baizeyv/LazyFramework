@@ -1,5 +1,5 @@
 using System;
-using Lazy.Utility;
+using Lazy;
 
 namespace Lazy.Rx
 {
@@ -8,9 +8,7 @@ namespace Lazy.Rx
         internal static readonly Action<Result> HandleResult = (result) =>
         {
             if (result.IsFailure)
-            {
                 ObservableSystem.GetUnhandledExceptionHandler().Invoke(result.Exception);
-            }
         };
     }
 
@@ -18,8 +16,8 @@ namespace Lazy.Rx
     {
         internal static readonly Func<T, T> ReturnSelf = x => x;
 
-        internal static readonly Action<Exception, T> HandleException =
-            (x, _) => ObservableSystem.GetUnhandledExceptionHandler().Fire(x);
+        internal static readonly Action<Exception, T> HandleException = (x, _) =>
+            ObservableSystem.GetUnhandledExceptionHandler().Fire(x);
 
         internal static readonly Action<Result, T> HandleResult = (x, _) =>
         {

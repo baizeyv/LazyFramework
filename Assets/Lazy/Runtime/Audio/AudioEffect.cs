@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy;
 using Lazy.Pool;
 using Lazy.Res;
 using Lazy.Timer;
-using Lazy.Utility;
 using UnityEngine;
 using UnityEngine.Audio;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-namespace Lazy.Audio
+namespace Lazy
 {
     /// <summary>
     /// * 3D声音特效

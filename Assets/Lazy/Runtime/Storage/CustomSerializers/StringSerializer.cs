@@ -1,4 +1,6 @@
-﻿namespace Lazy.Serializer.CustomSerializers
+﻿using Lazy.Serializer;
+
+namespace Lazy
 {
     public class StringSerializer : Serializer<string>
     {

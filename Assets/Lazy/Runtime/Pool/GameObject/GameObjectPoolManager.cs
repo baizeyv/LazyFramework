@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lazy;
 using Lazy.Event;
 using Lazy.Manage;
 using Lazy.Pool.GameObject.Data;
 using Lazy.Pool.GameObject.Enums;
-using Lazy.Utility;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -708,9 +708,7 @@ namespace Lazy.Pool.GameObject
 
         private void CreateDespawnRequest(GameObjectPoolable poolable, float delay)
         {
-            DespawnRequests.Add(
-                new DespawnRequest() { Poolable = poolable, TimeToDespawn = delay }
-            );
+            DespawnRequests.Add(new DespawnRequest { Poolable = poolable, TimeToDespawn = delay });
         }
 
         private void GetPositionAndRotationByParent(

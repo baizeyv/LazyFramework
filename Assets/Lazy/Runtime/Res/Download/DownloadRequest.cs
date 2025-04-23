@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using Lazy.Utility;
+using Lazy;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -39,24 +39,26 @@ namespace Lazy.Res
         /// <summary>
         /// * 获取已下载的文件的文本
         /// </summary>
-        public string DownloadedFileText => (IsFinished && _downloadType == DownloadType.File && _request != null)
-            ? _request.downloadHandler.text
-            : null;
+        public string DownloadedFileText =>
+            IsFinished && _downloadType == DownloadType.File && _request != null
+                ? _request.downloadHandler.text
+                : null;
 
         /// <summary>
         /// * 获取已下载的AssetBundle
         /// </summary>
         public AssetBundle DownloadedAssetBundle =>
-            (IsFinished && _downloadType == DownloadType.AssetBundle && _request != null)
+            IsFinished && _downloadType == DownloadType.AssetBundle && _request != null
                 ? DownloadHandlerAssetBundle.GetContent(_request)
                 : null;
 
         /// <summary>
         /// * 获取已下载的数据
         /// </summary>
-        public byte[] DownloadedBytes => (IsFinished && _downloadType != DownloadType.None && _request != null)
-            ? _request.downloadHandler.data
-            : null;
+        public byte[] DownloadedBytes =>
+            IsFinished && _downloadType != DownloadType.None && _request != null
+                ? _request.downloadHandler.data
+                : null;
 
         public DownloadRequest(string uri)
         {
@@ -75,8 +77,12 @@ namespace Lazy.Res
                 if (URLUtility.IsLegalUri(uri))
                 {
                     // # uri 合法,发送请求
-                    _request = new UnityWebRequest(uri, UnityWebRequest.kHttpVerbGET, new DownloadHandlerBuffer(),
-                        null);
+                    _request = new UnityWebRequest(
+                        uri,
+                        UnityWebRequest.kHttpVerbGET,
+                        new DownloadHandlerBuffer(),
+                        null
+                    );
                     _request.SendWebRequest();
                 }
                 else
@@ -117,7 +123,11 @@ namespace Lazy.Res
         /// <param name="uri"></param>
         /// <param name="hash"></param>
         /// <param name="crc"></param>
-        private void SendAssetBundleDownloadRequest(string uri, Hash128 hash = default, uint crc = 0)
+        private void SendAssetBundleDownloadRequest(
+            string uri,
+            Hash128 hash = default,
+            uint crc = 0
+        )
         {
             try
             {
@@ -126,9 +136,7 @@ namespace Lazy.Res
                     if (hash == default || DisableUnityCacheOnWebGL)
                         _request = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
                     else
-                    {
                         _request = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
-                    }
 
                     _request.SendWebRequest();
                 }
@@ -151,7 +159,11 @@ namespace Lazy.Res
         /// <param name="hash"></param>
         /// <param name="crc"></param>
         /// <returns></returns>
-        public IEnumerator SendAssetBundleDownloadRequestCoroutine(string uri, Hash128 hash = default, uint crc = 0)
+        public IEnumerator SendAssetBundleDownloadRequestCoroutine(
+            string uri,
+            Hash128 hash = default,
+            uint crc = 0
+        )
         {
             if (!URLUtility.IsLegalUri(uri))
             {
@@ -165,9 +177,7 @@ namespace Lazy.Res
                 if (hash == default || DisableUnityCacheOnWebGL)
                     _request = UnityWebRequestAssetBundle.GetAssetBundle(uri, crc);
                 else
-                {
                     _request = UnityWebRequestAssetBundle.GetAssetBundle(uri, hash, crc);
-                }
             }
             catch (Exception e)
             {

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Lazy.IOC;
+using Lazy;
 
 namespace Lazy
 {

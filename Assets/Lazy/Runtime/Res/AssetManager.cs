@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Lazy;
 using Lazy.Manage;
 using Lazy.Res.Loader;
-using Lazy.Utility;
 using Newtonsoft.Json;
 using UnityEngine;
 using AssetBundleManager = Lazy.Res.Manager.AssetBundleManager;

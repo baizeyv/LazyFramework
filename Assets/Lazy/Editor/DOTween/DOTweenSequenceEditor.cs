@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DG.DOTweenEditor;
 using DG.Tweening;
-using Lazy.Utility;
+using Lazy;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

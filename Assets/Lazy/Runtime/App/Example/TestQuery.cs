@@ -1,4 +1,4 @@
-namespace Lazy.Example
+namespace Lazy
 {
     public class MultipleCount : ABSQuery<int>
     {

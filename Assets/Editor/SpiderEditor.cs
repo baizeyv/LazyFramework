@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Lazy.Utility;
+using Lazy;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
@@ -593,7 +593,7 @@ namespace Editor
                     80303,
                     33744,
                     15345,
-                    75804
+                    75804,
                 };
             List<int> winnable1Suit8Max =
                 new()
@@ -697,7 +697,7 @@ namespace Editor
                     43317,
                     37718,
                     43837,
-                    18482
+                    18482,
                 };
             List<int> winnable1Suit10Max =
                 new()
@@ -801,7 +801,7 @@ namespace Editor
                     81827,
                     43863,
                     41695,
-                    3217
+                    3217,
                 };
             List<int> winnable2Suits =
                 new()
@@ -905,7 +905,7 @@ namespace Editor
                     30151,
                     9229,
                     33865,
-                    7871
+                    7871,
                 };
             List<int> winnable3Suits =
                 new()
@@ -1009,7 +1009,7 @@ namespace Editor
                     53169,
                     19307,
                     97013,
-                    79230
+                    79230,
                 };
             List<int> winnable4Suits =
                 new()
@@ -1063,7 +1063,7 @@ namespace Editor
                     206996,
                     310399,
                     849954,
-                    325192
+                    325192,
                 };
 
             const string winnable1SuitSaveFile = @"C:\Users\baizeyv\Documents\a\winnable1Suit.txt";

@@ -1,4 +1,4 @@
-﻿namespace Lazy.FSM
+﻿namespace Lazy
 {
     public abstract class ABSState<TStateKey, TTarget> : IState
     {
@@ -42,26 +42,19 @@
             OnExit();
         }
 
-        protected virtual bool OnCondition() => true;
-
-        protected virtual void OnEnter()
+        protected virtual bool OnCondition()
         {
+            return true;
         }
 
-        protected virtual void OnUpdate()
-        {
-        }
+        protected virtual void OnEnter() { }
 
-        protected virtual void OnFixedUpdate()
-        {
-        }
+        protected virtual void OnUpdate() { }
 
-        protected virtual void OnGUI()
-        {
-        }
+        protected virtual void OnFixedUpdate() { }
 
-        protected virtual void OnExit()
-        {
-        }
+        protected virtual void OnGUI() { }
+
+        protected virtual void OnExit() { }
     }
 }

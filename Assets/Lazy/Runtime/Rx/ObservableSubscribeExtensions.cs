@@ -1,5 +1,5 @@
 using System;
-using Lazy.Utility;
+using Lazy;
 
 namespace Lazy.Rx
 {
@@ -16,11 +16,20 @@ namespace Lazy.Rx
             );
         }
 
-        public static IDisposable Subscribe<T, TState>(this Observable<T> source, TState state,
-            Action<T, TState> onNext)
+        public static IDisposable Subscribe<T, TState>(
+            this Observable<T> source,
+            TState state,
+            Action<T, TState> onNext
+        )
         {
-            return source.Subscribe(new AnonymousObserver<T, TState>(onNext, Stubs<TState>.HandleException,
-                Stubs<TState>.HandleResult, state));
+            return source.Subscribe(
+                new AnonymousObserver<T, TState>(
+                    onNext,
+                    Stubs<TState>.HandleException,
+                    Stubs<TState>.HandleResult,
+                    state
+                )
+            );
         }
     }
 

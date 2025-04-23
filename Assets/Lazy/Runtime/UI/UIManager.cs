@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Lazy;
 using Lazy.Manage;
 using Lazy.Res;
 using Lazy.Runtime.Utility;
 using Lazy.Singleton;
-using Lazy.Utility;
 using UnityEngine;
 
 namespace Lazy
@@ -67,9 +67,7 @@ namespace Lazy
 
         private WaitForEndOfFrame _waitForEndOfFrame = new();
 
-        private UIManager()
-        {
-        }
+        private UIManager() { }
 
         #region API
 
@@ -98,13 +96,12 @@ namespace Lazy
             if (typeof(IDialog).IsAssignableFrom(typeof(T)))
             {
                 if (_dialogPendingQueue.Count <= 0 && _currentDialog == null)
-                {
                     OpenDialogSync(key);
-                }
                 else
-                {
-                    _dialogPendingQueue.Enqueue(() => { OpenDialogSync(key); });
-                }
+                    _dialogPendingQueue.Enqueue(() =>
+                    {
+                        OpenDialogSync(key);
+                    });
             }
             else
             {
@@ -138,7 +135,9 @@ namespace Lazy
                 return;
             }
 
-            CoroutineCenter.StartCoroutine(OpenPanelCoroutine<T>(data, prefabName, layer, openType));
+            CoroutineCenter.StartCoroutine(
+                OpenPanelCoroutine<T>(data, prefabName, layer, openType)
+            );
         }
 
         /// <summary>
@@ -213,6 +212,7 @@ namespace Lazy
                         panel.Info = null;
                     }
                 }
+
                 _backStack.Clear();
             }
             else
@@ -253,6 +253,7 @@ namespace Lazy
                         panel.Info.Free();
                         panel.Info = null;
                     }
+
                     // # 立即打开要返回的界面
                     if (_backStack.TryPop(out var backPanel))
                     {
@@ -275,9 +276,7 @@ namespace Lazy
             if (_dialogPendingQueue.Count <= 0)
                 return;
             if (_dialogPendingQueue.TryDequeue(out var task))
-            {
                 task.Fire();
-            }
         }
 
         internal void TryDisable(IPanel panel)
@@ -418,14 +417,10 @@ namespace Lazy
                 // # 只能打开一次
                 var dialog = _table.Search(key).FirstOrDefault() as IDialog;
                 if (dialog == null)
-                {
                     // # 创建新的dialog
                     dialog = CreateDialogSync(key);
-                }
                 else
-                {
                     dialog.Open(key.Data);
-                }
 
                 if (dialog.Info != null && dialog.Info.Layer != key.Layer)
                     _root.SetLayerOfPanel(key.Layer, dialog);
@@ -436,15 +431,12 @@ namespace Lazy
             else
             {
                 // # 可以打开多次
-                var dialog = _table.Search(key).FirstOrDefault(x => x.State == PanelState.Closed) as IDialog;
+                var dialog =
+                    _table.Search(key).FirstOrDefault(x => x.State == PanelState.Closed) as IDialog;
                 if (dialog == null)
-                {
                     dialog = CreateDialogSync(key);
-                }
                 else
-                {
                     dialog.Open(key.Data);
-                }
 
                 if (dialog.Info != null && dialog.Info.Layer != key.Layer)
                     _root.SetLayerOfPanel(key.Layer, dialog);
@@ -633,24 +625,14 @@ namespace Lazy
             };
         }
 
-        public void OnUpdate()
-        {
-        }
+        public void OnUpdate() { }
 
-        public void OnFixedUpdate()
-        {
-        }
+        public void OnFixedUpdate() { }
 
-        public void OnLateUpdate()
-        {
-        }
+        public void OnLateUpdate() { }
 
-        public void OnDestroyRelease()
-        {
-        }
+        public void OnDestroyRelease() { }
 
-        public void OnGui()
-        {
-        }
+        public void OnGui() { }
     }
 }

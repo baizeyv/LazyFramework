@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     [AddComponentMenu("Lazy/Layout/Grid Center Layout Group", 999)]
     public class GridCenterLayoutGroup : LayoutGroup
@@ -47,8 +47,8 @@ namespace Lazy.Utility
 
         public Corner startCorner
         {
-            get { return mStartCorner; }
-            set { SetProperty(ref mStartCorner, value); }
+            get => mStartCorner;
+            set => SetProperty(ref mStartCorner, value);
         }
 
         [SerializeField]
@@ -56,17 +56,17 @@ namespace Lazy.Utility
 
         public Axis startAxis
         {
-            get { return mStartAxis; }
-            set { SetProperty(ref mStartAxis, value); }
+            get => mStartAxis;
+            set => SetProperty(ref mStartAxis, value);
         }
 
         [SerializeField]
-        protected Vector2 mCellSize = new Vector2(100, 100);
+        protected Vector2 mCellSize = new(100, 100);
 
         public Vector2 cellSize
         {
-            get { return mCellSize; }
-            set { SetProperty(ref mCellSize, value); }
+            get => mCellSize;
+            set => SetProperty(ref mCellSize, value);
         }
 
         [SerializeField]
@@ -74,8 +74,8 @@ namespace Lazy.Utility
 
         public Vector2 spacing
         {
-            get { return mSpacing; }
-            set { SetProperty(ref mSpacing, value); }
+            get => mSpacing;
+            set => SetProperty(ref mSpacing, value);
         }
 
         [SerializeField]
@@ -83,8 +83,8 @@ namespace Lazy.Utility
 
         public Constraint constraint
         {
-            get { return mConstraint; }
-            set { SetProperty(ref mConstraint, value); }
+            get => mConstraint;
+            set => SetProperty(ref mConstraint, value);
         }
 
         [SerializeField]
@@ -92,8 +92,8 @@ namespace Lazy.Utility
 
         public int constraintCount
         {
-            get { return mConstraintCount; }
-            set { SetProperty(ref mConstraintCount, Mathf.Max(value, 1)); }
+            get => mConstraintCount;
+            set => SetProperty(ref mConstraintCount, Mathf.Max(value, 1));
         }
 
         protected GridCenterLayoutGroup() { }
@@ -110,8 +110,8 @@ namespace Lazy.Utility
         {
             base.CalculateLayoutInputHorizontal();
 
-            int minColumns = 0;
-            int preferredColumns = 0;
+            var minColumns = 0;
+            var preferredColumns = 0;
             if (mConstraint == Constraint.FixedColumnCount)
             {
                 minColumns = preferredColumns = mConstraintCount;
@@ -138,7 +138,7 @@ namespace Lazy.Utility
 
         public override void CalculateLayoutInputVertical()
         {
-            int minRows = 0;
+            var minRows = 0;
             if (mConstraint == Constraint.FixedColumnCount)
             {
                 minRows = Mathf.CeilToInt(rectChildren.Count / (float)mConstraintCount - 0.001f);
@@ -149,8 +149,8 @@ namespace Lazy.Utility
             }
             else
             {
-                float width = rectTransform.rect.width;
-                int cellCountX = Mathf.Max(
+                var width = rectTransform.rect.width;
+                var cellCountX = Mathf.Max(
                     1,
                     Mathf.FloorToInt(
                         (width - padding.horizontal + spacing.x + 0.001f) / (cellSize.x + spacing.x)
@@ -159,7 +159,7 @@ namespace Lazy.Utility
                 minRows = Mathf.CeilToInt(rectChildren.Count / (float)cellCountX);
             }
 
-            float minSpace = padding.vertical + (cellSize.y + spacing.y) * minRows - spacing.y;
+            var minSpace = padding.vertical + (cellSize.y + spacing.y) * minRows - spacing.y;
             SetLayoutInputForAxis(minSpace, minSpace, -1, 1);
         }
 
@@ -185,9 +185,9 @@ namespace Lazy.Utility
             {
                 // Only set the sizes when invoked for horizontal axis, not the positions.
 
-                for (int i = 0; i < rectChildrenCount; i++)
+                for (var i = 0; i < rectChildrenCount; i++)
                 {
-                    RectTransform rect = rectChildren[i];
+                    var rect = rectChildren[i];
 
                     m_Tracker.Add(
                         this,
@@ -201,14 +201,15 @@ namespace Lazy.Utility
                     rect.anchorMax = Vector2.up;
                     rect.sizeDelta = cellSize;
                 }
+
                 return;
             }
 
-            float width = rectTransform.rect.size.x;
-            float height = rectTransform.rect.size.y;
+            var width = rectTransform.rect.size.x;
+            var height = rectTransform.rect.size.y;
 
-            int cellCountX = 1;
-            int cellCountY = 1;
+            var cellCountX = 1;
+            var cellCountY = 1;
             if (mConstraint == Constraint.FixedColumnCount)
             {
                 cellCountX = mConstraintCount;
@@ -252,8 +253,8 @@ namespace Lazy.Utility
                     );
             }
 
-            int cornerX = (int)startCorner % 2;
-            int cornerY = (int)startCorner / 2;
+            var cornerX = (int)startCorner % 2;
+            var cornerY = (int)startCorner / 2;
 
             int cellsPerMainAxis,
                 actualCellCountX,
@@ -279,16 +280,16 @@ namespace Lazy.Utility
                 );
             }
 
-            Vector2 requiredSpace = new Vector2(
+            var requiredSpace = new Vector2(
                 actualCellCountX * cellSize.x + (actualCellCountX - 1) * spacing.x,
                 actualCellCountY * cellSize.y + (actualCellCountY - 1) * spacing.y
             );
-            Vector2 startOffset = new Vector2(
+            var startOffset = new Vector2(
                 GetStartOffset(0, requiredSpace.x),
                 GetStartOffset(1, requiredSpace.y)
             );
 
-            for (int i = 0; i < rectChildrenCount; i++)
+            for (var i = 0; i < rectChildrenCount; i++)
             {
                 int positionX;
                 int positionY;
@@ -352,6 +353,7 @@ namespace Lazy.Utility
                 offsetY = 0;
                 return;
             }
+
             if (startAxis == 0)
             {
                 var rowIndex = index / cellCountX;
@@ -362,6 +364,7 @@ namespace Lazy.Utility
                     offsetY = 0;
                     return;
                 }
+
                 var totalInRowIndex = (totalCount - 1) % cellCountX;
                 if (totalInRowIndex + 1 == cellCountX)
                 {
@@ -369,6 +372,7 @@ namespace Lazy.Utility
                     offsetY = 0;
                     return;
                 }
+
                 var inRowIndex = index % cellCountX;
                 // * 最后一行缺少的元素数量
                 var offsetCount = cellCountX - (totalInRowIndex + 1);
@@ -385,6 +389,7 @@ namespace Lazy.Utility
                     offsetY = 0;
                     return;
                 }
+
                 var totalInColIndex = (totalCount - 1) % cellCountY;
                 if (totalInColIndex + 1 == cellCountY)
                 {
@@ -392,6 +397,7 @@ namespace Lazy.Utility
                     offsetY = 0;
                     return;
                 }
+
                 // * 最后一列缺少的元素数量
                 var offsetCount = cellCountY - (totalInColIndex + 1);
                 offsetY = cellSize.y / 2f * offsetCount + spacing.y / 2f * offsetCount;

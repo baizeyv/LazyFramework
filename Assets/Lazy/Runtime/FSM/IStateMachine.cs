@@ -1,6 +1,6 @@
 ﻿using Lazy.Pool;
 
-namespace Lazy.FSM
+namespace Lazy
 {
     public interface IStateMachine
     {

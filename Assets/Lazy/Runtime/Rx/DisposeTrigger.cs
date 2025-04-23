@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Utility;
+using Lazy;
 using UnityEngine;
 
 namespace Lazy.Rx
@@ -23,9 +23,7 @@ namespace Lazy.Rx
         public void Dispose()
         {
             foreach (var item in _disposables)
-            {
                 item.Dispose();
-            }
 
             _disposables.Clear();
         }
@@ -33,35 +31,52 @@ namespace Lazy.Rx
 
     public class DisposeOnDestroyTrigger : DisposeTrigger
     {
-        private void OnDestroy() => Dispose();
+        private void OnDestroy()
+        {
+            Dispose();
+        }
     }
 
     public class DisposeOnDisableTrigger : DisposeTrigger
     {
-        private void OnDisable() => Dispose();
+        private void OnDisable()
+        {
+            Dispose();
+        }
     }
 
     public static class DisposeExtensions
     {
-        public static IDisposable DisposeOnDestroy(this IDisposable disposable, GameObject gameObject)
+        public static IDisposable DisposeOnDestroy(
+            this IDisposable disposable,
+            GameObject gameObject
+        )
         {
             return gameObject.GetOrAddComponent<DisposeOnDestroyTrigger>().Add(disposable);
         }
 
-        public static IDisposable DisposeOnDestroy<T>(this IDisposable disposable, T component) where T : Component
+        public static IDisposable DisposeOnDestroy<T>(this IDisposable disposable, T component)
+            where T : Component
         {
-            return component.gameObject.GetOrAddComponent<DisposeOnDestroyTrigger>().Add(disposable);
+            return component
+                .gameObject.GetOrAddComponent<DisposeOnDestroyTrigger>()
+                .Add(disposable);
         }
 
-        public static IDisposable DisposeOnDisable(this IDisposable disposable, GameObject gameObject)
+        public static IDisposable DisposeOnDisable(
+            this IDisposable disposable,
+            GameObject gameObject
+        )
         {
             return gameObject.GetOrAddComponent<DisposeOnDisableTrigger>().Add(disposable);
         }
 
-        public static IDisposable DisposeOnDisable<T>(this IDisposable disposable, T component) where T : Component
+        public static IDisposable DisposeOnDisable<T>(this IDisposable disposable, T component)
+            where T : Component
         {
-            return component.gameObject.GetOrAddComponent<DisposeOnDisableTrigger>().Add(disposable);
+            return component
+                .gameObject.GetOrAddComponent<DisposeOnDisableTrigger>()
+                .Add(disposable);
         }
     }
-
 }

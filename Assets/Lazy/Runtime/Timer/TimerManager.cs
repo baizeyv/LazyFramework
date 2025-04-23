@@ -4,10 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Lazy;
 using Lazy.Event;
 using Lazy.Manage;
 using Lazy.Rx;
-using Lazy.Utility;
 using UnityEngine;
 
 namespace Lazy.Timer

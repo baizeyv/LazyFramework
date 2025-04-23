@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     public static class UnityReactiveExtensions
     {
@@ -26,7 +26,11 @@ namespace Lazy.Utility
         /// <param name="text"></param>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static IDisposable SubscribeToText<T>(this Observable<T> source, Text text, Func<T, string> selector)
+        public static IDisposable SubscribeToText<T>(
+            this Observable<T> source,
+            Text text,
+            Func<T, string> selector
+        )
         {
             return source.Subscribe<T, Text>(text, (x, t) => t.text = selector.Fire(x));
         }
@@ -50,7 +54,11 @@ namespace Lazy.Utility
         /// <param name="selector"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IDisposable SubscribeToTMPText<T>(this Observable<T> source, TMP_Text text, Func<T, string> selector)
+        public static IDisposable SubscribeToTMPText<T>(
+            this Observable<T> source,
+            TMP_Text text,
+            Func<T, string> selector
+        )
         {
             return source.Subscribe<T, TMP_Text>(text, (x, t) => t.text = selector.Fire(x));
         }
@@ -83,7 +91,10 @@ namespace Lazy.Utility
         /// <param name="source"></param>
         /// <param name="gameObject"></param>
         /// <returns></returns>
-        public static IDisposable SubscribeToVisible(this Observable<bool> source, GameObject gameObject)
+        public static IDisposable SubscribeToVisible(
+            this Observable<bool> source,
+            GameObject gameObject
+        )
         {
             return source.Subscribe<bool, GameObject>(gameObject, (x, o) => o.SetVisible(x));
         }
@@ -94,10 +105,12 @@ namespace Lazy.Utility
         /// <param name="source"></param>
         /// <param name="gameObject"></param>
         /// <returns></returns>
-        public static IDisposable SubscribeToVisible(this Observable<bool> source, MonoBehaviour gameObject)
+        public static IDisposable SubscribeToVisible(
+            this Observable<bool> source,
+            MonoBehaviour gameObject
+        )
         {
             return source.Subscribe<bool, MonoBehaviour>(gameObject, (x, o) => o.SetVisible(x));
         }
-
     }
 }

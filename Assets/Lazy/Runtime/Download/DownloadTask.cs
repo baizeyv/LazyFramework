@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Download
+namespace Lazy
 {
     /// <summary>
     /// * 下载任务

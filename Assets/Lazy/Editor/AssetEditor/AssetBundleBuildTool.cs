@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Lazy;
 using Lazy.Editor.Build;
 using Lazy.Res;
-using Lazy.Utility;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
@@ -433,7 +433,7 @@ namespace Lazy.Editor.AssetEditor
                 + nameof(ResourceMapping)
                 + ".json";
             FileUtility.CheckFileAndCreateDirWhenNeeded(path);
-            var settings = new JsonSerializerSettings()
+            var settings = new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Include,
             };
@@ -461,7 +461,7 @@ namespace Lazy.Editor.AssetEditor
                 + ".json";
             FileUtility.CheckFileAndCreateDirWhenNeeded(assetBundleMapPath);
 
-            var settings = new JsonSerializerSettings()
+            var settings = new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Include,
             };

@@ -1,7 +1,7 @@
 ﻿using System;
+using Lazy;
 using Lazy.Debugger.Module;
 using Lazy.Runtime.Utility;
-using Lazy.Utility;
 using UnityEngine;
 
 namespace Lazy.Debugger.Misc

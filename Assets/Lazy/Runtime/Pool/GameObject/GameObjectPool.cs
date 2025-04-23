@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy;
 using Lazy.Event;
 using Lazy.Pool.Attribute;
 using Lazy.Pool.GameObject.Enums;
-using Lazy.Utility;
 using UnityEditor;
 using UnityEngine;
 
@@ -487,7 +487,7 @@ namespace Lazy.Pool.GameObject
 
         private GameObjectPoolable CreatePoolable(UnityEngine.GameObject clone)
         {
-            return new GameObjectPoolable()
+            return new GameObjectPoolable
             {
                 Pool = this,
                 GameObject = clone,

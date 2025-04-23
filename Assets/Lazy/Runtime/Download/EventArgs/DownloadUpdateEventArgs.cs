@@ -1,7 +1,8 @@
 ﻿using System;
+using Lazy;
 using Lazy.Ref;
 
-namespace Lazy.Download.Args
+namespace Lazy
 {
     public class DownloadUpdateEventArgs : IReference
     {

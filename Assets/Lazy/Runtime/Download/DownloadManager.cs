@@ -5,10 +5,10 @@ using System.IO;
 using Lazy.Manage;
 using Lazy.Runtime.Utility;
 using Lazy.Singleton;
-using Lazy.Utility;
+using Lazy;
 using UnityEngine.Networking;
 
-namespace Lazy.Download
+namespace Lazy
 {
     public class DownloadManager : Singleton<DownloadManager>, IManager
     {

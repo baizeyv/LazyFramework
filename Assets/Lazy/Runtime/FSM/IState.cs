@@ -1,4 +1,4 @@
-namespace Lazy.FSM
+namespace Lazy
 {
     public interface IState
     {

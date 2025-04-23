@@ -1,6 +1,6 @@
 using System;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     public static class URLUtility
     {
@@ -11,7 +11,11 @@ namespace Lazy.Utility
         /// <returns></returns>
         public static bool IsLegalHttpUri(string uri)
         {
-            return !string.IsNullOrEmpty(uri) && (uri.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || uri.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+            return !string.IsNullOrEmpty(uri)
+                && (
+                    uri.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                    || uri.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                );
         }
 
         public static bool IsLegalUri(string uri)

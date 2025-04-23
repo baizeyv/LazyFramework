@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
-using Lazy.Utility;
+using Lazy;
 
 namespace Lazy.Editor.UIEditor
 {
@@ -12,9 +12,7 @@ namespace Lazy.Editor.UIEditor
             public static void Generate(CodeGenInfo info)
             {
                 if (!File.Exists(info.ScriptFilePath))
-                {
                     WriteMainCode(info);
-                }
                 WriteDesignerCode(info);
             }
 
@@ -38,7 +36,9 @@ namespace Lazy.Editor.UIEditor
                 var scriptFile = info.ScriptFilePath.Replace(".cs", ".designer.cs");
                 FileUtility.CheckFileAndCreateDirWhenNeeded(scriptFile);
                 var sw = File.CreateText(scriptFile);
-                var writer = TemplateUtility.GetScriptTemplateString("UIPanelTemplate.designer.cs.txt");
+                var writer = TemplateUtility.GetScriptTemplateString(
+                    "UIPanelTemplate.designer.cs.txt"
+                );
                 writer = writer.Replace("#NAMESPACE#", info.Namespace);
                 writer = writer.Replace("#CLASSNAME#", info.ClassName);
                 writer = writer.Replace("#INHERIT#", info.IsDialog ? "UIDialog" : "UIPanel");
@@ -53,15 +53,15 @@ namespace Lazy.Editor.UIEditor
                         sb.AppendLine("\t\t/// " + property.Comment);
                         sb.AppendLine("\t\t/// </summary>");
                     }
+
                     sb.AppendLine("\t\t[SerializeField]");
                     sb.AppendLine($"\t\tpublic {property.TypeName} {property.PropertyName};");
                 }
+
                 writer = writer.Replace("#FIELD#", sb.ToString());
                 sb.Clear();
                 foreach (var property in info.Properties)
-                {
                     sb.AppendLine($"\t\t\t{property.PropertyName} = null;");
-                }
                 writer = writer.Replace("#CLEAR#", sb.ToString());
                 sw.Write(writer);
                 sw.Flush();
@@ -75,9 +75,7 @@ namespace Lazy.Editor.UIEditor
             public static void Generate(CodeGenInfo info)
             {
                 if (!File.Exists(info.ScriptFilePath))
-                {
                     WriteMainCode(info);
-                }
                 WriteDesignerCode(info);
             }
 
@@ -100,7 +98,9 @@ namespace Lazy.Editor.UIEditor
                 var scriptFile = info.ScriptFilePath.Replace(".cs", ".designer.cs");
                 FileUtility.CheckFileAndCreateDirWhenNeeded(scriptFile);
                 var sw = new StreamWriter(scriptFile, false, Encoding.UTF8);
-                var writer = TemplateUtility.GetScriptTemplateString("UIWidgetTemplate.designer.cs.txt");
+                var writer = TemplateUtility.GetScriptTemplateString(
+                    "UIWidgetTemplate.designer.cs.txt"
+                );
                 writer = writer.Replace("#NAMESPACE#", info.Namespace);
                 writer = writer.Replace("#CLASSNAME#", info.ClassName);
                 writer = writer.Replace("#TIME#", DateTimeOffset.Now.ToLocalTime().ToString("F"));
@@ -118,12 +118,11 @@ namespace Lazy.Editor.UIEditor
                     sb.AppendLine("\t\t[SerializeField]");
                     sb.AppendLine($"\t\tpublic {property.TypeName} {property.PropertyName};");
                 }
+
                 writer = writer.Replace("#FIELD#", sb.ToString());
                 sb.Clear();
                 foreach (var property in info.Properties)
-                {
                     sb.AppendLine($"\t\t\t{property.PropertyName} = null;");
-                }
                 writer = writer.Replace("#CLEAR#", sb.ToString());
                 sw.Write(writer);
                 sw.Flush();

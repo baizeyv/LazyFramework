@@ -1,5 +1,5 @@
 ﻿using System;
-using Lazy.Utility;
+using Lazy;
 using UnityEngine;
 
 namespace Lazy
@@ -68,9 +68,7 @@ namespace Lazy
         protected virtual void OnDestroy()
         {
             if (Application.isPlaying)
-            {
                 OnBeforeDestroy();
-            }
         }
 
         protected virtual void OnBeforeDestroy() { }

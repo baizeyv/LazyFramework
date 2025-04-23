@@ -1,7 +1,7 @@
 using System;
-using Lazy.Utility;
+using Lazy;
 
-namespace Lazy.Example
+namespace Lazy
 {
     /// <summary>
     /// ! Data Binding Intermediary

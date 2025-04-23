@@ -1,11 +1,9 @@
-﻿
-using System;
+﻿using System;
 
-namespace Lazy.FSM
+namespace Lazy
 {
     public class SimpleState : IState
     {
-
         #region Property
 
         private Func<bool> _onCondition;

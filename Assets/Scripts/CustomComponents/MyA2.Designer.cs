@@ -7,7 +7,7 @@ namespace A.B.C.D
     {
 		public RectTransform aa;
 
-		public Lazy.Utility.GridCenterLayoutGroup aacc;
+		public Lazy.GridCenterLayoutGroup aacc;
 
 
     }

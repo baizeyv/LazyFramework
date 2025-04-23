@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using FileInfo = System.IO.FileInfo;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     public static class FileUtility
     {

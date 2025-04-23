@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lazy.IOC
+namespace Lazy
 {
     /// <summary>
     /// * 控制反转容器

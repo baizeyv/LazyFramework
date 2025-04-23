@@ -8,7 +8,7 @@ namespace Lazy.Melody
 		public UnityEngine.UI.Image mImage6;
 		public UnityEngine.UI.Image mImage6a;
 
-		public Lazy.IApp App => Lazy.Example.TestApp.Gate;
+		public Lazy.IApp App => Lazy.TestApp.Gate;
 
     }
 }

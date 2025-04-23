@@ -1,4 +1,4 @@
-﻿namespace Lazy.Audio
+﻿namespace Lazy
 {
     public static class AudioConstant
     {

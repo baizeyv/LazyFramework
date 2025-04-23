@@ -1,4 +1,4 @@
-﻿using Lazy.Utility;
+﻿using Lazy;
 using TMPro;
 using UnityEngine;
 

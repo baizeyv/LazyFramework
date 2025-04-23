@@ -1,6 +1,6 @@
 ﻿using System;
 using DG.Tweening;
-using Lazy.Utility;
+using Lazy;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
@@ -87,25 +87,17 @@ namespace Lazy
             showTween.OnComplete(() =>
             {
                 if (this is IDialog)
-                {
                     UIManager.Instance.RemovePlayingTweenDialog(this as IDialog);
-                }
                 else
-                {
                     UIManager.Instance.RemovePlayingTweenPanel(this);
-                }
                 UIManager.Instance.BlockRaycastState(false);
                 OnShowTweenEnd();
             });
             UIManager.Instance.BlockRaycastState(true);
             if (this is IDialog)
-            {
                 UIManager.Instance.AddPlayingTweenDialog(this as IDialog);
-            }
             else
-            {
                 UIManager.Instance.AddPlayingTweenPanel(this);
-            }
             base.Show();
         }
 
@@ -118,24 +110,16 @@ namespace Lazy
                 : HideTweenSequence.DOPlay();
             UIManager.Instance.BlockRaycastState(true);
             if (this is IDialog)
-            {
                 UIManager.Instance.AddPlayingTweenDialog(this as IDialog);
-            }
             else
-            {
                 UIManager.Instance.AddPlayingTweenPanel(this);
-            }
             OnEndTweenBegin();
             hideTween.OnComplete(() =>
             {
                 if (this is IDialog)
-                {
                     UIManager.Instance.RemovePlayingTweenDialog(this as IDialog);
-                }
                 else
-                {
                     UIManager.Instance.RemovePlayingTweenPanel(this);
-                }
                 UIManager.Instance.BlockRaycastState(false);
                 base.Hide();
                 HideCallback.Fire();
@@ -176,7 +160,7 @@ namespace Lazy
             ClearUIComponents();
         }
 
-        protected virtual void OnUIDestroy() {}
+        protected virtual void OnUIDestroy() { }
 
         protected virtual void ClearUIComponents() { }
 
@@ -236,7 +220,6 @@ namespace Lazy
                 EditorApplication.delayCall += () =>
                 {
                     while (seqArray.Length < 2)
-                    {
                         try
                         {
                             gameObject.AddComponent<DOTweenSequence>();
@@ -246,7 +229,6 @@ namespace Lazy
                         {
                             break;
                         }
-                    }
                 };
             }
         }

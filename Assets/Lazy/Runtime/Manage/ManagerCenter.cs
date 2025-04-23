@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lazy.IOC;
+using Lazy;
 using Lazy.Singleton;
-using Lazy.Utility;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

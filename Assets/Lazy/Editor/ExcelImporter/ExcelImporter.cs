@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Lazy;
 using Lazy.Excel;
-using Lazy.Utility;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -66,11 +66,11 @@ namespace Lazy.Editor.ExcelImporter
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             foreach (var type in assembly.GetTypes())
             {
-                var attributes = type.GetCustomAttributes(typeof(Excel.ExcelAssetAttribute), false);
+                var attributes = type.GetCustomAttributes(typeof(ExcelAssetAttribute), false);
                 if (attributes.Length == 0)
                     continue;
-                var attribute = (Excel.ExcelAssetAttribute)attributes[0];
-                var info = new ExcelAssetInfo() { AssetType = type, Attribute = attribute };
+                var attribute = (ExcelAssetAttribute)attributes[0];
+                var info = new ExcelAssetInfo { AssetType = type, Attribute = attribute };
                 list.Add(info);
             }
 

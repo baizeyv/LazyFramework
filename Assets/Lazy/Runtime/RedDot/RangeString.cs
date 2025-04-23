@@ -1,5 +1,4 @@
 ﻿using System;
-using Lazy.Ref;
 
 namespace Lazy.RedDot
 {

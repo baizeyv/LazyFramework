@@ -4,11 +4,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     public static class UnityExtensions
     {
-        
         #region SetVisible
 
         public static GameObject SetVisible(this GameObject selfObj, bool visible)
@@ -24,6 +23,7 @@ namespace Lazy.Utility
                 if (selfObj.activeSelf)
                     selfObj.SetActive(false);
             }
+
             return selfObj;
         }
 
@@ -67,7 +67,7 @@ namespace Lazy.Utility
         #endregion
 
 
-        private static readonly List<Transform> s_CachedTransforms = new List<Transform>();
+        private static readonly List<Transform> s_CachedTransforms = new();
 
         /// <summary>
         /// 获取或增加组件。
@@ -78,11 +78,9 @@ namespace Lazy.Utility
         public static T GetOrAddComponent<T>(this GameObject gameObject)
             where T : Component
         {
-            T component = gameObject.GetComponent<T>();
+            var component = gameObject.GetComponent<T>();
             if (component == null)
-            {
                 component = gameObject.AddComponent<T>();
-            }
 
             return component;
         }
@@ -95,11 +93,9 @@ namespace Lazy.Utility
         /// <returns>获取或增加的组件。</returns>
         public static Component GetOrAddComponent(this GameObject gameObject, Type type)
         {
-            Component component = gameObject.GetComponent(type);
+            var component = gameObject.GetComponent(type);
             if (component == null)
-            {
                 component = gameObject.AddComponent(type);
-            }
 
             return component;
         }
@@ -123,10 +119,8 @@ namespace Lazy.Utility
         public static void SetLayerRecursively(this GameObject gameObject, int layer)
         {
             gameObject.GetComponentsInChildren(true, s_CachedTransforms);
-            for (int i = 0; i < s_CachedTransforms.Count; i++)
-            {
+            for (var i = 0; i < s_CachedTransforms.Count; i++)
                 s_CachedTransforms[i].gameObject.layer = layer;
-            }
 
             s_CachedTransforms.Clear();
         }
@@ -171,7 +165,7 @@ namespace Lazy.Utility
         /// <param name="newValue">x 坐标值。</param>
         public static void SetPositionX(this Transform transform, float newValue)
         {
-            Vector3 v = transform.position;
+            var v = transform.position;
             v.x = newValue;
             transform.position = v;
         }
@@ -183,7 +177,7 @@ namespace Lazy.Utility
         /// <param name="newValue">y 坐标值。</param>
         public static void SetPositionY(this Transform transform, float newValue)
         {
-            Vector3 v = transform.position;
+            var v = transform.position;
             v.y = newValue;
             transform.position = v;
         }
@@ -195,7 +189,7 @@ namespace Lazy.Utility
         /// <param name="newValue">z 坐标值。</param>
         public static void SetPositionZ(this Transform transform, float newValue)
         {
-            Vector3 v = transform.position;
+            var v = transform.position;
             v.z = newValue;
             transform.position = v;
         }
@@ -207,7 +201,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">x 坐标值增量。</param>
         public static void AddPositionX(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.position;
+            var v = transform.position;
             v.x += deltaValue;
             transform.position = v;
         }
@@ -219,7 +213,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">y 坐标值增量。</param>
         public static void AddPositionY(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.position;
+            var v = transform.position;
             v.y += deltaValue;
             transform.position = v;
         }
@@ -231,7 +225,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">z 坐标值增量。</param>
         public static void AddPositionZ(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.position;
+            var v = transform.position;
             v.z += deltaValue;
             transform.position = v;
         }
@@ -243,7 +237,7 @@ namespace Lazy.Utility
         /// <param name="newValue">x 坐标值。</param>
         public static void SetLocalPositionX(this Transform transform, float newValue)
         {
-            Vector3 v = transform.localPosition;
+            var v = transform.localPosition;
             v.x = newValue;
             transform.localPosition = v;
         }
@@ -255,7 +249,7 @@ namespace Lazy.Utility
         /// <param name="newValue">y 坐标值。</param>
         public static void SetLocalPositionY(this Transform transform, float newValue)
         {
-            Vector3 v = transform.localPosition;
+            var v = transform.localPosition;
             v.y = newValue;
             transform.localPosition = v;
         }
@@ -267,7 +261,7 @@ namespace Lazy.Utility
         /// <param name="newValue">z 坐标值。</param>
         public static void SetLocalPositionZ(this Transform transform, float newValue)
         {
-            Vector3 v = transform.localPosition;
+            var v = transform.localPosition;
             v.z = newValue;
             transform.localPosition = v;
         }
@@ -279,7 +273,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">x 坐标值。</param>
         public static void AddLocalPositionX(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.localPosition;
+            var v = transform.localPosition;
             v.x += deltaValue;
             transform.localPosition = v;
         }
@@ -291,7 +285,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">y 坐标值。</param>
         public static void AddLocalPositionY(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.localPosition;
+            var v = transform.localPosition;
             v.y += deltaValue;
             transform.localPosition = v;
         }
@@ -303,7 +297,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">z 坐标值。</param>
         public static void AddLocalPositionZ(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.localPosition;
+            var v = transform.localPosition;
             v.z += deltaValue;
             transform.localPosition = v;
         }
@@ -315,7 +309,7 @@ namespace Lazy.Utility
         /// <param name="newValue">x 分量值。</param>
         public static void SetLocalScaleX(this Transform transform, float newValue)
         {
-            Vector3 v = transform.localScale;
+            var v = transform.localScale;
             v.x = newValue;
             transform.localScale = v;
         }
@@ -327,7 +321,7 @@ namespace Lazy.Utility
         /// <param name="newValue">y 分量值。</param>
         public static void SetLocalScaleY(this Transform transform, float newValue)
         {
-            Vector3 v = transform.localScale;
+            var v = transform.localScale;
             v.y = newValue;
             transform.localScale = v;
         }
@@ -339,7 +333,7 @@ namespace Lazy.Utility
         /// <param name="newValue">z 分量值。</param>
         public static void SetLocalScaleZ(this Transform transform, float newValue)
         {
-            Vector3 v = transform.localScale;
+            var v = transform.localScale;
             v.z = newValue;
             transform.localScale = v;
         }
@@ -351,7 +345,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">x 分量增量。</param>
         public static void AddLocalScaleX(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.localScale;
+            var v = transform.localScale;
             v.x += deltaValue;
             transform.localScale = v;
         }
@@ -363,7 +357,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">y 分量增量。</param>
         public static void AddLocalScaleY(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.localScale;
+            var v = transform.localScale;
             v.y += deltaValue;
             transform.localScale = v;
         }
@@ -375,7 +369,7 @@ namespace Lazy.Utility
         /// <param name="deltaValue">z 分量增量。</param>
         public static void AddLocalScaleZ(this Transform transform, float deltaValue)
         {
-            Vector3 v = transform.localScale;
+            var v = transform.localScale;
             v.z += deltaValue;
             transform.localScale = v;
         }
@@ -388,17 +382,17 @@ namespace Lazy.Utility
         /// <remarks>假定其 forward 向量为 <see cref="Vector3.up" />。</remarks>
         public static void LookAt2D(this Transform transform, Vector2 lookAtPoint2D)
         {
-            Vector3 vector = lookAtPoint2D.ToVector3() - transform.position;
+            var vector = lookAtPoint2D.ToVector3() - transform.position;
             vector.y = 0f;
 
             if (vector.magnitude > 0f)
-            {
                 transform.rotation = Quaternion.LookRotation(vector.normalized, Vector3.up);
-            }
         }
 
         #endregion Transform
+
         #region Unity UI Extension
+
         public static void SetAnchoredPositionX(
             this RectTransform rectTransform,
             float anchoredPositionX
@@ -429,7 +423,7 @@ namespace Lazy.Utility
             rectTransform.anchoredPosition3D = value;
         }
 
-        public static void SetColorAlpha(this UnityEngine.UI.Graphic graphic, float alpha)
+        public static void SetColorAlpha(this Graphic graphic, float alpha)
         {
             var value = graphic.color;
             value.a = alpha;
@@ -468,6 +462,7 @@ namespace Lazy.Utility
         {
             return new Vector2(layoutElement.preferredWidth, layoutElement.preferredHeight);
         }
+
         #endregion
     }
 }

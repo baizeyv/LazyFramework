@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using Lazy;
 using Lazy.Manage;
-using Lazy.Serializer.CustomSerializers;
 using Lazy.Singleton;
 
 namespace Lazy.Serializer

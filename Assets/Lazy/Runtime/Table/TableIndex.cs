@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lazy.Pool;
 
-namespace Lazy.Table
+namespace Lazy
 {
     public class TableIndex<TKey, TValue> : IDisposable
     {

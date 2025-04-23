@@ -1,6 +1,6 @@
 using UnityEngine.UI;
 
-namespace Lazy.Example
+namespace Lazy
 {
     /// <summary>
     /// ! View Layer

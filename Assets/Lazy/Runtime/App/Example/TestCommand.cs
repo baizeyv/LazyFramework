@@ -1,6 +1,6 @@
-using Lazy.Utility;
+using Lazy;
 
-namespace Lazy.Example
+namespace Lazy
 {
     public struct CountCommandArguments
     {

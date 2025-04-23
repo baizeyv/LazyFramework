@@ -5,7 +5,7 @@ using Lazy.Manage;
 using Lazy.Pool;
 using Lazy.Singleton;
 
-namespace Lazy.FSM
+namespace Lazy
 {
     [ManagerUpdate]
     [ManagerFixedUpdate]

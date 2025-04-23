@@ -13,7 +13,7 @@ namespace A.B.C.D
 		public Transform c;
 		public A.B.C.D.MyA2 a2;
 
-		public Lazy.IApp App => Lazy.Example.TestApp.Gate;
+		public Lazy.IApp App => Lazy.TestApp.Gate;
 
     }
 }

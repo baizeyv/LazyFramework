@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Lazy.Utility;
+using Lazy;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
@@ -17,7 +17,10 @@ namespace Lazy.Editor.UIEditor
         public static void GenerateUIPanelCode()
         {
             Map.Clear();
-            var objs = Selection.GetFiltered(typeof(GameObject), SelectionMode.Assets | SelectionMode.TopLevel);
+            var objs = Selection.GetFiltered(
+                typeof(GameObject),
+                SelectionMode.Assets | SelectionMode.TopLevel
+            );
             foreach (var item in objs)
             {
                 DoUI(item, AssetDatabase.GetAssetPath(item), false, true);
@@ -34,7 +37,10 @@ namespace Lazy.Editor.UIEditor
         public static void GenerateUIDialogCode()
         {
             Map.Clear();
-            var objs = Selection.GetFiltered(typeof(GameObject), SelectionMode.Assets | SelectionMode.TopLevel);
+            var objs = Selection.GetFiltered(
+                typeof(GameObject),
+                SelectionMode.Assets | SelectionMode.TopLevel
+            );
             foreach (var item in objs)
             {
                 DoUI(item, AssetDatabase.GetAssetPath(item), true, true);
@@ -66,17 +72,24 @@ namespace Lazy.Editor.UIEditor
             EditorPrefs.DeleteKey(AfterMethodKey);
 
             // # 重新生成一次Map, 在编译后会被清空
-            var objs = Selection.GetFiltered(typeof(GameObject), SelectionMode.Assets | SelectionMode.TopLevel);
+            var objs = Selection.GetFiltered(
+                typeof(GameObject),
+                SelectionMode.Assets | SelectionMode.TopLevel
+            );
             foreach (var item in objs)
-            {
-                DoUI(item, AssetDatabase.GetAssetPath(item), !afterMethodType.Equals("UIPanel"), false);
-            }
+                DoUI(
+                    item,
+                    AssetDatabase.GetAssetPath(item),
+                    !afterMethodType.Equals("UIPanel"),
+                    false
+                );
 
             var assembly = GetAssemblyCSharp();
             var paths = pathStr.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
             var displayProgress = paths.Length > 3;
-            if (displayProgress) EditorUtility.DisplayProgressBar("", "Serialize UIPrefab...", 0);
+            if (displayProgress)
+                EditorUtility.DisplayProgressBar("", "Serialize UIPrefab...", 0);
 
             for (var i = 0; i < paths.Length; i++)
             {
@@ -85,19 +98,20 @@ namespace Lazy.Editor.UIEditor
                 SetObjectRef2Property(uiPrefab, uiPrefab.name, assembly, map.RootBindNodes);
 
                 foreach (var x in map.WidgetBindNodes)
-                {
                     SetObjectRef2Property(x.Key.GameObject, x.Key.TypeName, assembly, x.Value);
-                }
-
 
                 // uibehaviour
                 if (displayProgress)
-                    EditorUtility.DisplayProgressBar("", "Serialize UIPrefab..." + uiPrefab.name,
-                        (float)(i + 1) / paths.Length);
+                    EditorUtility.DisplayProgressBar(
+                        "",
+                        "Serialize UIPrefab..." + uiPrefab.name,
+                        (float)(i + 1) / paths.Length
+                    );
                 Debug.Log(">>>>>>>Success Serialize UIPrefab: " + uiPrefab.name);
             }
 
-            if (displayProgress) EditorUtility.ClearProgressBar();
+            if (displayProgress)
+                EditorUtility.ClearProgressBar();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -109,19 +123,19 @@ namespace Lazy.Editor.UIEditor
         /// <param name="behaviourName"></param>
         /// <param name="assembly"></param>
         /// <param name="marks"></param>
-        private static void SetObjectRef2Property(GameObject obj, string behaviourName, Assembly assembly,
-            List<BindNode> marks)
+        private static void SetObjectRef2Property(
+            GameObject obj,
+            string behaviourName,
+            Assembly assembly,
+            List<BindNode> marks
+        )
         {
             var iBind = obj.GetComponent<ABSBind>();
             var className = string.Empty;
             if (iBind != null)
-            {
                 className = GenCodeSetting.Instance.uiNamespace + "." + iBind.TypeName;
-            }
             else
-            {
                 className = GenCodeSetting.Instance.uiNamespace + "." + behaviourName;
-            }
 
             var tp = assembly.GetType(className);
             var com = obj.GetOrAddComponent(tp);
@@ -131,9 +145,12 @@ namespace Lazy.Editor.UIEditor
                 var cpt = mark.GameObject.GetComponent(mark.TypeName);
                 if (cpt == null)
                 {
-                    var tmpType = assembly.GetType(GenCodeSetting.Instance.uiNamespace + "." + mark.TypeName);
+                    var tmpType = assembly.GetType(
+                        GenCodeSetting.Instance.uiNamespace + "." + mark.TypeName
+                    );
                     mark.GameObject.AddComponent(tmpType);
                 }
+
                 sObj.FindProperty(mark.PropertyName).objectReferenceValue = mark.GameObject;
             }
 
@@ -148,14 +165,10 @@ namespace Lazy.Editor.UIEditor
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var a in assemblies)
-            {
                 if (a.FullName.StartsWith("Assembly-CSharp,"))
-                {
                     return a;
-                }
-            }
 
-//            Log.E(">>>>>>>Error: Can\'t find Assembly-CSharp.dll");
+            //            Log.E(">>>>>>>Error: Can\'t find Assembly-CSharp.dll");
             return null;
         }
 
@@ -175,13 +188,9 @@ namespace Lazy.Editor.UIEditor
 
             var pathStr = EditorPrefs.GetString(AutoGenKey);
             if (string.IsNullOrEmpty(pathStr))
-            {
                 pathStr = prefabPath;
-            }
             else
-            {
                 pathStr += ";" + prefabPath;
-            }
 
             EditorPrefs.SetString(AutoGenKey, pathStr);
         }
@@ -198,9 +207,7 @@ namespace Lazy.Editor.UIEditor
 #pragma warning disable CS0618
                 if (PrefabType.Prefab != prefabType)
 #pragma warning restore CS0618
-                {
                     return;
-                }
 
                 var prefab = obj as GameObject;
 
@@ -210,45 +217,44 @@ namespace Lazy.Editor.UIEditor
 
                 var binds = prefab?.GetComponentsInChildren<ABSBind>();
                 if (binds != null)
-                {
                     foreach (var bind in binds)
                     {
                         var parentBind = GetUIParentBind(bind.Transform, out var except);
                         if (except)
                             continue;
                         if (parentBind == null)
+                        {
                             map.RootBinds.Add(bind);
+                        }
                         else
                         {
                             if (map.WidgetBinds.TryGetValue(parentBind, out var widgetBind))
-                            {
                                 widgetBind.Add(bind);
-                            }
                             else
-                            {
                                 map.WidgetBinds.Add(parentBind, new List<ABSBind> { bind });
-                            }
                         }
                     }
-                }
 
-                foreach (var node in map.RootBinds.Select(item => new BindNode()
-                         {
-                             Comment = item.Comment,
-                             TypeName = item.TypeName,
-                             GameObject = item.Transform.gameObject,
-                             PropertyName = GetPropertyName(item.Transform.gameObject.name, map._propertyNameMap),
-                             Bind = item
-                         }))
-                {
+                foreach (
+                    var node in map.RootBinds.Select(item => new BindNode
+                    {
+                        Comment = item.Comment,
+                        TypeName = item.TypeName,
+                        GameObject = item.Transform.gameObject,
+                        PropertyName = GetPropertyName(
+                            item.Transform.gameObject.name,
+                            map._propertyNameMap
+                        ),
+                        Bind = item,
+                    })
+                )
                     map.RootBindNodes.Add(node);
-                }
 
                 map._propertyNameMap.Clear();
 
                 foreach (var item in map.WidgetBinds)
                 {
-                    var keyNode = new BindNode()
+                    var keyNode = new BindNode
                     {
                         Bind = item.Key,
                         TypeName = item.Key.TypeName,
@@ -256,17 +262,20 @@ namespace Lazy.Editor.UIEditor
                         GameObject = item.Key.Transform.gameObject,
                     };
                     map.WidgetBindNodes.Add(keyNode, new List<BindNode>());
-                    foreach (var childNode in item.Value.Select(x => new BindNode()
-                             {
-                                 Comment = x.Comment,
-                                 TypeName = x.TypeName,
-                                 GameObject = x.Transform.gameObject,
-                                 PropertyName = GetPropertyName(x.Transform.gameObject.name, map._propertyNameMap),
-                                 Bind = x
-                             }))
-                    {
+                    foreach (
+                        var childNode in item.Value.Select(x => new BindNode
+                        {
+                            Comment = x.Comment,
+                            TypeName = x.TypeName,
+                            GameObject = x.Transform.gameObject,
+                            PropertyName = GetPropertyName(
+                                x.Transform.gameObject.name,
+                                map._propertyNameMap
+                            ),
+                            Bind = x,
+                        })
+                    )
                         map.WidgetBindNodes[keyNode].Add(childNode);
-                    }
 
                     map._propertyNameMap.Clear();
                 }
@@ -275,13 +284,13 @@ namespace Lazy.Editor.UIEditor
                 {
                     var srcPath = GenSourceFilePathFromPrefabPath(uiPrefabPath, obj.name);
                     // # 生成 CodeGenInfo
-                    var rootCodeGenInfo = new CodeGenInfo()
+                    var rootCodeGenInfo = new CodeGenInfo
                     {
                         ClassName = obj.name,
                         IsDialog = isDialog,
                         Namespace = GenCodeSetting.Instance.uiNamespace,
                         Properties = map.RootBindNodes,
-                        ScriptFilePath = srcPath
+                        ScriptFilePath = srcPath,
                     };
                     CodeGenTemplate.UIPanelTemplate.Generate(rootCodeGenInfo);
                     var dir = srcPath.Replace(obj.name + ".cs", "");
@@ -289,7 +298,7 @@ namespace Lazy.Editor.UIEditor
                     {
                         var bind = item.Key.Bind;
                         var suffix = GetWidgetPath(obj.name, bind);
-                        var info = new CodeGenInfo()
+                        var info = new CodeGenInfo
                         {
                             ClassName = bind.TypeName,
                             IsDialog = isDialog,
@@ -311,12 +320,8 @@ namespace Lazy.Editor.UIEditor
             {
                 var bd = transform.parent.GetComponent<ABSBind>();
                 if (bd != null)
-                {
                     if (bind.BindType == BindType.UIWidget)
-                    {
                         ret = $"{bd.TypeName}/{ret}";
-                    }
-                }
 
                 transform = transform.parent;
             }
@@ -334,16 +339,15 @@ namespace Lazy.Editor.UIEditor
                     except = true;
                     return null;
                 }
+
                 var bind = transform.parent.GetComponent<ABSBind>();
                 if (bind != null)
-                {
                     if (bind.BindType == BindType.UIWidget)
                     {
                         // # 父级中的UIWidget
                         except = false;
                         return bind;
                     }
-                }
 
                 transform = transform.parent;
             }
@@ -358,25 +362,30 @@ namespace Lazy.Editor.UIEditor
         /// <param name="uiPrefabPath"></param>
         /// <param name="prefabName"></param>
         /// <returns></returns>
-        private static string GenSourceFilePathFromPrefabPath(string uiPrefabPath, string prefabName)
+        private static string GenSourceFilePathFromPrefabPath(
+            string uiPrefabPath,
+            string prefabName
+        )
         {
-            var strFilePath = String.Empty;
+            var strFilePath = string.Empty;
 
             var prefabDirPattern = GenCodeSetting.Instance.uiPrefabDir;
 
             if (uiPrefabPath.Contains(prefabDirPattern))
-            {
-                strFilePath = uiPrefabPath.Replace(prefabDirPattern, GenCodeSetting.Instance.uiScriptDir);
-            }
+                strFilePath = uiPrefabPath.Replace(
+                    prefabDirPattern,
+                    GenCodeSetting.Instance.uiScriptDir
+                );
             else if (uiPrefabPath.Contains("/Resources"))
-            {
-                strFilePath = uiPrefabPath.Replace("/Resources", GenCodeSetting.Instance.uiScriptDir);
-            }
+                strFilePath = uiPrefabPath.Replace(
+                    "/Resources",
+                    GenCodeSetting.Instance.uiScriptDir
+                );
             else
-            {
-                strFilePath = uiPrefabPath.Replace("/" + GetLastDirName(uiPrefabPath),
-                    GenCodeSetting.Instance.uiScriptDir);
-            }
+                strFilePath = uiPrefabPath.Replace(
+                    "/" + GetLastDirName(uiPrefabPath),
+                    GenCodeSetting.Instance.uiScriptDir
+                );
 
             var str = strFilePath.Replace(prefabName + ".prefab", string.Empty);
             FileUtility.CheckOrCreateDir(str);
@@ -402,9 +411,7 @@ namespace Lazy.Editor.UIEditor
                 var cnt = _propertyNameMap[name];
                 var tmp = GetNewName(name, ref cnt);
                 while (_propertyNameMap.ContainsKey(tmp))
-                {
                     tmp = GetNewName(name, ref cnt);
-                }
 
                 _propertyNameMap.Add(tmp, 1);
                 newName = ToPascalCase(tmp);
@@ -431,7 +438,7 @@ namespace Lazy.Editor.UIEditor
             while (number > 0)
             {
                 number--; // 调整为 0-based 索引
-                result = (char)('A' + (number % 26)) + result;
+                result = (char)('A' + number % 26) + result;
                 number /= 26;
             }
 
@@ -440,8 +447,12 @@ namespace Lazy.Editor.UIEditor
 
         private static string ToPascalCase(string str)
         {
-            var newStr = string.Concat(Regex.Split(str, @"^a-zA-Z0-9").Where(w => w.Length > 0)
-                .Select(w => char.ToUpper(w[0]) + w.Substring(1).ToLower()));
+            var newStr = string.Concat(
+                Regex
+                    .Split(str, @"^a-zA-Z0-9")
+                    .Where(w => w.Length > 0)
+                    .Select(w => char.ToUpper(w[0]) + w.Substring(1).ToLower())
+            );
             return Regex.Replace(newStr, @"[^a-zA-Z0-9]", "");
         }
     }
@@ -493,14 +504,14 @@ namespace Lazy.Editor.UIEditor
         /// <summary>
         /// * 根的绑定
         /// </summary>
-        public List<ABSBind> RootBinds = new List<ABSBind>();
+        public List<ABSBind> RootBinds = new();
 
         /// <summary>
         /// * 组件的绑定
         /// </summary>
         public Dictionary<ABSBind, List<ABSBind>> WidgetBinds = new();
 
-        public List<BindNode> RootBindNodes = new List<BindNode>();
+        public List<BindNode> RootBindNodes = new();
 
         public Dictionary<BindNode, List<BindNode>> WidgetBindNodes = new();
 

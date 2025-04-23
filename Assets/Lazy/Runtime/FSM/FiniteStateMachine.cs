@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Lazy.Pool;
 using UnityEngine;
 
-namespace Lazy.FSM
+namespace Lazy
 {
     /// <summary>
     /// * 有限状态机

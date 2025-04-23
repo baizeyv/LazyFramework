@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Lazy;
 using Lazy.Log;
-using Lazy.Utility;
 
 namespace Solver
 {
@@ -649,7 +649,7 @@ namespace Solver
                     // # 可以向其他列移动
                     var newPoker = SpiderSolver.CreateNewPoker(
                         poker,
-                        new List<Card>() { poker.VisibleGroup[column][0] },
+                        new List<Card> { poker.VisibleGroup[column][0] },
                         column,
                         i
                     );
@@ -734,7 +734,7 @@ namespace Solver
                 if (VisibleGroup[index].Count == 0 && HiddenGroup[index].Count > 0)
                 {
                     // # 移动后新的列收牌了,如若没有可见的了则展示新的牌
-                    VisibleGroup[index] = new List<Card>() { HiddenGroup[index].First() };
+                    VisibleGroup[index] = new List<Card> { HiddenGroup[index].First() };
                     HiddenGroup[index] = HiddenGroup[index].Skip(1).ToList();
                 }
             }
@@ -766,7 +766,7 @@ namespace Solver
             // # 来源列在没有可见牌的时候要翻开隐藏牌
             if (VisibleGroup[from].Count == 0 && HiddenGroup[from].Count > 0)
             {
-                VisibleGroup[from] = new List<Card>() { HiddenGroup[from].First() };
+                VisibleGroup[from] = new List<Card> { HiddenGroup[from].First() };
                 HiddenGroup[from] = HiddenGroup[from].Skip(1).ToList();
             }
 

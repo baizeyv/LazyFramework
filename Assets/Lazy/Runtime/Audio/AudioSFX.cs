@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy;
 using Lazy.Res;
-using Lazy.Utility;
 using UnityEngine;
 
-namespace Lazy.Audio
+namespace Lazy
 {
     /// <summary>
     /// * 音频音效

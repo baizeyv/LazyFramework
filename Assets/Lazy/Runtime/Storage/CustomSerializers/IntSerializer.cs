@@ -1,6 +1,7 @@
-﻿using Lazy.Utility;
+﻿using Lazy;
+using Lazy.Serializer;
 
-namespace Lazy.Serializer.CustomSerializers
+namespace Lazy
 {
     public class IntSerializer : Serializer<int>
     {

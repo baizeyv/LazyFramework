@@ -6,7 +6,7 @@ using Lazy.Singleton;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Lazy.Audio
+namespace Lazy
 {
     [MonoSingletonPath("Lazy/SFX/AudioManager")]
     [ManagerUpdate]

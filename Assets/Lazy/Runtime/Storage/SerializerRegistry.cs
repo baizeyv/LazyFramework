@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace Lazy.Serializer
+﻿namespace Lazy.Serializer
 {
     public static class SerializerRegistry<T>
     {

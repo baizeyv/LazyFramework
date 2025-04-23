@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Lazy.Utility;
+using Lazy;
 
 namespace Solver.Exporter
 {

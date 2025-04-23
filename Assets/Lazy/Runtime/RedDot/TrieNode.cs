@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Utility;
 
 namespace Lazy.RedDot
 {

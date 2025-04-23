@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Lazy.Utility
+namespace Lazy
 {
     public class DOTweenSequence : MonoBehaviour
     {
@@ -19,7 +19,7 @@ namespace Lazy.Utility
         private float m_Delay = 0;
 
         [SerializeField]
-        private DG.Tweening.Ease m_Ease = DG.Tweening.Ease.OutQuad;
+        private Ease m_Ease = Ease.OutQuad;
 
         [SerializeField]
         private int m_Loops = 1;
@@ -400,7 +400,7 @@ namespace Lazy.Utility
 
             public AnimationCurve EaseCurve;
 
-            public DG.Tweening.Ease Ease = DG.Tweening.Ease.OutQuad;
+            public Ease Ease = Ease.OutQuad;
 
             public int Loops = 1;
 

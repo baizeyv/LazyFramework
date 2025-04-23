@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Lazy.Table
+namespace Lazy
 {
     public abstract class ABSTable<T> : IEnumerable<T>, IDisposable
     {
