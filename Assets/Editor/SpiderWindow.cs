@@ -33,6 +33,8 @@ namespace Editor
 
         private bool _showOutput;
 
+        private string _exportStepLimitText;
+
         // ##################################################
 
         private int _searchCalc;
@@ -161,7 +163,7 @@ namespace Editor
         {
             var json = File.ReadAllText(_inputVitaJsonPath);
             var bean = JsonConvert.DeserializeObject<VitaBean>(json, Constant.JsonSetting);
-
+            var step = int.Parse(_exportStepLimitText);
             _vitaThread = new Thread(() =>
             {
                 foreach (var x in bean.SelectMany(item => item.Value))
@@ -169,7 +171,7 @@ namespace Editor
                     var solver = new SpiderSolver();
                     var poker = new Poker(x.question);
                     solver.SuitCount = poker.GetSuitCount();
-                    solver.ThreadDfs(poker, null, _outputVitaCsvPath, x.id);
+                    solver.ThreadDfs(poker, null, _outputVitaCsvPath, x.id, stepLimit: step);
                 }
             });
             _vitaThread.Start();
@@ -191,13 +193,14 @@ namespace Editor
         {
             var array = _inputPlayValveSeeds.Split(',');
             var seeds = array.Select(int.Parse).ToArray();
+            var step = int.Parse(_exportStepLimitText);
             _playValveThread = new Thread(() =>
             {
                 for (var i = 0; i < seeds.Length; i++)
                 {
                     var solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1 };
                     var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
-                    solver.ThreadDfs(poker, null, _outputPlayValveCsvPath, i + 1);
+                    solver.ThreadDfs(poker, null, _outputPlayValveCsvPath, i + 1, stepLimit: step);
                 }
             });
             _playValveThread.Start();
@@ -820,14 +823,25 @@ namespace Editor
 
             if (_showExporter)
             {
-                GUILayout.BeginHorizontal("helpbox");
+                GUILayout.BeginVertical("helpbox");
                 {
-                    DrawExportPlayValve();
-                    GUILayout.Space(2);
-                    DrawExportVita();
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Label("Step Limit:", GUILayout.Width(100));
+                        _exportStepLimitText = GUILayout.TextField(_exportStepLimitText);
+                        if (!int.TryParse(_exportStepLimitText, out var val))
+                            _exportStepLimitText = "-1";
+                    }
+                    GUILayout.EndHorizontal();
+                    GUILayout.EndVertical();
+                    GUILayout.BeginHorizontal("helpbox");
+                    {
+                        DrawExportPlayValve();
+                        GUILayout.Space(2);
+                        DrawExportVita();
+                    }
+                    GUILayout.EndHorizontal();
                 }
-                GUILayout.EndHorizontal();
-
                 GUILayout.Space(15);
             }
 
