@@ -43,25 +43,25 @@ namespace Lazy
 
         public static Logger D(Object context = null)
         {
-            var logger = SafeObjectPool<LoggerType>.Instance.Obtain();
+            var logger = ReferencePool.Instance.Obtain<LoggerType>();
             return logger.Debug(context);
         }
 
         public static Logger E(Object context = null)
         {
-            var logger = SafeObjectPool<LoggerType>.Instance.Obtain();
+            var logger = ReferencePool.Instance.Obtain<LoggerType>();
             return logger.Error(context);
         }
 
         public static Logger W(Object context = null)
         {
-            var logger = SafeObjectPool<LoggerType>.Instance.Obtain();
+            var logger = ReferencePool.Instance.Obtain<LoggerType>();
             return logger.Warning(context);
         }
 
         public static Logger I(Object context = null)
         {
-            var logger = SafeObjectPool<LoggerType>.Instance.Obtain();
+            var logger = ReferencePool.Instance.Obtain<LoggerType>();
             return logger.Info(context);
         }
 
@@ -119,14 +119,14 @@ namespace Lazy
             logger.Sep().Do();
         }
 
-        internal class LoggerType : IPoolable
+        internal class LoggerType : IPoolable, IReference
         {
             internal OutputType _outputType;
 
             public Logger Error(Object context = null)
             {
                 _outputType = OutputType.Error;
-                var logger = SafeObjectPool<Logger>.Instance.Obtain();
+                var logger = ReferencePool.Instance.Obtain<Logger>();
                 logger.Setup(this, context);
                 return logger;
             }
@@ -134,7 +134,7 @@ namespace Lazy
             public Logger Warning(Object context = null)
             {
                 _outputType = OutputType.Warning;
-                var logger = SafeObjectPool<Logger>.Instance.Obtain();
+                var logger = ReferencePool.Instance.Obtain<Logger>();
                 logger.Setup(this, context);
                 return logger;
             }
@@ -142,7 +142,7 @@ namespace Lazy
             public Logger Debug(Object context = null)
             {
                 _outputType = OutputType.Debug;
-                var logger = SafeObjectPool<Logger>.Instance.Obtain();
+                var logger = ReferencePool.Instance.Obtain<Logger>();
                 logger.Setup(this, context);
                 return logger;
             }
@@ -150,7 +150,7 @@ namespace Lazy
             public Logger Info(Object context = null)
             {
                 _outputType = OutputType.Info;
-                var logger = SafeObjectPool<Logger>.Instance.Obtain();
+                var logger = ReferencePool.Instance.Obtain<Logger>();
                 logger.Setup(this, context);
                 return logger;
             }
@@ -159,9 +159,14 @@ namespace Lazy
             {
                 _outputType = OutputType.Info;
             }
+
+            public void Clear()
+            {
+                _outputType = OutputType.Info;
+            }
         }
 
-        public class Logger : IPoolable
+        public class Logger : IPoolable, IReference
         {
             private Object _context;
 
@@ -244,8 +249,8 @@ namespace Lazy
                         Debug.Log(content.ToString(), _context);
                 }
 
-                SafeObjectPool<LoggerType>.Instance.Free(_loggerType);
-                SafeObjectPool<Logger>.Instance.Free(this);
+                ReferencePool.Instance.Free(_loggerType);
+                ReferencePool.Instance.Free(this);
             }
 
             private bool Filter(OutputType outputType)
@@ -317,6 +322,16 @@ namespace Lazy
             }
 
             public void Reset()
+            {
+                C();
+            }
+
+            public void Clear()
+            {
+                C();
+            }
+
+            private void C()
             {
                 _context = null;
                 _loggerType = null;

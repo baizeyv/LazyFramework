@@ -77,6 +77,9 @@ namespace Lazy.Example
             });
             */
             StartCoroutine(TestPanelClose());
+
+            var t = App.Asset.LoadSync<TextAsset>("cc22");
+            Log.MsgI(t.text);
         }
 
         private IEnumerator TestPanelClose()

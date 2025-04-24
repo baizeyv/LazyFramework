@@ -32,11 +32,7 @@ namespace Lazy
             get
             {
 #if UNITY_EDITOR
-                return _isEditorMode
-                    || UnityEditor.EditorPrefs.GetBool(
-                        Application.dataPath.GetHashCode() + "IsEditorMode",
-                        false
-                    );
+                return _isEditorMode || UnityEditor.EditorPrefs.GetBool("IsEditorMode", false);
 #endif
 #pragma warning disable CS0162
                 return false;
