@@ -125,6 +125,14 @@
             set => _monoNode ??= value;
         }
 
+        private static SafeAreaManager _safeArea;
+
+        public static SafeAreaManager SafeArea
+        {
+            get { return _safeArea ??= ManagerCenter.Create(() => SafeAreaManager.Instance); }
+            set => _safeArea ??= value;
+        }
+
         private static Debugger _debugger;
 
         public static Debugger Debugger

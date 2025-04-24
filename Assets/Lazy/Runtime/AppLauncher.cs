@@ -42,6 +42,7 @@ namespace Lazy
             App.Timer = ManagerCenter.Create(() => TimerManager.Instance);
             App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
             App.Audio = ManagerCenter.CreateMono(() => AudioManager.Instance);
+            App.SafeArea = ManagerCenter.Create(() => SafeAreaManager.Instance);
             App.UI = ManagerCenter.CreateMono(() => UIManager.Instance);
             App.MonoNode = ManagerCenter.Create(() => MonoNodeManager.Instance);
             App.Fsm = ManagerCenter.Create(() => FsmManager.Instance);
