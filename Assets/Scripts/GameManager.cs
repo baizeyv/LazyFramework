@@ -1,25 +1,14 @@
 ﻿using System.Collections;
-using Lazy;
-using Lazy.Example;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DefaultNamespace
+namespace Lazy.Example
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : ABSGameManager
     {
         public Image img;
 
-        private void Start()
-        {
-            AppLauncher.Instance.OnStartGame += OnStart;
-            AppLauncher.Instance.OnFocusGame += b =>
-            {
-                Log.MsgD($"focus:{b} -> {Time.unscaledTime}");
-            };
-        }
-
-        private void OnStart()
+        protected override void OnStart()
         {
             StorageManager.Instance.Set("test", 5);
             Log.MsgD("START APP GAME !");
