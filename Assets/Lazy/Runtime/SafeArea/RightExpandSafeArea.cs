@@ -4,21 +4,26 @@ namespace Lazy
 {
     public class RightExpandSafeArea : MonoBehaviour
     {
-        private RectTransform _rectTransform;
+        /// <summary>
+        /// * 上下边缘扩展至安全区外
+        /// </summary>
+        public bool edgeExpand = true;
+
+        public RectTransform RectTransform { get; private set; }
 
         private void Awake()
         {
-            _rectTransform = GetComponent<RectTransform>();
+            RectTransform = GetComponent<RectTransform>();
         }
 
         private void OnEnable()
         {
-            SafeAreaManager.Instance.SubscribeRightExpand(_rectTransform);
+            SafeAreaManager.Instance.SubscribeRightExpand(this);
         }
 
         private void OnDisable()
         {
-            SafeAreaManager.Instance.UnsubscribeRightExpand(_rectTransform);
+            SafeAreaManager.Instance.UnsubscribeRightExpand(this);
         }
     }
 }

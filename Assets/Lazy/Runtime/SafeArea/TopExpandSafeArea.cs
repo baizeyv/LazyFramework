@@ -7,21 +7,26 @@ namespace Lazy
     /// </summary>
     public class TopExpandSafeArea : MonoBehaviour
     {
-        private RectTransform _rectTransform;
+        /// <summary>
+        /// * 左右边缘扩展至安全区外
+        /// </summary>
+        public bool edgeExpand = true;
+
+        public RectTransform RectTransform { get; private set; }
 
         private void Awake()
         {
-            _rectTransform = GetComponent<RectTransform>();
+            RectTransform = GetComponent<RectTransform>();
         }
 
         private void OnEnable()
         {
-            SafeAreaManager.Instance.SubscribeTopExpand(_rectTransform);
+            SafeAreaManager.Instance.SubscribeTopExpand(this);
         }
 
         private void OnDisable()
         {
-            SafeAreaManager.Instance.UnsubscribeTopExpand(_rectTransform);
+            SafeAreaManager.Instance.UnsubscribeTopExpand(this);
         }
     }
 }

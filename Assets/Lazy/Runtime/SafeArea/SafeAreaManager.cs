@@ -11,13 +11,16 @@ namespace Lazy
     {
         private static readonly HashSet<RectTransform> TransformSet = new(10);
 
-        private static readonly Dictionary<RectTransform, Vector2> BottomExpandTransforms = new();
+        private static readonly Dictionary<BottomExpandSafeArea, Vector2> BottomExpandTransforms =
+            new();
 
-        private static readonly Dictionary<RectTransform, Vector2> TopExpandTransforms = new();
+        private static readonly Dictionary<TopExpandSafeArea, Vector2> TopExpandTransforms = new();
 
-        private static readonly Dictionary<RectTransform, Vector2> LeftExpandTransforms = new();
+        private static readonly Dictionary<LeftExpandSafeArea, Vector2> LeftExpandTransforms =
+            new();
 
-        private static readonly Dictionary<RectTransform, Vector2> RightExpandTransforms = new();
+        private static readonly Dictionary<RightExpandSafeArea, Vector2> RightExpandTransforms =
+            new();
 
         /// <summary>
         /// * 上一次的安全区
@@ -60,58 +63,58 @@ namespace Lazy
             TransformSet.Remove(transform);
         }
 
-        public void SubscribeBottomExpand(RectTransform transform)
+        public void SubscribeBottomExpand(BottomExpandSafeArea transform)
         {
-            BottomExpandTransforms.Add(transform, transform.sizeDelta);
+            BottomExpandTransforms.Add(transform, transform.RectTransform.sizeDelta);
             if (!_initFlag)
                 UpdateRect();
             else
                 ApplyBottomExpand(transform);
         }
 
-        public void UnsubscribeBottomExpand(RectTransform transform)
+        public void UnsubscribeBottomExpand(BottomExpandSafeArea transform)
         {
             BottomExpandTransforms.Remove(transform);
         }
 
-        public void SubscribeTopExpand(RectTransform transform)
+        public void SubscribeTopExpand(TopExpandSafeArea transform)
         {
-            TopExpandTransforms.Add(transform, transform.sizeDelta);
+            TopExpandTransforms.Add(transform, transform.RectTransform.sizeDelta);
             if (!_initFlag)
                 UpdateRect();
             else
                 ApplyTopExpand(transform);
         }
 
-        public void UnsubscribeTopExpand(RectTransform transform)
+        public void UnsubscribeTopExpand(TopExpandSafeArea transform)
         {
             TopExpandTransforms.Remove(transform);
         }
 
-        public void SubscribeLeftExpand(RectTransform transform)
+        public void SubscribeLeftExpand(LeftExpandSafeArea transform)
         {
-            LeftExpandTransforms.Add(transform, transform.sizeDelta);
+            LeftExpandTransforms.Add(transform, transform.RectTransform.sizeDelta);
             if (!_initFlag)
                 UpdateRect();
             else
                 ApplyLeftExpand(transform);
         }
 
-        public void UnsubscribeLeftExpand(RectTransform transform)
+        public void UnsubscribeLeftExpand(LeftExpandSafeArea transform)
         {
             LeftExpandTransforms.Remove(transform);
         }
 
-        public void SubscribeRightExpand(RectTransform transform)
+        public void SubscribeRightExpand(RightExpandSafeArea transform)
         {
-            RightExpandTransforms.Add(transform, transform.sizeDelta);
+            RightExpandTransforms.Add(transform, transform.RectTransform.sizeDelta);
             if (!_initFlag)
                 UpdateRect();
             else
                 ApplyRightExpand(transform);
         }
 
-        public void UnsubscribeRightExpand(RectTransform transform)
+        public void UnsubscribeRightExpand(RightExpandSafeArea transform)
         {
             RightExpandTransforms.Remove(transform);
         }
@@ -173,135 +176,135 @@ namespace Lazy
             }
         }
 
-        private void ApplyBottomExpand(params RectTransform[] trans)
+        private void ApplyBottomExpand(params BottomExpandSafeArea[] trans)
         {
             var yMin = _lastSafeArea.yMin;
             var xMin = _lastSafeArea.xMin;
             var rightOffset = _lastScreenWidth - _lastSafeArea.xMax;
-            foreach (var rectTransform in trans)
+            foreach (var expandSafeArea in trans)
             {
                 // # 设置锚点
-                rectTransform.anchorMin = Vector2.zero;
-                rectTransform.anchorMax = Vector2.right;
+                expandSafeArea.RectTransform.anchorMin = Vector2.zero;
+                expandSafeArea.RectTransform.anchorMax = Vector2.right;
 
                 // # 设置pivot
-                var pvt = rectTransform.pivot;
+                var pvt = expandSafeArea.RectTransform.pivot;
                 pvt.x = 0.5f;
                 pvt.y = 1;
-                rectTransform.pivot = pvt;
-                var v = BottomExpandTransforms[rectTransform];
-                var ap = rectTransform.anchoredPosition;
+                expandSafeArea.RectTransform.pivot = pvt;
+                var v = BottomExpandTransforms[expandSafeArea];
+                var ap = expandSafeArea.RectTransform.anchoredPosition;
                 ap.y = v.y;
-                rectTransform.anchoredPosition = ap;
+                expandSafeArea.RectTransform.anchoredPosition = ap;
                 v.y += yMin;
-                rectTransform.sizeDelta = v;
+                expandSafeArea.RectTransform.sizeDelta = v;
 
                 // # 设置 Left Right
-                var tmpOffsetMin = rectTransform.offsetMin;
-                tmpOffsetMin.x = -xMin;
-                rectTransform.offsetMin = tmpOffsetMin;
-                var tmpOffsetMax = rectTransform.offsetMax;
-                tmpOffsetMax.x = rightOffset;
-                rectTransform.offsetMax = tmpOffsetMax;
+                var tmpOffsetMin = expandSafeArea.RectTransform.offsetMin;
+                tmpOffsetMin.x = expandSafeArea.edgeExpand ? -xMin : 0;
+                expandSafeArea.RectTransform.offsetMin = tmpOffsetMin;
+                var tmpOffsetMax = expandSafeArea.RectTransform.offsetMax;
+                tmpOffsetMax.x = expandSafeArea.edgeExpand ? rightOffset : 0;
+                expandSafeArea.RectTransform.offsetMax = tmpOffsetMax;
             }
         }
 
-        private void ApplyTopExpand(params RectTransform[] trans)
+        private void ApplyTopExpand(params TopExpandSafeArea[] trans)
         {
             var topOffset = _lastScreenHeight - _lastSafeArea.yMax;
             var xMin = _lastSafeArea.xMin;
             var rightOffset = _lastScreenWidth - _lastSafeArea.xMax;
-            foreach (var rectTransform in trans)
+            foreach (var expandSafeArea in trans)
             {
                 // # 设置锚点
-                rectTransform.anchorMin = Vector2.up;
-                rectTransform.anchorMax = Vector2.one;
+                expandSafeArea.RectTransform.anchorMin = Vector2.up;
+                expandSafeArea.RectTransform.anchorMax = Vector2.one;
 
                 // # 设置pivot
-                var pvt = rectTransform.pivot;
+                var pvt = expandSafeArea.RectTransform.pivot;
                 pvt.x = 0.5f;
                 pvt.y = 0;
-                rectTransform.pivot = pvt;
-                var v = TopExpandTransforms[rectTransform];
-                var ap = rectTransform.anchoredPosition;
+                expandSafeArea.RectTransform.pivot = pvt;
+                var v = TopExpandTransforms[expandSafeArea];
+                var ap = expandSafeArea.RectTransform.anchoredPosition;
                 ap.y = -v.y;
-                rectTransform.anchoredPosition = ap;
+                expandSafeArea.RectTransform.anchoredPosition = ap;
                 v.y += topOffset;
-                rectTransform.sizeDelta = v;
+                expandSafeArea.RectTransform.sizeDelta = v;
 
                 // # 设置 Left Right
-                var tmpOffsetMin = rectTransform.offsetMin;
-                tmpOffsetMin.x = -xMin;
-                rectTransform.offsetMin = tmpOffsetMin;
-                var tmpOffsetMax = rectTransform.offsetMax;
-                tmpOffsetMax.x = rightOffset;
-                rectTransform.offsetMax = tmpOffsetMax;
+                var tmpOffsetMin = expandSafeArea.RectTransform.offsetMin;
+                tmpOffsetMin.x = expandSafeArea.edgeExpand ? -xMin : 0;
+                expandSafeArea.RectTransform.offsetMin = tmpOffsetMin;
+                var tmpOffsetMax = expandSafeArea.RectTransform.offsetMax;
+                tmpOffsetMax.x = expandSafeArea.edgeExpand ? rightOffset : 0;
+                expandSafeArea.RectTransform.offsetMax = tmpOffsetMax;
             }
         }
 
-        private void ApplyLeftExpand(params RectTransform[] trans)
+        private void ApplyLeftExpand(params LeftExpandSafeArea[] trans)
         {
             var xMin = _lastSafeArea.xMin;
             var yMin = _lastSafeArea.yMin;
             var topOffset = _lastScreenHeight - _lastSafeArea.yMax;
-            foreach (var rectTransform in trans)
+            foreach (var expandSafeArea in trans)
             {
                 // # 设置锚点
-                rectTransform.anchorMin = Vector2.zero;
-                rectTransform.anchorMax = Vector2.up;
+                expandSafeArea.RectTransform.anchorMin = Vector2.zero;
+                expandSafeArea.RectTransform.anchorMax = Vector2.up;
 
                 // # 设置pivot
-                var pvt = rectTransform.pivot;
+                var pvt = expandSafeArea.RectTransform.pivot;
                 pvt.x = 1;
                 pvt.y = 0.5f;
-                rectTransform.pivot = pvt;
-                var v = LeftExpandTransforms[rectTransform];
-                var ap = rectTransform.anchoredPosition;
+                expandSafeArea.RectTransform.pivot = pvt;
+                var v = LeftExpandTransforms[expandSafeArea];
+                var ap = expandSafeArea.RectTransform.anchoredPosition;
                 ap.x = v.x;
-                rectTransform.anchoredPosition = ap;
+                expandSafeArea.RectTransform.anchoredPosition = ap;
                 v.x += xMin;
-                rectTransform.sizeDelta = v;
+                expandSafeArea.RectTransform.sizeDelta = v;
 
                 // # 设置 top bottom
-                var tmpOffsetMin = rectTransform.offsetMin;
-                tmpOffsetMin.y = -yMin;
-                rectTransform.offsetMin = tmpOffsetMin;
-                var tmpOffsetMax = rectTransform.offsetMax;
-                tmpOffsetMax.y = topOffset;
-                rectTransform.offsetMax = tmpOffsetMax;
+                var tmpOffsetMin = expandSafeArea.RectTransform.offsetMin;
+                tmpOffsetMin.y = expandSafeArea.edgeExpand ? -yMin : 0;
+                expandSafeArea.RectTransform.offsetMin = tmpOffsetMin;
+                var tmpOffsetMax = expandSafeArea.RectTransform.offsetMax;
+                tmpOffsetMax.y = expandSafeArea.edgeExpand ? topOffset : 0;
+                expandSafeArea.RectTransform.offsetMax = tmpOffsetMax;
             }
         }
 
-        private void ApplyRightExpand(params RectTransform[] trans)
+        private void ApplyRightExpand(params RightExpandSafeArea[] trans)
         {
             var rightOffset = _lastScreenWidth - _lastSafeArea.xMax;
             var yMin = _lastSafeArea.yMin;
             var topOffset = _lastScreenHeight - _lastSafeArea.yMax;
-            foreach (var rectTransform in trans)
+            foreach (var expandSafeArea in trans)
             {
                 // # 设置锚点
-                rectTransform.anchorMin = Vector2.right;
-                rectTransform.anchorMax = Vector2.one;
+                expandSafeArea.RectTransform.anchorMin = Vector2.right;
+                expandSafeArea.RectTransform.anchorMax = Vector2.one;
 
                 // # 设置pivot
-                var pvt = rectTransform.pivot;
+                var pvt = expandSafeArea.RectTransform.pivot;
                 pvt.x = 0;
                 pvt.y = 0.5f;
-                rectTransform.pivot = pvt;
-                var v = RightExpandTransforms[rectTransform];
-                var ap = rectTransform.anchoredPosition;
+                expandSafeArea.RectTransform.pivot = pvt;
+                var v = RightExpandTransforms[expandSafeArea];
+                var ap = expandSafeArea.RectTransform.anchoredPosition;
                 ap.x = -v.x;
-                rectTransform.anchoredPosition = ap;
+                expandSafeArea.RectTransform.anchoredPosition = ap;
                 v.x += rightOffset;
-                rectTransform.sizeDelta = v;
+                expandSafeArea.RectTransform.sizeDelta = v;
 
                 // # 设置 Top Bottom
-                var tmpOffsetMin = rectTransform.offsetMin;
-                tmpOffsetMin.y = -yMin;
-                rectTransform.offsetMin = tmpOffsetMin;
-                var tmpOffsetMax = rectTransform.offsetMax;
-                tmpOffsetMax.y = topOffset;
-                rectTransform.offsetMax = tmpOffsetMax;
+                var tmpOffsetMin = expandSafeArea.RectTransform.offsetMin;
+                tmpOffsetMin.y = expandSafeArea.edgeExpand ? -yMin : 0;
+                expandSafeArea.RectTransform.offsetMin = tmpOffsetMin;
+                var tmpOffsetMax = expandSafeArea.RectTransform.offsetMax;
+                tmpOffsetMax.y = expandSafeArea.edgeExpand ? topOffset : 0;
+                expandSafeArea.RectTransform.offsetMax = tmpOffsetMax;
             }
         }
 
