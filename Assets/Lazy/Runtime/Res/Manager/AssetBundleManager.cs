@@ -656,11 +656,15 @@ namespace Lazy
 
         public void OnUpdate()
         {
-            var assetBundleLoadersList = _assetBundleLoaders
-                .Values.Where(loader => loader != null)
-                .ToList();
+            var assetBundleLoadersList = ListPool<AssetBundleLoader>.Obtain();
+            // var assetBundleLoadersList = new List<AssetBundleLoader>();
+            foreach (var loader in _assetBundleLoaders.Values)
+                if (loader != null)
+                    assetBundleLoadersList.Add(loader);
+
             foreach (var t in assetBundleLoadersList)
                 t.OnUpdate();
+            ListPool<AssetBundleLoader>.Free(assetBundleLoadersList);
         }
 
         public void OnFixedUpdate() { }

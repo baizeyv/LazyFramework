@@ -39,13 +39,15 @@ namespace Lazy
 
         public void OnUpdate()
         {
-            foreach (var fsm in _machines.Values.SelectMany(list => list))
+            foreach (var list in _machines.Values)
+            foreach (var fsm in list)
                 fsm.Update();
         }
 
         public void OnFixedUpdate()
         {
-            foreach (var fsm in _machines.Values.SelectMany(list => list))
+            foreach (var list in _machines.Values)
+            foreach (var fsm in list)
                 fsm.FixedUpdate();
         }
 
@@ -53,14 +55,16 @@ namespace Lazy
 
         public void OnDestroyRelease()
         {
-            foreach (var fsm in _machines.Values.SelectMany(list => list))
+            foreach (var list in _machines.Values)
+            foreach (var fsm in list)
                 fsm.End();
             _machines.Clear();
         }
 
         public void OnGui()
         {
-            foreach (var fsm in _machines.Values.SelectMany(list => list))
+            foreach (var list in _machines.Values)
+            foreach (var fsm in list)
                 fsm.GUI();
         }
     }
