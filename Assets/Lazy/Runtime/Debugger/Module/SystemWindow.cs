@@ -1,5 +1,4 @@
 ﻿using System;
-using Lazy;
 using UnityEngine;
 
 namespace Lazy

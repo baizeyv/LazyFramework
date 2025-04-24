@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Lazy;
 using UnityEngine;
-using IPoolable = Lazy.IPoolable;
 using Object = UnityEngine.Object;
 
 namespace Lazy

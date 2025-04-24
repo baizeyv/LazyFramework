@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     public class WindowsPreferencesStorageAccessor : ABSPreferencesStorageAccessor
     {
@@ -12,9 +12,10 @@ namespace Editor.Lazy.PrefEditor
         /// </summary>
         private WindowsRegistryMonitor _monitor;
 
-        public WindowsPreferencesStorageAccessor(string pathToPrefs) : base(pathToPrefs)
+        public WindowsPreferencesStorageAccessor(string pathToPrefs)
+            : base(pathToPrefs)
         {
-            _monitor = new(RegistryHive.CurrentUser, prefPath);
+            _monitor = new WindowsRegistryMonitor(RegistryHive.CurrentUser, prefPath);
             // # 监听注册表改变事件
             _monitor.RegChanged += OnRegChanged;
         }
@@ -28,7 +29,7 @@ namespace Editor.Lazy.PrefEditor
         {
             cachedData = new string[0];
 
-            using (RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(prefPath))
+            using (var rootKey = Registry.CurrentUser.OpenSubKey(prefPath))
             {
                 if (rootKey != null)
                 {
@@ -36,8 +37,11 @@ namespace Editor.Lazy.PrefEditor
                     rootKey.Close();
                 }
             }
+
             // Clean <key>_h3320113488 nameing
-            cachedData = cachedData.Select(key => key.Substring(0, key.LastIndexOf("_h", StringComparison.Ordinal))).ToArray();
+            cachedData = cachedData
+                .Select(key => key.Substring(0, key.LastIndexOf("_h", StringComparison.Ordinal)))
+                .ToArray();
 
             EncodeAnsiInPlace();
         }
@@ -48,9 +52,7 @@ namespace Editor.Lazy.PrefEditor
             var ansi = Encoding.GetEncoding(1252);
 
             for (var i = 0; i < cachedData.Length; i++)
-            {
                 cachedData[i] = utf8.GetString(ansi.GetBytes(cachedData[i]));
-            }
         }
 
         public override void StartMonitoring()

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     public class OSXPreferencesStorageAccessor : ABSPreferencesStorageAccessor
     {
@@ -13,7 +13,8 @@ namespace Editor.Lazy.PrefEditor
 
         private string _prefsFileNameWithoutExtension;
 
-        public OSXPreferencesStorageAccessor(string pathToPrefs) : base(Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "/home", pathToPrefs))
+        public OSXPreferencesStorageAccessor(string pathToPrefs)
+            : base(Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "/home", pathToPrefs))
         {
             _prefsDirInfo = new DirectoryInfo(Path.GetDirectoryName(prefPath));
             _prefsFileNameWithoutExtension = Path.GetFileNameWithoutExtension(prefPath);
@@ -30,26 +31,31 @@ namespace Editor.Lazy.PrefEditor
         protected override void FetchKeysFromSystem()
         {
             // Workaround to avoid incomplete tmp phase from MAC OS
-            foreach (FileInfo info in _prefsDirInfo.GetFiles())
-            {
+            foreach (var info in _prefsDirInfo.GetFiles())
                 // Check if tmp PlayerPrefs file exist
-                if (info.FullName.Contains(_prefsFileNameWithoutExtension) && !info.FullName.EndsWith(".plist"))
+                if (
+                    info.FullName.Contains(_prefsFileNameWithoutExtension)
+                    && !info.FullName.EndsWith(".plist")
+                )
                 {
                     onStartLoading?.Invoke();
                     return;
                 }
-            }
+
             onStopLoading?.Invoke();
 
             cachedData = new string[0];
 
             if (File.Exists(prefPath))
             {
-                string fixedPrefsPath = prefPath.Replace("\"", "\\\"").Replace("'", "\\'").Replace("`", "\\`");
+                var fixedPrefsPath = prefPath
+                    .Replace("\"", "\\\"")
+                    .Replace("'", "\\'")
+                    .Replace("`", "\\`");
                 var cmdStr = string.Format(@"-p '{0}'", fixedPrefsPath);
 
-                string stdOut = String.Empty;
-                string errOut = String.Empty;
+                var stdOut = string.Empty;
+                var errOut = string.Empty;
 
                 var process = new System.Diagnostics.Process();
                 process.StartInfo.UseShellExecute = false;
@@ -57,8 +63,14 @@ namespace Editor.Lazy.PrefEditor
                 process.StartInfo.Arguments = cmdStr;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
-                process.OutputDataReceived += (_, evt) => { stdOut += evt.Data + "\n"; };
-                process.ErrorDataReceived += (_, evt) => { errOut += evt.Data + "\n"; };
+                process.OutputDataReceived += (_, evt) =>
+                {
+                    stdOut += evt.Data + "\n";
+                };
+                process.ErrorDataReceived += (_, evt) =>
+                {
+                    errOut += evt.Data + "\n";
+                };
 
                 process.Start();
 
@@ -67,7 +79,7 @@ namespace Editor.Lazy.PrefEditor
 
                 process.WaitForExit();
 
-                MatchCollection matches = Regex.Matches(stdOut, @"(?: "")(.*)(?:"" =>.*)");
+                var matches = Regex.Matches(stdOut, @"(?: "")(.*)(?:"" =>.*)");
                 cachedData = matches.Select((e) => e.Groups[1].Value).ToArray();
             }
         }

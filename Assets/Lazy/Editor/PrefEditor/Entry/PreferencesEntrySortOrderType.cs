@@ -1,9 +1,9 @@
-﻿namespace Editor.Lazy.PrefEditor
+﻿namespace LazyEditor
 {
     public enum PreferencesEntrySortOrderType
     {
         None = 0,
         Ascending = 1,
-        Descending = 2
+        Descending = 2,
     }
 }

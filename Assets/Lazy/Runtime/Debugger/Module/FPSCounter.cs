@@ -10,19 +10,14 @@ namespace Lazy
     {
         private readonly float _updateInterval;
 
+        private float _accumulator;
+
         /// <summary>
         /// * 帧总数
         /// </summary>
         private int _frames;
 
-        private float _accumulator;
-
         private float _timeLeft;
-
-        /// <summary>
-        /// * 当前FPS
-        /// </summary>
-        public float CurrentFPS { get; private set; }
 
         public FPSCounter(float updateInterval)
         {
@@ -31,6 +26,11 @@ namespace Lazy
             _updateInterval = updateInterval;
             Reset();
         }
+
+        /// <summary>
+        /// * 当前FPS
+        /// </summary>
+        public float CurrentFPS { get; private set; }
 
         public void Update(float realElapsedSeconds)
         {

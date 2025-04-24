@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Lazy;
-using LazyEditor;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -12,7 +11,7 @@ using UnityEngine.SceneManagement;
 namespace LazyEditor
 {
     [CustomEditor(typeof(ViewPresenter), true)]
-    public class ViewPresenterInspector : UnityEditor.Editor
+    public class ViewPresenterInspector : Editor
     {
         [MenuItem("GameObject/Lazy/Add ViewPresenter(Alt+2) &2", false, 0)]
         public static void AddView()

@@ -1,11 +1,11 @@
 ﻿using Lazy;
 using UnityEditor;
 
-namespace Editor.Lazy
+namespace LazyEditor.Lazy
 {
     [CustomEditor(typeof(GridCenterLayoutGroup), true)]
     [CanEditMultipleObjects]
-    public class GridCenterLayoutGroupEditor : UnityEditor.Editor
+    public class GridCenterLayoutGroupEditor : Editor
     {
         private SerializedProperty m_Padding;
         private SerializedProperty m_CellSize;

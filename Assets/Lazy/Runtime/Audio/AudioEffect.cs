@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy;
 using UnityEngine;
 using UnityEngine.Audio;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Lazy

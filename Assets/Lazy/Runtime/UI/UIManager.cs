@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Lazy;
 using UnityEngine;
 
 namespace Lazy

@@ -1,5 +1,3 @@
-using Lazy;
-
 namespace Lazy
 {
     public interface IManager

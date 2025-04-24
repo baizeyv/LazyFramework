@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Lazy;
 using UnityEditor;
 using UnityEngine;
@@ -9,7 +8,7 @@ namespace LazyEditor
 {
     [CustomEditor(typeof(ABSBind), true)]
     [CanEditMultipleObjects]
-    public class BindInspector : UnityEditor.Editor
+    public class BindInspector : Editor
     {
         private ABSBind BindScript => target as ABSBind;
 

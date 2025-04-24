@@ -1,5 +1,4 @@
-﻿using Lazy;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 namespace Lazy

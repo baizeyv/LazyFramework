@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Solver
+﻿namespace Solver
 {
     // "Ａ　２　３　４　５　６　７　８　９　Ｘ　Ｊ　Ｑ　Ｋ"
     public abstract class Card

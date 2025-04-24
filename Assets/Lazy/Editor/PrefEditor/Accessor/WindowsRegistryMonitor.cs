@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Win32;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     /// <summary>
     /// * Windows注册表监视器
@@ -39,15 +39,15 @@ namespace Editor.Lazy.PrefEditor
         private const int KEY_NOTIFY = 0x0010;
         private const int STANDARD_RIGHTS_READ = 0x00020000;
 
-        private static readonly IntPtr HKEY_CLASSES_ROOT = new IntPtr(unchecked((int)0x80000000));
-        private static readonly IntPtr HKEY_CURRENT_USER = new IntPtr(unchecked((int)0x80000001));
-        private static readonly IntPtr HKEY_LOCAL_MACHINE = new IntPtr(unchecked((int)0x80000002));
-        private static readonly IntPtr HKEY_USERS = new IntPtr(unchecked((int)0x80000003));
-        private static readonly IntPtr HKEY_PERFORMANCE_DATA = new IntPtr(
-            unchecked((int)0x80000004)
-        );
-        private static readonly IntPtr HKEY_CURRENT_CONFIG = new IntPtr(unchecked((int)0x80000005));
-        private static readonly IntPtr HKEY_DYN_DATA = new IntPtr(unchecked((int)0x80000006));
+        private static readonly IntPtr HKEY_CLASSES_ROOT = new(unchecked((int)0x80000000));
+        private static readonly IntPtr HKEY_CURRENT_USER = new(unchecked((int)0x80000001));
+        private static readonly IntPtr HKEY_LOCAL_MACHINE = new(unchecked((int)0x80000002));
+        private static readonly IntPtr HKEY_USERS = new(unchecked((int)0x80000003));
+
+        private static readonly IntPtr HKEY_PERFORMANCE_DATA = new(unchecked((int)0x80000004));
+
+        private static readonly IntPtr HKEY_CURRENT_CONFIG = new(unchecked((int)0x80000005));
+        private static readonly IntPtr HKEY_DYN_DATA = new(unchecked((int)0x80000006));
 
         #endregion
 
@@ -72,7 +72,7 @@ namespace Editor.Lazy.PrefEditor
         /// </remarks>
         protected virtual void OnRegChanged()
         {
-            EventHandler handler = RegChanged;
+            var handler = RegChanged;
             if (handler != null)
                 handler(this, null);
         }
@@ -97,7 +97,7 @@ namespace Editor.Lazy.PrefEditor
         /// </remarks>
         protected virtual void OnError(Exception e)
         {
-            ErrorEventHandler handler = Error;
+            var handler = Error;
             if (handler != null)
                 handler(this, new ErrorEventArgs(e));
         }
@@ -108,10 +108,10 @@ namespace Editor.Lazy.PrefEditor
 
         private IntPtr _registryHive;
         private string _registrySubName;
-        private object _threadLock = new object();
+        private object _threadLock = new();
         private Thread _thread;
         private bool _disposed = false;
-        private ManualResetEvent _eventTerminate = new ManualResetEvent(false);
+        private ManualResetEvent _eventTerminate = new(false);
 
         private RegChangeNotifyFilter _regFilter =
             RegChangeNotifyFilter.Key
@@ -167,7 +167,7 @@ namespace Editor.Lazy.PrefEditor
         /// </summary>
         public RegChangeNotifyFilter RegChangeNotifyFilter
         {
-            get { return _regFilter; }
+            get => _regFilter;
             set
             {
                 lock (_threadLock)
@@ -217,12 +217,13 @@ namespace Editor.Lazy.PrefEditor
                 default:
                     throw new InvalidEnumArgumentException("hive", (int)hive, typeof(RegistryHive));
             }
+
             _registrySubName = name;
         }
 
         private void InitRegistryKey(string name)
         {
-            string[] nameParts = name.Split('\\');
+            var nameParts = name.Split('\\');
 
             switch (nameParts[0])
             {
@@ -257,7 +258,7 @@ namespace Editor.Lazy.PrefEditor
                     );
             }
 
-            _registrySubName = String.Join("\\", nameParts, 1, nameParts.Length - 1);
+            _registrySubName = string.Join("\\", nameParts, 1, nameParts.Length - 1);
         }
 
         #endregion
@@ -266,10 +267,7 @@ namespace Editor.Lazy.PrefEditor
         /// <b>true</b> if this <see cref="RegistryMonitor"/> object is currently monitoring;
         /// otherwise, <b>false</b>.
         /// </summary>
-        public bool IsMonitoring
-        {
-            get { return _thread != null; }
-        }
+        public bool IsMonitoring => _thread != null;
 
         /// <summary>
         /// Start monitoring.
@@ -300,7 +298,7 @@ namespace Editor.Lazy.PrefEditor
 
             lock (_threadLock)
             {
-                Thread thread = _thread;
+                var thread = _thread;
                 if (thread != null)
                 {
                     _eventTerminate.Set();
@@ -319,13 +317,14 @@ namespace Editor.Lazy.PrefEditor
             {
                 OnError(e);
             }
+
             _thread = null;
         }
 
         private void ThreadLoop()
         {
             IntPtr registryKey;
-            int result = RegOpenKeyEx(
+            var result = RegOpenKeyEx(
                 _registryHive,
                 _registrySubName,
                 0,
@@ -333,14 +332,12 @@ namespace Editor.Lazy.PrefEditor
                 out registryKey
             );
             if (result != 0)
-            {
                 throw new Win32Exception(result);
-            }
 
             try
             {
-                AutoResetEvent _eventNotify = new AutoResetEvent(false);
-                WaitHandle[] waitHandles = new WaitHandle[] { _eventNotify, _eventTerminate };
+                var _eventNotify = new AutoResetEvent(false);
+                var waitHandles = new WaitHandle[] { _eventNotify, _eventTerminate };
                 while (!_eventTerminate.WaitOne(0, true))
                 {
                     result = RegNotifyChangeKeyValue(
@@ -351,22 +348,16 @@ namespace Editor.Lazy.PrefEditor
                         true
                     );
                     if (result != 0)
-                    {
                         throw new Win32Exception(result);
-                    }
 
                     if (WaitHandle.WaitAny(waitHandles) == 0)
-                    {
                         OnRegChanged();
-                    }
                 }
             }
             finally
             {
                 if (registryKey != IntPtr.Zero)
-                {
                     RegCloseKey(registryKey);
-                }
             }
         }
     }

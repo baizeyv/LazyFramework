@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy;
 using UnityEngine;
 
 namespace Lazy
@@ -344,7 +343,7 @@ namespace Lazy
                                 "label"
                             )
                         )
-                            Lazy.Debugger.CopyToClipboard(
+                            Debugger.CopyToClipboard(
                                 TextUtility.Format(
                                     "{0}{2}{2}{1}",
                                     _selectedLog.LOGMessage,

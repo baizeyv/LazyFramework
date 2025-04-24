@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     [Serializable]
     public class PreferenceEntry
@@ -9,7 +9,7 @@ namespace Editor.Lazy.PrefEditor
         {
             String = 0,
             Int = 1,
-            Float = 2
+            Float = 2,
         }
 
         public PrefType typeSelection;
@@ -29,7 +29,7 @@ namespace Editor.Lazy.PrefEditor
                 PrefType.String => stringValue,
                 PrefType.Int => intValue.ToString(),
                 PrefType.Float => floatValue.ToString(),
-                _ => string.Empty
+                _ => string.Empty,
             };
         }
     }

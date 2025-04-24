@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Lazy;
 using UnityEngine.Networking;
 
 namespace Lazy

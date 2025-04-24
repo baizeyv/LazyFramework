@@ -12,41 +12,69 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Editor
+namespace LazyEditor
 {
     public class SpiderWindow : EditorWindow
     {
-        private Thread _thread;
+        /// <summary>
+        /// * 隐藏牌的牌数组
+        /// </summary>
+        private readonly List<List<EditorCard>> _hiddenList = new(10);
 
-        private Thread _playValveThread;
+        /// <summary>
+        /// * 隐藏牌的ReorderableList的数组
+        /// </summary>
+        private readonly List<ReorderableList> _hiddenReorderableList = new(10);
 
-        private Thread _vitaThread;
+        // ##################################################
 
-        private bool _showSolver = true;
+        private readonly string[] _suitOptions = { " Suit 1", " Suit 2", " Suit 3", " Suit 4" };
 
-        private bool _showExporter;
+        /// <summary>
+        /// * 可见牌的牌数组
+        /// </summary>
+        private readonly List<List<EditorCard>> _visibleList = new(10);
 
-        private bool _showGenerator;
-
-        private bool _showCalculation;
-
-        private bool _showOutput;
+        /// <summary>
+        /// * 可见牌的ReorderableList的数组
+        /// </summary>
+        private readonly List<ReorderableList> _visibleReorderableList = new(10);
 
         private string _exportStepLimitText;
 
         // ##################################################
 
-        private int _searchCalc;
+        /// <summary>
+        /// * 生成关卡的CSV文件路径
+        /// </summary>
+        private string _generationFileCsvPath;
 
-        private int _searchStep = -1;
+        /// <summary>
+        /// * 生成关卡的最大种子,-1为int.MaxValue
+        /// </summary>
+        private string _generationMaxSeedText;
 
-        // ##################################################
+        /// <summary>
+        /// * 生成关卡的最小种子
+        /// </summary>
+        private string _generationMinSeedText;
 
-        private Vector2 _scrollPos;
+        /// <summary>
+        /// * 生成关卡的步骤最大限制, -1为不限制
+        /// </summary>
+        private string _generationStepLimit;
 
-        private Vector2 _scrollPos2;
+        /// <summary>
+        /// * 生成关卡的花色数量索引
+        /// </summary>
+        private int _generationSuitCountIndex;
 
-        private Vector2 _scrollPos3;
+        private List<SpiderGenerator> _generators = new();
+
+        /// <summary>
+        /// * PlayValve 的种子列表,用`,`分割
+        /// </summary>
+        private string _inputPlayValveSeeds;
 
         // ##################################################
 
@@ -62,64 +90,170 @@ namespace Editor
         private string _inputVitaJsonPath;
 
         /// <summary>
-        /// * Vita 的Csv输出文件路径
-        /// </summary>
-        private string _outputVitaCsvPath;
-
-        /// <summary>
-        /// * PlayValve 的种子列表,用`,`分割
-        /// </summary>
-        private string _inputPlayValveSeeds;
-
-        /// <summary>
         /// * PlayValve 的Csv输出文件路径
         /// </summary>
         private string _outputPlayValveCsvPath;
 
-        private List<SpiderGenerator> _generators = new();
-
-        // ##################################################
-
         /// <summary>
-        /// * 生成关卡的CSV文件路径
+        /// * Vita 的Csv输出文件路径
         /// </summary>
-        private string _generationFileCsvPath;
+        private string _outputVitaCsvPath;
 
-        /// <summary>
-        /// * 生成关卡的花色数量索引
-        /// </summary>
-        private int _generationSuitCountIndex;
-
-        /// <summary>
-        /// * 生成关卡的步骤最大限制, -1为不限制
-        /// </summary>
-        private string _generationStepLimit;
-
-        /// <summary>
-        /// * 生成关卡的最小种子
-        /// </summary>
-        private string _generationMinSeedText;
-
-        /// <summary>
-        /// * 生成关卡的最大种子,-1为int.MaxValue
-        /// </summary>
-        private string _generationMaxSeedText;
-
-        // ##################################################
-
-        private readonly string[] _suitOptions = { " Suit 1", " Suit 2", " Suit 3", " Suit 4" };
+        private IEnumerator _playValveCoroutine;
 
         private int _playValveSelectedOption;
 
+        private Thread _playValveThread;
+
+        // ##################################################
+
+        private Vector2 _scrollPos;
+
+        private Vector2 _scrollPos2;
+
+        private Vector2 _scrollPos3;
+
+        // ##################################################
+
+        private int _searchCalc;
+
+        private int _searchStep = -1;
+
         private int _selectedOption;
+
+        private bool _showCalculation;
+
+        private bool _showExporter;
+
+        private bool _showGenerator;
+
+        private bool _showOutput;
+
+        private bool _showSolver = true;
+
+        // ##################################################
+
+        private SpiderSolver _solver;
+        private Thread _thread;
 
         // ##################################################
 
         private int _valuation = -99999;
 
-        // ##################################################
+        private IEnumerator _vitaCoroutine;
 
-        private SpiderSolver _solver;
+        private Thread _vitaThread;
+
+        private void OnEnable()
+        {
+            InitializeEditorCardReorderableList();
+        }
+
+        private void OnDisable()
+        {
+            if (_thread != null)
+            {
+                _thread.Abort();
+                _thread = null;
+            }
+
+            foreach (var generator in _generators)
+                generator.StopGeneration();
+        }
+
+        private void OnGUI()
+        {
+            GUILayout.BeginHorizontal("helpbox");
+            {
+                _showSolver = GUILayout.Toggle(_showSolver, "Show Solver", GUILayout.Width(100));
+                _showExporter = GUILayout.Toggle(
+                    _showExporter,
+                    "Show Exporter",
+                    GUILayout.Width(110)
+                );
+                _showGenerator = GUILayout.Toggle(
+                    _showGenerator,
+                    "Show Generator",
+                    GUILayout.Width(120)
+                );
+                _showCalculation = GUILayout.Toggle(
+                    _showCalculation,
+                    "Show Calculation",
+                    GUILayout.Width(120)
+                );
+                _showOutput = GUILayout.Toggle(_showOutput, "Show Output", GUILayout.Width(120));
+            }
+            GUILayout.EndHorizontal();
+            if (_showSolver)
+            {
+                GUILayout.BeginVertical("helpbox");
+                {
+                    GUILayout.BeginHorizontal();
+                    {
+                        DrawSolvePlayValve();
+                        GUILayout.Space(2);
+                        DrawSolveVita();
+                    }
+                    GUILayout.EndHorizontal();
+                    GUILayout.Space(5);
+                    if (GUILayout.Button("Stop Solve It", GUILayout.Height(35)))
+                        if (_thread != null)
+                        {
+                            _thread.Abort();
+                            _thread = null;
+                        }
+                    // if (_solverCoroutine != null)
+                    //     _solverCoroutine.Stop();
+                    // _solverCoroutine = null;
+                }
+                GUILayout.EndVertical();
+                GUILayout.Space(15);
+            }
+
+            if (_showExporter)
+            {
+                GUILayout.BeginVertical("helpbox");
+                {
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Label("Step Limit:", GUILayout.Width(100));
+                        _exportStepLimitText = GUILayout.TextField(_exportStepLimitText);
+                        if (!int.TryParse(_exportStepLimitText, out var val))
+                            _exportStepLimitText = "-1";
+                    }
+                    GUILayout.EndHorizontal();
+                    GUILayout.EndVertical();
+                    GUILayout.BeginHorizontal("helpbox");
+                    {
+                        DrawExportPlayValve();
+                        GUILayout.Space(2);
+                        DrawExportVita();
+                    }
+                    GUILayout.EndHorizontal();
+                }
+                GUILayout.Space(15);
+            }
+
+            if (_showGenerator)
+                DrawGenerator();
+
+            if (_showCalculation)
+            {
+                _scrollPos = GUILayout.BeginScrollView(_scrollPos);
+                DrawCalculationValuation();
+                GUILayout.EndScrollView();
+                GUILayout.Space(15);
+            }
+
+            if (_showOutput)
+            {
+                _scrollPos2 = GUILayout.BeginScrollView(_scrollPos2);
+                DrawOutput();
+                GUILayout.EndScrollView();
+            }
+
+            GUILayout.Space(5);
+        }
 
         [MenuItem("Spider/Spider Window")]
         private static void OpenSpiderWindow()
@@ -134,10 +268,6 @@ namespace Editor
                 window.minSize = new Vector2(1200, 600);
             }
         }
-
-        private IEnumerator _vitaCoroutine;
-
-        private IEnumerator _playValveCoroutine;
 
         private IEnumerator VitaColor()
         {
@@ -747,137 +877,6 @@ namespace Editor
                     _searchCalc = _solver.AllStep.Count - 1;
             }
         }
-
-        private void OnEnable()
-        {
-            InitializeEditorCardReorderableList();
-        }
-
-        private void OnDisable()
-        {
-            if (_thread != null)
-            {
-                _thread.Abort();
-                _thread = null;
-            }
-
-            foreach (var generator in _generators)
-                generator.StopGeneration();
-        }
-
-        private void OnGUI()
-        {
-            GUILayout.BeginHorizontal("helpbox");
-            {
-                _showSolver = GUILayout.Toggle(_showSolver, "Show Solver", GUILayout.Width(100));
-                _showExporter = GUILayout.Toggle(
-                    _showExporter,
-                    "Show Exporter",
-                    GUILayout.Width(110)
-                );
-                _showGenerator = GUILayout.Toggle(
-                    _showGenerator,
-                    "Show Generator",
-                    GUILayout.Width(120)
-                );
-                _showCalculation = GUILayout.Toggle(
-                    _showCalculation,
-                    "Show Calculation",
-                    GUILayout.Width(120)
-                );
-                _showOutput = GUILayout.Toggle(_showOutput, "Show Output", GUILayout.Width(120));
-            }
-            GUILayout.EndHorizontal();
-            if (_showSolver)
-            {
-                GUILayout.BeginVertical("helpbox");
-                {
-                    GUILayout.BeginHorizontal();
-                    {
-                        DrawSolvePlayValve();
-                        GUILayout.Space(2);
-                        DrawSolveVita();
-                    }
-                    GUILayout.EndHorizontal();
-                    GUILayout.Space(5);
-                    if (GUILayout.Button("Stop Solve It", GUILayout.Height(35)))
-                        if (_thread != null)
-                        {
-                            _thread.Abort();
-                            _thread = null;
-                        }
-                    // if (_solverCoroutine != null)
-                    //     _solverCoroutine.Stop();
-                    // _solverCoroutine = null;
-                }
-                GUILayout.EndVertical();
-                GUILayout.Space(15);
-            }
-
-            if (_showExporter)
-            {
-                GUILayout.BeginVertical("helpbox");
-                {
-                    GUILayout.BeginHorizontal();
-                    {
-                        GUILayout.Label("Step Limit:", GUILayout.Width(100));
-                        _exportStepLimitText = GUILayout.TextField(_exportStepLimitText);
-                        if (!int.TryParse(_exportStepLimitText, out var val))
-                            _exportStepLimitText = "-1";
-                    }
-                    GUILayout.EndHorizontal();
-                    GUILayout.EndVertical();
-                    GUILayout.BeginHorizontal("helpbox");
-                    {
-                        DrawExportPlayValve();
-                        GUILayout.Space(2);
-                        DrawExportVita();
-                    }
-                    GUILayout.EndHorizontal();
-                }
-                GUILayout.Space(15);
-            }
-
-            if (_showGenerator)
-                DrawGenerator();
-
-            if (_showCalculation)
-            {
-                _scrollPos = GUILayout.BeginScrollView(_scrollPos);
-                DrawCalculationValuation();
-                GUILayout.EndScrollView();
-                GUILayout.Space(15);
-            }
-
-            if (_showOutput)
-            {
-                _scrollPos2 = GUILayout.BeginScrollView(_scrollPos2);
-                DrawOutput();
-                GUILayout.EndScrollView();
-            }
-
-            GUILayout.Space(5);
-        }
-
-        /// <summary>
-        /// * 隐藏牌的ReorderableList的数组
-        /// </summary>
-        private readonly List<ReorderableList> _hiddenReorderableList = new(10);
-
-        /// <summary>
-        /// * 隐藏牌的牌数组
-        /// </summary>
-        private readonly List<List<EditorCard>> _hiddenList = new(10);
-
-        /// <summary>
-        /// * 可见牌的ReorderableList的数组
-        /// </summary>
-        private readonly List<ReorderableList> _visibleReorderableList = new(10);
-
-        /// <summary>
-        /// * 可见牌的牌数组
-        /// </summary>
-        private readonly List<List<EditorCard>> _visibleList = new(10);
 
         private void InitializeEditorCardReorderableList()
         {

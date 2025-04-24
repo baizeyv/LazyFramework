@@ -10,7 +10,7 @@ using UnityEngine;
 using Log = Lazy.Log;
 using Random = System.Random;
 
-namespace Editor
+namespace LazyEditor
 {
     public static class SpiderEditor
     {

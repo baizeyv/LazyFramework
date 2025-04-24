@@ -1,4 +1,3 @@
-using Lazy;
 using UnityEngine;
 
 namespace Lazy

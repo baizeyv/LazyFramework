@@ -1,42 +1,40 @@
 ﻿#region copyright
+
 // ------------------------------------------------------
 // Copyright (C) Dmitriy Yukhanov [https://codestage.net]
 // ------------------------------------------------------
-#endregion
 
-using CodeStage.AntiCheat.Genuine.Android;
+#endregion
 
 namespace CodeStage.AntiCheat.Examples
 {
-	using UnityEngine;
+    using UnityEngine;
 
-	internal partial class WebExamples
-	{
-		public void DrawUI()
-		{
-			DrawDomainLockUI();
-		}
+    internal partial class WebExamples
+    {
+        public void DrawUI()
+        {
+            DrawDomainLockUI();
+        }
 
-		private void DrawDomainLockUI()
-		{
-			GUILayout.Label("<b>Web domain lock</b>");
-			GUILayout.Space(10);
-			using (new GUILayout.VerticalScope(GUI.skin.box))
-			{
-				GUILayout.Label($"You can detect your app is running from unknown domains.");
-				
-				GUILayout.Space(5);
+        private void DrawDomainLockUI()
+        {
+            GUILayout.Label("<b>Web domain lock</b>");
+            GUILayout.Space(10);
+            using (new GUILayout.VerticalScope(GUI.skin.box))
+            {
+                GUILayout.Label($"You can detect your app is running from unknown domains.");
 
-				if (Application.platform != RuntimePlatform.WebGLPlayer)
-				{
-					GUILayout.Label(ExamplesGUI.Colorize("Works only in WebGL builds.", 
-							ExamplesGUI.YellowColor));
-				}
-				else
-				{
-					
-				}
-			}
-		}
-	}
+                GUILayout.Space(5);
+
+                if (Application.platform != RuntimePlatform.WebGLPlayer)
+                {
+                    GUILayout.Label(
+                        ExamplesGUI.Colorize("Works only in WebGL builds.", ExamplesGUI.YellowColor)
+                    );
+                }
+                else { }
+            }
+        }
+    }
 }

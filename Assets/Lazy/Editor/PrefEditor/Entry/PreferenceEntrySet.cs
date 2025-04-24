@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     /// <summary>
     /// * 本地存储条目集合

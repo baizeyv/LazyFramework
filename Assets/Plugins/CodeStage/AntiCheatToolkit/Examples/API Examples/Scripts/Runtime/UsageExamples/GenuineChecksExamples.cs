@@ -1,11 +1,12 @@
 ﻿#region copyright
+
 // ------------------------------------------------------
 // Copyright (C) Dmitriy Yukhanov [https://codestage.net]
 // ------------------------------------------------------
+
 #endregion
 
 using System;
-using CodeStage.AntiCheat.Genuine.Android;
 using CodeStage.AntiCheat.Genuine.CodeHash;
 using UnityEngine;
 
@@ -83,9 +84,7 @@ namespace CodeStage.AntiCheat.Examples
                     $"Files hashed: {result.FileHashes.Count} in {result.DurationSeconds:F2} secs"
                 );
                 foreach (var fileHash in result.FileHashes)
-                {
                     Debug.Log(fileHash.ToString());
-                }
 
                 // Here you can upload your hashes to the server to make a validation check on the server side and punish cheater with server logic.
                 //

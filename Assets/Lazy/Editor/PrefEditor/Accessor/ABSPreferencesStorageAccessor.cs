@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     /// <summary>
     /// * 本地存储访问器
@@ -50,9 +50,7 @@ namespace Editor.Lazy.PrefEditor
         public string[] GetKeys(bool reloadData = true)
         {
             if (reloadData || cachedData.Length == 0)
-            {
                 FetchKeysFromSystem();
-            }
 
             return cachedData;
         }
@@ -69,6 +67,7 @@ namespace Editor.Lazy.PrefEditor
                 ignoreNextChange = false;
                 return;
             }
+
             onPrefEntryChanged?.Invoke();
         }
 
@@ -87,6 +86,5 @@ namespace Editor.Lazy.PrefEditor
         /// </summary>
         /// <returns></returns>
         public abstract bool IsMonitoring();
-
     }
 }

@@ -1,11 +1,10 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     public class LazyEditorPrefs
     {
-
         // * 获取 EditorPrefs 中的字符串
         public static string GetString(string key, string value = default)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using Lazy;
 using UnityEngine;
 
 namespace Lazy
@@ -46,7 +45,7 @@ namespace Lazy
             {
                 GUILayout.Label(tag, GUILayout.Width(TitleWidth));
                 if (GUILayout.Button(content, "label"))
-                    Lazy.Debugger.CopyToClipboard(content);
+                    Debugger.CopyToClipboard(content);
             }
             GUILayout.EndHorizontal();
         }

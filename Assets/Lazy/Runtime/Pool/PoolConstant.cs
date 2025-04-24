@@ -1,7 +1,4 @@
-﻿using Lazy;
-using UnityEngine;
-
-namespace Lazy
+﻿namespace Lazy
 {
     public static class PoolConstant
     {

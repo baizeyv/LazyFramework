@@ -2,7 +2,6 @@
 // Created: 2018/07/13
 
 #if true // MODULE_MARKER
-using System;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using UnityEngine;
@@ -25,12 +24,7 @@ namespace DG.Tweening
             float duration
         )
         {
-            TweenerCore<Color, Color, ColorOptions> t = DOTween.To(
-                () => target.color,
-                x => target.color = x,
-                endValue,
-                duration
-            );
+            var t = DOTween.To(() => target.color, x => target.color = x, endValue, duration);
             t.SetTarget(target);
             return t;
         }
@@ -44,12 +38,7 @@ namespace DG.Tweening
             float duration
         )
         {
-            TweenerCore<Color, Color, ColorOptions> t = DOTween.ToAlpha(
-                () => target.color,
-                x => target.color = x,
-                endValue,
-                duration
-            );
+            var t = DOTween.ToAlpha(() => target.color, x => target.color = x, endValue, duration);
             t.SetTarget(target);
             return t;
         }
@@ -64,23 +53,25 @@ namespace DG.Tweening
             float duration
         )
         {
-            Sequence s = DOTween.Sequence();
-            GradientColorKey[] colors = gradient.colorKeys;
-            int len = colors.Length;
-            for (int i = 0; i < len; ++i)
+            var s = DOTween.Sequence();
+            var colors = gradient.colorKeys;
+            var len = colors.Length;
+            for (var i = 0; i < len; ++i)
             {
-                GradientColorKey c = colors[i];
+                var c = colors[i];
                 if (i == 0 && c.time <= 0)
                 {
                     target.color = c.color;
                     continue;
                 }
-                float colorDuration =
+
+                var colorDuration =
                     i == len - 1
                         ? duration - s.Duration(false) // Verifies that total duration is correct
                         : duration * (i == 0 ? c.time : c.time - colors[i - 1].time);
                 s.Append(target.DOColor(c.color, colorDuration).SetEase(Ease.Linear));
             }
+
             s.SetTarget(target);
             return s;
         }
@@ -103,13 +94,13 @@ namespace DG.Tweening
         )
         {
             endValue = endValue - target.color;
-            Color to = new Color(0, 0, 0, 0);
+            var to = new Color(0, 0, 0, 0);
             return DOTween
                 .To(
                     () => to,
                     x =>
                     {
-                        Color diff = x - to;
+                        var diff = x - to;
                         to = x;
                         target.color += diff;
                     },

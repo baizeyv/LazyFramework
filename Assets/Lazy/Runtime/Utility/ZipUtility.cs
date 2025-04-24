@@ -3,7 +3,6 @@ using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
-using Lazy;
 
 namespace Lazy
 {

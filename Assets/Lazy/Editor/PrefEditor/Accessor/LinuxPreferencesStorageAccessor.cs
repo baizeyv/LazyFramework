@@ -4,13 +4,14 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     public class LinuxPreferencesStorageAccessor : ABSPreferencesStorageAccessor
     {
         private FileSystemWatcher _fileWatcher;
 
-        public LinuxPreferencesStorageAccessor(string pathToPrefs) : base(Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "/home", pathToPrefs))
+        public LinuxPreferencesStorageAccessor(string pathToPrefs)
+            : base(Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "/home", pathToPrefs))
         {
             _fileWatcher = new FileSystemWatcher();
             _fileWatcher.Path = Path.GetDirectoryName(prefPath);
@@ -25,9 +26,12 @@ namespace Editor.Lazy.PrefEditor
             if (File.Exists(prefPath))
             {
                 XmlReaderSettings settings = new();
-                XmlReader reader = XmlReader.Create(prefPath, settings);
-                XDocument doc = XDocument.Load(reader);
-                cachedData = doc.Element("unity_prefs").Elements().Select(e => e.Attribute("name").Value).ToArray();
+                var reader = XmlReader.Create(prefPath, settings);
+                var doc = XDocument.Load(reader);
+                cachedData = doc.Element("unity_prefs")
+                    .Elements()
+                    .Select(e => e.Attribute("name").Value)
+                    .ToArray();
             }
         }
 

@@ -4,14 +4,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Editor.Lazy.PrefEditor.SearchField;
-using LazyEditor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Editor.Lazy.PrefEditor
+namespace LazyEditor
 {
     public class PreferencesEditorWindow : EditorWindow
     {

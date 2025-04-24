@@ -1,6 +1,4 @@
-﻿using Lazy;
-
-namespace Lazy
+﻿namespace Lazy
 {
     public class PoolManager : Singleton<PoolManager>, IManager
     {

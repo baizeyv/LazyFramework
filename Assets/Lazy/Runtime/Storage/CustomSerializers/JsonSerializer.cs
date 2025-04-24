@@ -1,5 +1,4 @@
-﻿using Lazy;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Lazy
 {

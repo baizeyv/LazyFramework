@@ -3,11 +3,10 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace LazyEditor
 {
-    public class NinePatchSlicer : UnityEditor.Editor
+    public class NinePatchSlicer : Editor
     {
         private static List<string> _texture2DList;
 

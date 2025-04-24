@@ -4,12 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Lazy;
-using LazyEditor;
 using UnityEditor;
-using UnityEditor.Build;
 using UnityEditorInternal;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace LazyEditor
 {

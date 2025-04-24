@@ -1,6 +1,4 @@
-﻿using Lazy;
-
-namespace Lazy
+﻿namespace Lazy
 {
     public abstract class CheatWindowBase : ScrollableDebuggerWindowBase
     {
@@ -10,7 +8,7 @@ namespace Lazy
                 "Close ✖",
                 () =>
                 {
-                    Lazy.Debugger.Instance.SetShowType(DebuggerShowType.Icon);
+                    Debugger.Instance.SetShowType(DebuggerShowType.Icon);
                     // TODO: Show GUIMASK
                 },
                 "#c8161d"

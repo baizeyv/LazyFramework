@@ -1,6 +1,3 @@
-using Lazy;
-using UnityEngine;
-
 namespace Lazy.Example
 {
     public partial class Heel : ViewPresenter
