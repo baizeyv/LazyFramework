@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,6 +8,10 @@ namespace Lazy
     public class SafeAreaManager : Singleton<SafeAreaManager>, IManager
     {
         private static readonly HashSet<RectTransform> TransformSet = new(10);
+
+        private static readonly Dictionary<RectTransform, Vector2> BottomExpandTransforms = new();
+
+        private static readonly Dictionary<RectTransform, Vector2> TopExpandTransforms = new();
 
         /// <summary>
         /// * 上一次的安全区
@@ -32,6 +35,10 @@ namespace Lazy
 
         private SafeAreaManager() { }
 
+        /// <summary>
+        /// * 订阅安全区
+        /// </summary>
+        /// <param name="transform"></param>
         public void Subscribe(RectTransform transform)
         {
             TransformSet.Add(transform);
@@ -45,6 +52,32 @@ namespace Lazy
         public void Unsubscribe(RectTransform transform)
         {
             TransformSet.Remove(transform);
+        }
+
+        public void SubscribeBottomExpand(RectTransform transform)
+        {
+            BottomExpandTransforms.Add(transform, transform.sizeDelta);
+            if (!_initFlag)
+                UpdateRect();
+            ApplyBottomExpand();
+        }
+
+        public void UnsubscribeBottomExpand(RectTransform transform)
+        {
+            BottomExpandTransforms.Remove(transform);
+        }
+
+        public void SubscribeTopExpand(RectTransform transform)
+        {
+            TopExpandTransforms.Add(transform, transform.sizeDelta);
+            if (!_initFlag)
+                UpdateRect();
+            ApplyTopExpand(transform);
+        }
+
+        public void UnsubscribeTopExpand(RectTransform transform)
+        {
+            TopExpandTransforms.Remove(transform);
         }
 
         private void UpdateRect()
@@ -67,6 +100,8 @@ namespace Lazy
             _lastScreenWidth = screenWidth;
             _lastScreenHeight = screenHeight;
             _initFlag = true;
+            ApplyTopExpand(TopExpandTransforms.Keys.ToArray());
+            ApplyBottomExpand(BottomExpandTransforms.Keys.ToArray());
         }
 
         /// <summary>
@@ -97,6 +132,29 @@ namespace Lazy
                 rectTransform.sizeDelta = Vector2.zero;
                 rectTransform.anchorMin = anchorMin.IsFinite() ? anchorMin : Vector2.zero;
                 rectTransform.anchorMax = anchorMax.IsFinite() ? anchorMax : Vector2.zero;
+            }
+        }
+
+        private void ApplyBottomExpand(params RectTransform[] trans)
+        {
+            var yMin = _lastSafeArea.yMin;
+            foreach (var rectTransform in trans)
+            {
+                var v = BottomExpandTransforms[rectTransform];
+                v.y += yMin;
+                rectTransform.sizeDelta = v;
+            }
+        }
+
+        private void ApplyTopExpand(params RectTransform[] trans)
+        {
+            var yMax = _lastSafeArea.yMax;
+            var offset = _lastScreenHeight - yMax;
+            foreach (var rectTransform in trans)
+            {
+                var v = TopExpandTransforms[rectTransform];
+                v.y += offset;
+                rectTransform.sizeDelta = v;
             }
         }
 
