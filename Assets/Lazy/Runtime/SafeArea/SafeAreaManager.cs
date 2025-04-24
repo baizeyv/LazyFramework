@@ -317,6 +317,10 @@ namespace Lazy
         public void OnDestroyRelease()
         {
             TransformSet.Clear();
+            TopExpandTransforms.Clear();
+            BottomExpandTransforms.Clear();
+            LeftExpandTransforms.Clear();
+            RightExpandTransforms.Clear();
         }
 
         public void OnGui() { }
