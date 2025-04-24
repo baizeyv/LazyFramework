@@ -1,5 +1,4 @@
 using System;
-using Lazy.Pool.Factory;
 using Lazy.Singleton;
 
 namespace Lazy.Pool
@@ -14,13 +13,9 @@ namespace Lazy.Pool
             SetObjectFactory(new DefaultObjectFactory<T>());
         }
 
-        public void OnSingletonInitialize()
-        {
-        }
+        public void OnSingletonInitialize() { }
 
-        protected override void CustomFree(T obj)
-        {
-        }
+        protected override void CustomFree(T obj) { }
 
         public void Dispose()
         {

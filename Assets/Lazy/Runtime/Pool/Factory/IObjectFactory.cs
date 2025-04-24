@@ -1,4 +1,4 @@
-namespace Lazy.Pool.Factory
+namespace Lazy
 {
     public interface IObjectFactory<T>
     {

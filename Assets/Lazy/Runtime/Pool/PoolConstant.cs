@@ -1,4 +1,4 @@
-﻿using Lazy.Pool.GameObject.Enums;
+﻿using Lazy;
 using UnityEngine;
 
 namespace Lazy.Pool

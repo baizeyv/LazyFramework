@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Lazy;
 using Lazy.Event;
-using Lazy.Manage;
-using Lazy.Pool.GameObject.Data;
-using Lazy.Pool.GameObject.Enums;
+using Lazy.Pool;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Pool.GameObject
+namespace Lazy
 {
     public class GameObjectPoolManager : Singleton.Singleton<GameObjectPoolManager>, IManager
     {
@@ -27,7 +25,7 @@ namespace Lazy.Pool.GameObject
         /// <summary>
         /// * 从池中取出的克隆体的字典 Key->克隆体 Value->克隆体对应的Poolable
         /// </summary>
-        internal readonly Dictionary<UnityEngine.GameObject, GameObjectPoolable> ClonesMap =
+        internal readonly Dictionary<GameObject, GameObjectPoolable> ClonesMap =
             new(PoolConstant.DefaultClonesMapCapacity);
 
         internal readonly PoolList<DespawnRequest> DespawnRequests =
@@ -36,13 +34,13 @@ namespace Lazy.Pool.GameObject
         /// <summary>
         /// * Persistent Pool Dictionary
         /// </summary>
-        private readonly Dictionary<UnityEngine.GameObject, GameObjectPool> _persistentPoolsMap =
+        private readonly Dictionary<GameObject, GameObjectPool> _persistentPoolsMap =
             new(PoolConstant.DefaultPersistentPoolsCapacity);
 
         /// <summary>
         /// * 所有池子的映射字典 Key->预制体 Value->预制体对应的池子
         /// </summary>
-        private readonly Dictionary<UnityEngine.GameObject, GameObjectPool> _allPoolsMap =
+        private readonly Dictionary<GameObject, GameObjectPool> _allPoolsMap =
             new(PoolConstant.DefaultPersistentPoolsCapacity);
 
         private readonly List<ISpawnable> _spawnableItemComponents =
@@ -54,7 +52,7 @@ namespace Lazy.Pool.GameObject
         /// <summary>
         /// * 实例化一个物体时的回调
         /// </summary>
-        public readonly SimpleEvent<UnityEngine.GameObject> GameObjectInstantiated = new();
+        public readonly SimpleEvent<GameObject> GameObjectInstantiated = new();
 
         private readonly object _securityLock = new();
 
@@ -138,7 +136,7 @@ namespace Lazy.Pool.GameObject
         }
 
         private void InvokeCallback<T>(
-            UnityEngine.GameObject gameObject,
+            GameObject gameObject,
             CallbackType callbackType,
             Action<T> poolableCallback,
             List<T> listForComponentsCaching,
@@ -177,7 +175,7 @@ namespace Lazy.Pool.GameObject
         }
 
         private void InvokeGameObjectPoolEvents<T>(
-            UnityEngine.GameObject gameObject,
+            GameObject gameObject,
             List<T> listForComponentCaching,
             Action<T> callback,
             bool inChildren
@@ -431,7 +429,7 @@ namespace Lazy.Pool.GameObject
             return true;
         }
 
-        private GameObjectPool GetPoolByPrefabOrCreate(UnityEngine.GameObject prefab)
+        private GameObjectPool GetPoolByPrefabOrCreate(GameObject prefab)
         {
             if (!TryGetPoolByPrefab(prefab, out var pool))
             {
@@ -452,16 +450,16 @@ namespace Lazy.Pool.GameObject
             return pool;
         }
 
-        private GameObjectPool CreateNewGameObjectPool(UnityEngine.GameObject prefab)
+        private GameObjectPool CreateNewGameObjectPool(GameObject prefab)
         {
-            return new UnityEngine.GameObject(
+            return new GameObject(
                 $"[{nameof(GameObjectPoolManager)}] {prefab.name}"
             ).AddComponent<GameObjectPool>();
         }
 
         private void SetupNewPool(
             GameObjectPool pool,
-            UnityEngine.GameObject prefab,
+            GameObject prefab,
             CapacityReachedBehaviour capacityReachedBehaviour,
             DespawnType despawnType,
             CallbackType callbackType,
@@ -533,8 +531,8 @@ namespace Lazy.Pool.GameObject
 #endif
         }
 
-        private UnityEngine.GameObject DefaultSpawn(
-            UnityEngine.GameObject prefab,
+        private GameObject DefaultSpawn(
+            GameObject prefab,
             Vector3 position,
             Quaternion rotation,
             Transform parent,
@@ -597,7 +595,7 @@ namespace Lazy.Pool.GameObject
             return arguments.Poolable.GameObject;
         }
 
-        private void DefaultDespawn(UnityEngine.GameObject gameObject, float delay = 0f)
+        private void DefaultDespawn(GameObject gameObject, float delay = 0f)
         {
             if (!CanFirePoolAction())
             {
@@ -712,7 +710,7 @@ namespace Lazy.Pool.GameObject
         }
 
         private void GetPositionAndRotationByParent(
-            UnityEngine.GameObject prefab,
+            GameObject prefab,
             Transform parent,
             out Vector3 position,
             out Quaternion rotation
@@ -731,7 +729,7 @@ namespace Lazy.Pool.GameObject
             }
         }
 
-        private void DestroyPoolableWithGameObject(UnityEngine.GameObject clone, bool immediately)
+        private void DestroyPoolableWithGameObject(GameObject clone, bool immediately)
         {
             if (ClonesMap.TryGetValue(clone, out var poolable))
             {
@@ -766,7 +764,7 @@ namespace Lazy.Pool.GameObject
         /// </summary>
         /// <param name="prefabName"></param>
         /// <returns></returns>
-        public UnityEngine.GameObject Spawn(string prefabName)
+        public GameObject Spawn(string prefabName)
         {
             var pool = GetPoolByPrefabName(prefabName);
             if (!pool)
@@ -791,7 +789,7 @@ namespace Lazy.Pool.GameObject
         /// </summary>
         /// <param name="prefab"></param>
         /// <returns></returns>
-        public UnityEngine.GameObject Spawn(UnityEngine.GameObject prefab)
+        public GameObject Spawn(GameObject prefab)
         {
             var prefabTransform = prefab.transform;
             return DefaultSpawn(
@@ -804,17 +802,13 @@ namespace Lazy.Pool.GameObject
             );
         }
 
-        public UnityEngine.GameObject Spawn(
-            UnityEngine.GameObject prefab,
-            Vector3 position,
-            Quaternion rotation
-        )
+        public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
         {
             return DefaultSpawn(prefab, position, rotation, null, false, out _);
         }
 
-        public UnityEngine.GameObject Spawn(
-            UnityEngine.GameObject prefab,
+        public GameObject Spawn(
+            GameObject prefab,
             Vector3 position,
             Quaternion rotation,
             Transform parent
@@ -829,8 +823,8 @@ namespace Lazy.Pool.GameObject
             return DefaultSpawn(prefab, position, rotation, parent, false, out _);
         }
 
-        public UnityEngine.GameObject Spawn(
-            UnityEngine.GameObject prefab,
+        public GameObject Spawn(
+            GameObject prefab,
             Transform parent,
             bool worldPositionStays = false
         )
@@ -929,7 +923,7 @@ namespace Lazy.Pool.GameObject
         /// </summary>
         /// <param name="clone"></param>
         /// <param name="delay"></param>
-        public void Despawn(UnityEngine.GameObject clone, float delay = 0f)
+        public void Despawn(GameObject clone, float delay = 0f)
         {
             DefaultDespawn(clone, delay);
         }
@@ -954,7 +948,7 @@ namespace Lazy.Pool.GameObject
         /// </summary>
         /// <param name="action"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public void ForEachClone(Action<UnityEngine.GameObject> action)
+        public void ForEachClone(Action<GameObject> action)
         {
 #if DEBUG
             if (action == null)
@@ -996,7 +990,7 @@ namespace Lazy.Pool.GameObject
         /// <param name="prefab"></param>
         /// <param name="pool"></param>
         /// <returns></returns>
-        public bool TryGetPoolByPrefab(UnityEngine.GameObject prefab, out GameObjectPool pool)
+        public bool TryGetPoolByPrefab(GameObject prefab, out GameObjectPool pool)
         {
             return _allPoolsMap.TryGetValue(prefab, out pool);
         }
@@ -1006,7 +1000,7 @@ namespace Lazy.Pool.GameObject
             return TryGetPoolByClone(clone.gameObject, out pool);
         }
 
-        public bool TryGetPoolByClone(UnityEngine.GameObject clone, out GameObjectPool pool)
+        public bool TryGetPoolByClone(GameObject clone, out GameObjectPool pool)
         {
             if (ClonesMap.TryGetValue(clone, out var poolable) && poolable.IsSetup)
             {
@@ -1018,7 +1012,7 @@ namespace Lazy.Pool.GameObject
             return false;
         }
 
-        public GameObjectPool GetPoolByClone(UnityEngine.GameObject clone)
+        public GameObjectPool GetPoolByClone(GameObject clone)
         {
             var hasPool = TryGetPoolByClone(clone, out var pool);
 #if DEBUG
@@ -1033,7 +1027,7 @@ namespace Lazy.Pool.GameObject
             return GetPoolByClone(clone.gameObject);
         }
 
-        public GameObjectPool GetPoolByPrefab(UnityEngine.GameObject prefab)
+        public GameObjectPool GetPoolByPrefab(GameObject prefab)
         {
             var hasPool = TryGetPoolByPrefab(prefab, out var pool);
 #if DEBUG
@@ -1053,7 +1047,7 @@ namespace Lazy.Pool.GameObject
         /// </summary>
         /// <param name="clone"></param>
         /// <returns></returns>
-        public bool IsClone(UnityEngine.GameObject clone)
+        public bool IsClone(GameObject clone)
         {
             return ClonesMap.ContainsKey(clone);
         }
@@ -1063,7 +1057,7 @@ namespace Lazy.Pool.GameObject
             return IsClone(clone.gameObject);
         }
 
-        public PoolableStatus GetCloneStatus(UnityEngine.GameObject clone)
+        public PoolableStatus GetCloneStatus(GameObject clone)
         {
             if (ClonesMap.TryGetValue(clone.gameObject, out var poolable))
                 return poolable.Status;
@@ -1091,7 +1085,7 @@ namespace Lazy.Pool.GameObject
         /// Destroys a clone.
         /// </summary>
         /// <param name="clone">GameObject which spawned via F8Pool</param>
-        public void DestroyClone(UnityEngine.GameObject clone)
+        public void DestroyClone(GameObject clone)
         {
             DestroyPoolableWithGameObject(clone, false);
         }
@@ -1109,7 +1103,7 @@ namespace Lazy.Pool.GameObject
         /// Destroys a clone immediately.
         /// </summary>
         /// <param name="clone">GameObject which spawned via F8Pool</param>
-        public void DestroyCloneImmediately(UnityEngine.GameObject clone)
+        public void DestroyCloneImmediately(GameObject clone)
         {
             DestroyPoolableWithGameObject(clone, true);
         }

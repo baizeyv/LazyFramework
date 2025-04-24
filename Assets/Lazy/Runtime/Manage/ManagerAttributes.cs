@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Manage
+namespace Lazy
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class ManagerUpdateAttribute : Attribute { }

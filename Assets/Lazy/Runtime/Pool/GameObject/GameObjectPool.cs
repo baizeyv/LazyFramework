@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy;
 using Lazy.Event;
-using Lazy.Pool.Attribute;
-using Lazy.Pool.GameObject.Enums;
+using Lazy.Pool;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Pool.GameObject
+namespace Lazy
 {
     [DisallowMultipleComponent]
     public class GameObjectPool : MonoBehaviour
@@ -15,7 +13,7 @@ namespace Lazy.Pool.GameObject
         [Header("MAIN")]
         [Tooltip("当前池预制体")]
         [SerializeField]
-        internal UnityEngine.GameObject prefab;
+        internal GameObject prefab;
 
         [Tooltip(PoolConstant.CapacityReachedBehaviourDesc)]
         [SerializeField]
@@ -96,7 +94,7 @@ namespace Lazy.Pool.GameObject
 
         [HideInInspector]
         [SerializeField]
-        private List<UnityEngine.GameObject> gameObjectsToPreload;
+        private List<GameObject> gameObjectsToPreload;
 
         [ReadOnlyInspectorField]
         [SerializeField]
@@ -119,13 +117,13 @@ namespace Lazy.Pool.GameObject
         private Transform _prefabTransform;
 
 #if UNITY_EDITOR
-        private UnityEngine.GameObject _cachedPrefab;
+        private GameObject _cachedPrefab;
 #endif
 
         /// <summary>
         /// * The prefab attached to this pool.
         /// </summary>
-        public UnityEngine.GameObject AttachedPrefab => prefab;
+        public GameObject AttachedPrefab => prefab;
 
         /// <summary>
         /// * Pool overflow behaviour
@@ -191,17 +189,17 @@ namespace Lazy.Pool.GameObject
         /// <summary>
         /// * The actions will be performed on a game object spawned by this pool.
         /// </summary>
-        public readonly SimpleEvent<UnityEngine.GameObject> GameObjectSpawnedEvent = new();
+        public readonly SimpleEvent<GameObject> GameObjectSpawnedEvent = new();
 
         /// <summary>
         /// * The actions will be performed on a game object despawned by this pool.
         /// </summary>
-        public readonly SimpleEvent<UnityEngine.GameObject> GameObjectDespawnedEvent = new();
+        public readonly SimpleEvent<GameObject> GameObjectDespawnedEvent = new();
 
         /// <summary>
         /// * The actions will be performed on a game object instantiated by this pool.
         /// </summary>
-        public readonly SimpleEvent<UnityEngine.GameObject> GameObjectInstantiatedEvent = new();
+        public readonly SimpleEvent<GameObject> GameObjectInstantiatedEvent = new();
 
         #region Life Cycle
 
@@ -243,7 +241,7 @@ namespace Lazy.Pool.GameObject
         /// * You can initialize the pool manually using this method
         /// </summary>
         /// <param name="prefab"></param>
-        public void Init(UnityEngine.GameObject prefab)
+        public void Init(GameObject prefab)
         {
 #if DEBUG
             if (_isSetup)
@@ -277,7 +275,7 @@ namespace Lazy.Pool.GameObject
         /// </summary>
         /// <param name="prefab"></param>
         /// <returns></returns>
-        internal bool TrySetup(UnityEngine.GameObject prefab)
+        internal bool TrySetup(GameObject prefab)
         {
             if (_isSetup)
                 return false;
@@ -467,17 +465,14 @@ namespace Lazy.Pool.GameObject
             allClonesCount--;
         }
 
-        private void SetupPoolableAsDefault(
-            UnityEngine.GameObject clone,
-            out GameObjectPoolable poolable
-        )
+        private void SetupPoolableAsDefault(GameObject clone, out GameObjectPoolable poolable)
         {
             poolable = CreatePoolable(clone);
             poolable.SetupAsDefault();
         }
 
         private void SetupPoolableAsSpawnedOverCapacity(
-            UnityEngine.GameObject clone,
+            GameObject clone,
             out GameObjectPoolable poolable
         )
         {
@@ -485,7 +480,7 @@ namespace Lazy.Pool.GameObject
             poolable.SetupAsSpawnedOverCapacity();
         }
 
-        private GameObjectPoolable CreatePoolable(UnityEngine.GameObject clone)
+        private GameObjectPoolable CreatePoolable(GameObject clone)
         {
             return new GameObjectPoolable
             {
@@ -579,17 +574,17 @@ namespace Lazy.Pool.GameObject
             }
         }
 
-        internal void FireGameObjectSpawnedCallback(UnityEngine.GameObject obj)
+        internal void FireGameObjectSpawnedCallback(GameObject obj)
         {
             FirePoolActionCallback(obj, ref spawnsCount, GameObjectSpawnedEvent);
         }
 
-        internal void FireGameObjectDespawnedCallback(UnityEngine.GameObject obj)
+        internal void FireGameObjectDespawnedCallback(GameObject obj)
         {
             FirePoolActionCallback(obj, ref despawnsCount, GameObjectDespawnedEvent);
         }
 
-        private void FireGameObjectInstantiatedCallback(UnityEngine.GameObject obj)
+        private void FireGameObjectInstantiatedCallback(GameObject obj)
         {
             instantiated++;
             GameObjectInstantiatedEvent.Fire(obj);
@@ -608,9 +603,9 @@ namespace Lazy.Pool.GameObject
         }
 
         private void FirePoolActionCallback(
-            UnityEngine.GameObject clone,
+            GameObject clone,
             ref int actionCount,
-            SimpleEvent<UnityEngine.GameObject> poolEvent
+            SimpleEvent<GameObject> poolEvent
         )
         {
             total++;
@@ -735,7 +730,7 @@ namespace Lazy.Pool.GameObject
         /// * Fire an action for each clone
         /// </summary>
         /// <param name="action"></param>
-        public void ForEachClone(Action<UnityEngine.GameObject> action)
+        public void ForEachClone(Action<GameObject> action)
         {
             ForEachSpawnedClone(action);
             ForEachDespawnedClone(action);
@@ -745,7 +740,7 @@ namespace Lazy.Pool.GameObject
         /// * Fire an action for each spawned clone
         /// </summary>
         /// <param name="action"></param>
-        public void ForEachSpawnedClone(Action<UnityEngine.GameObject> action)
+        public void ForEachSpawnedClone(Action<GameObject> action)
         {
             ForEach(_spawnedPoolables, action);
         }
@@ -754,7 +749,7 @@ namespace Lazy.Pool.GameObject
         /// * Fire an action for each despawned clone
         /// </summary>
         /// <param name="action"></param>
-        public void ForEachDespawnedClone(Action<UnityEngine.GameObject> action)
+        public void ForEachDespawnedClone(Action<GameObject> action)
         {
             ForEach(_despawnedPoolables, action);
         }
@@ -882,10 +877,7 @@ namespace Lazy.Pool.GameObject
             count--;
         }
 
-        private static void ForEach(
-            PoolList<GameObjectPoolable> list,
-            Action<UnityEngine.GameObject> action
-        )
+        private static void ForEach(PoolList<GameObjectPoolable> list, Action<GameObject> action)
         {
             if (action == null)
                 return;
@@ -998,7 +990,7 @@ namespace Lazy.Pool.GameObject
                     prefab = _cachedPrefab;
         }
 
-        private bool CheckForPrefab(UnityEngine.GameObject gameObjectToCheck)
+        private bool CheckForPrefab(GameObject gameObjectToCheck)
         {
             if (gameObjectToCheck == null)
                 return false;
@@ -1067,7 +1059,7 @@ namespace Lazy.Pool.GameObject
 
         private void PreloadGameObject()
         {
-            var obj = PrefabUtility.InstantiatePrefab(prefab, transform) as UnityEngine.GameObject;
+            var obj = PrefabUtility.InstantiatePrefab(prefab, transform) as GameObject;
             if (obj == null)
                 return;
             obj.SetVisible(false);

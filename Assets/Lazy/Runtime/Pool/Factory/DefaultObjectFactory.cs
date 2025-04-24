@@ -1,4 +1,4 @@
-namespace Lazy.Pool.Factory
+namespace Lazy
 {
     public class DefaultObjectFactory<T> : IObjectFactory<T>
         where T : new()

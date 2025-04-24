@@ -1,8 +1,7 @@
-﻿using Lazy.Manage;
-using Lazy.Singleton;
+﻿using Lazy.Singleton;
 using UnityEngine;
 
-namespace Lazy.Platform
+namespace Lazy
 {
     public class PlatformManager : Singleton<PlatformManager>, IManager
     {

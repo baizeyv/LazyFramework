@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Manage;
+using Lazy;
 using Lazy.Serializer;
 using Lazy.Singleton;
 using UnityEngine;

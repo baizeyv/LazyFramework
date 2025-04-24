@@ -1,6 +1,6 @@
 using System;
 
-namespace Lazy.Pool.Factory
+namespace Lazy
 {
     public class CustomObjectFactory<T> : IObjectFactory<T>
     {

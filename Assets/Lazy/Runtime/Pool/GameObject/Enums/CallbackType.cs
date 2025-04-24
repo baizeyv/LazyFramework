@@ -1,4 +1,4 @@
-﻿namespace Lazy.Pool.GameObject.Enums
+﻿namespace Lazy
 {
     public enum CallbackType
     {

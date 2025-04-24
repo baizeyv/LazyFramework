@@ -1,4 +1,4 @@
-﻿namespace Lazy.Pool.GameObject
+﻿namespace Lazy
 {
     /// <summary>
     /// * 放回池中的请求

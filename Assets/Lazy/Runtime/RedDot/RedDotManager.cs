@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Lazy.Manage;
+using Lazy;
 using Lazy.Singleton;
 
 namespace Lazy.RedDot

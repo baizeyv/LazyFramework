@@ -1,6 +1,6 @@
 using Lazy.Singleton;
 
-namespace Lazy.Manage
+namespace Lazy
 {
     public interface IManager
     {

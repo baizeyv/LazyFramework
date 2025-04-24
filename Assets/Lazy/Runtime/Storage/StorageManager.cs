@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Lazy;
-using Lazy.Manage;
 using Lazy.Singleton;
 
 namespace Lazy.Serializer

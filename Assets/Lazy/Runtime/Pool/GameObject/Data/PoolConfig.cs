@@ -1,8 +1,9 @@
 ﻿using System;
-using Lazy.Pool.GameObject.Enums;
+using Lazy;
+using Lazy.Pool;
 using UnityEngine;
 
-namespace Lazy.Pool.GameObject.Data
+namespace Lazy
 {
     /// <summary>
     /// * 一个GameObjectPool的配置
@@ -23,7 +24,7 @@ namespace Lazy.Pool.GameObject.Data
 
         [Tooltip("预制体")]
         [SerializeField]
-        private UnityEngine.GameObject prefab;
+        private GameObject prefab;
 
         [Tooltip(PoolConstant.CapacityReachedBehaviourDesc)]
         [SerializeField]
@@ -57,7 +58,7 @@ namespace Lazy.Pool.GameObject.Data
         private bool warning = true;
 
         public bool Enabled => enabled;
-        public UnityEngine.GameObject Prefab => prefab;
+        public GameObject Prefab => prefab;
         public CapacityReachedBehaviour CapacityReachedBehaviour => capacityReachedBehaviour;
         public DespawnType DespawnType => despawnType;
         public CallbackType CallbackType => callbackType;

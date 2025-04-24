@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lazy.Manage;
+using Lazy;
 using Lazy.Res.Loader;
 using Lazy.Singleton;
 using UnityEngine;

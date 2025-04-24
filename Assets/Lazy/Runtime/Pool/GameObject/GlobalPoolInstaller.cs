@@ -1,11 +1,10 @@
 ﻿using System;
-using Lazy.Manage;
-using Lazy.Pool.GameObject.Data;
-using Lazy.Pool.GameObject.Enums;
+using Lazy;
+using Lazy.Pool;
 using Lazy.Singleton;
 using UnityEngine;
 
-namespace Lazy.Pool.GameObject
+namespace Lazy
 {
     /// <summary>
     /// * 全局的GameObjectPool, 对于没有预设的池子,使用这个池子的参数

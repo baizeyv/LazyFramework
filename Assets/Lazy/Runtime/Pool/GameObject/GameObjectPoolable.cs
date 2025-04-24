@@ -1,7 +1,7 @@
-﻿using Lazy.Pool.GameObject.Enums;
+﻿using Lazy;
 using UnityEngine;
 
-namespace Lazy.Pool.GameObject
+namespace Lazy
 {
     /// <summary>
     /// * 可池化的GameObject对象
@@ -21,7 +21,7 @@ namespace Lazy.Pool.GameObject
         /// <summary>
         /// * instantiated game object
         /// </summary>
-        internal UnityEngine.GameObject GameObject;
+        internal GameObject GameObject;
 
         internal PoolableStatus Status;
 

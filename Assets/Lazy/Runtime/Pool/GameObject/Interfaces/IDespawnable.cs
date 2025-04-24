@@ -1,4 +1,4 @@
-﻿namespace Lazy.Pool.GameObject
+﻿namespace Lazy
 {
     public interface IDespawnable
     {

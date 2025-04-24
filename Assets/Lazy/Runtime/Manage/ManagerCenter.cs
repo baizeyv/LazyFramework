@@ -6,7 +6,7 @@ using Lazy.Singleton;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Manage
+namespace Lazy
 {
     public static class ManagerCenter
     {

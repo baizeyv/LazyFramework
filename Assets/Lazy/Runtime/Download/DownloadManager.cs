@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Lazy.Manage;
 using Lazy.Runtime.Utility;
 using Lazy.Singleton;
 using Lazy;

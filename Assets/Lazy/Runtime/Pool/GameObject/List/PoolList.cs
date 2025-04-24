@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Lazy.Pool.GameObject
+namespace Lazy
 {
     internal sealed class PoolList<T>
     {

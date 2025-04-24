@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Lazy.Pool.GameObject.Data
+namespace Lazy
 {
     public sealed class PoolsConfig : ScriptableObject
     {

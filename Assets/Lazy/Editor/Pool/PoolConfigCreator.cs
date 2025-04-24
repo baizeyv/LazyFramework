@@ -1,4 +1,4 @@
-﻿using Lazy.Pool.GameObject.Data;
+﻿using Lazy;
 using UnityEditor;
 using UnityEngine;
 

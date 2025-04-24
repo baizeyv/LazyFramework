@@ -1,5 +1,4 @@
-﻿using Lazy.Manage;
-using Lazy.Pool.GameObject;
+﻿using Lazy;
 using Lazy.Ref;
 using Lazy.Singleton;
 

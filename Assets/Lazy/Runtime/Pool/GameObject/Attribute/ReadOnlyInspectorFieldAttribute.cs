@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Lazy.Pool.Attribute
+namespace Lazy
 {
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class ReadOnlyInspectorFieldAttribute : PropertyAttribute { }

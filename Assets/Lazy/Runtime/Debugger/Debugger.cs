@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lazy;
 using Lazy.Debugger.Misc;
 using Lazy.Debugger.Module;
-using Lazy.Manage;
 using Lazy.Runtime.Utility;
 using Lazy.Singleton;
 using UnityEngine;
@@ -95,7 +95,7 @@ namespace Lazy.Debugger
         public void AddWindow(string windowName, IDebuggerWindow window)
         {
             var id = _windows.Values.Count;
-            _windows.Add(id, new WindowWrapper() { WindowName = windowName, Window = window });
+            _windows.Add(id, new WindowWrapper { WindowName = windowName, Window = window });
         }
 
         /// <summary>
@@ -123,17 +123,14 @@ namespace Lazy.Debugger
             consoleWindow.Initialize();
             _textEditor = new TextEditor();
 
-            _windows.Add(0, new WindowWrapper() { WindowName = "Console", Window = consoleWindow });
+            _windows.Add(0, new WindowWrapper { WindowName = "Console", Window = consoleWindow });
             _windows.Add(
                 1,
-                new WindowWrapper() { WindowName = "Environment", Window = environmentWindow }
+                new WindowWrapper { WindowName = "Environment", Window = environmentWindow }
             );
-            _windows.Add(2, new WindowWrapper() { WindowName = "System", Window = systemWindow });
-            _windows.Add(3, new WindowWrapper() { WindowName = "Screen", Window = screenWindow });
-            _windows.Add(
-                4,
-                new WindowWrapper() { WindowName = "Profiler", Window = profilerWindow }
-            );
+            _windows.Add(2, new WindowWrapper { WindowName = "System", Window = systemWindow });
+            _windows.Add(3, new WindowWrapper { WindowName = "Screen", Window = screenWindow });
+            _windows.Add(4, new WindowWrapper { WindowName = "Profiler", Window = profilerWindow });
         }
 
         public void OnUpdate()

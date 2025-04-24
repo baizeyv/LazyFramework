@@ -28,7 +28,7 @@ namespace Lazy
         private LoopType m_LoopType = LoopType.Restart;
 
         [SerializeField]
-        private UpdateType m_UpdateType = UpdateType.Normal;
+        private DG.Tweening.UpdateType m_UpdateType = DG.Tweening.UpdateType.Normal;
 
         [SerializeField]
         private bool m_IgnoreTimeScale = false;
@@ -394,7 +394,7 @@ namespace Lazy
 
             public float Delay = 0;
 
-            public UpdateType UpdateType = UpdateType.Normal;
+            public DG.Tweening.UpdateType UpdateType = DG.Tweening.UpdateType.Normal;
 
             public bool CustomEase = false;
 

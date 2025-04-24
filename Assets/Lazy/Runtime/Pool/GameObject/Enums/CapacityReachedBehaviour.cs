@@ -1,4 +1,4 @@
-﻿namespace Lazy.Pool.GameObject.Enums
+﻿namespace Lazy
 {
     /// <summary>
     /// * 容量到达极限的行为

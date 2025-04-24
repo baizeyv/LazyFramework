@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Lazy;
-using Lazy.Manage;
 using Lazy.Res.HotUpdate;
 using Lazy.Runtime.Utility;
 using Lazy.Singleton;

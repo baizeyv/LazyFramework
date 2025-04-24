@@ -1,4 +1,4 @@
-﻿using Lazy.Pool.Attribute;
+﻿using Lazy;
 using UnityEditor;
 using UnityEngine;
 

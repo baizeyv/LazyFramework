@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Lazy;
-using Lazy.Manage;
-using Lazy.Platform;
 using Lazy.Pool;
 using Lazy.RedDot;
 using Lazy.Res;

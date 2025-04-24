@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Lazy;
-using Lazy.Manage;
 using Lazy.Runtime.Utility.Coroutine;
 
 namespace Lazy.Runtime.Utility

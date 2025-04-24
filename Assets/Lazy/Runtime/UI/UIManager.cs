@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Manage;
 using Lazy.Res;
 using Lazy.Runtime.Utility;
 using Lazy.Singleton;
