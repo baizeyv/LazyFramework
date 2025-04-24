@@ -2,10 +2,7 @@
 
 namespace Lazy
 {
-    /// <summary>
-    /// ! Top-Center
-    /// </summary>
-    public class TopExpandSafeArea : MonoBehaviour
+    public class LeftExpandSafeArea : MonoBehaviour
     {
         private RectTransform _rectTransform;
 
@@ -16,12 +13,12 @@ namespace Lazy
 
         private void OnEnable()
         {
-            SafeAreaManager.Instance.SubscribeTopExpand(_rectTransform);
+            SafeAreaManager.Instance.SubscribeLeftExpand(_rectTransform);
         }
 
         private void OnDisable()
         {
-            SafeAreaManager.Instance.UnsubscribeTopExpand(_rectTransform);
+            SafeAreaManager.Instance.UnsubscribeLeftExpand(_rectTransform);
         }
     }
 }

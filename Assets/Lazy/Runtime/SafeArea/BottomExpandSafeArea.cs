@@ -3,7 +3,7 @@
 namespace Lazy
 {
     /// <summary>
-    /// ! Bottom-Center (Alt+Shift)
+    /// ! Bottom-Center
     /// </summary>
     public class BottomExpandSafeArea : MonoBehaviour
     {
