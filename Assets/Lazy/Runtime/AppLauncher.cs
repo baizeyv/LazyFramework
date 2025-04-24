@@ -43,6 +43,7 @@ namespace Lazy
             App.Pool = ManagerCenter.Create(() => PoolManager.Instance);
             App.Audio = ManagerCenter.CreateMono(() => AudioManager.Instance);
             App.UI = ManagerCenter.CreateMono(() => UIManager.Instance);
+            App.MonoNode = ManagerCenter.Create(() => MonoNodeManager.Instance);
             App.Fsm = ManagerCenter.Create(() => FsmManager.Instance);
             App.RedDot = ManagerCenter.Create(() => RedDotManager.Instance);
 #if UNITY_WEBGL

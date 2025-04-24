@@ -25,7 +25,6 @@ namespace Lazy
 
         private void OnCountChange(int count)
         {
-            Log.MsgI("RRRRRRRRRRRRRRRRRRRRR");
             if (count > 0)
             {
                 this.SetVisible(true);

@@ -117,6 +117,14 @@
             set => _redDotManager ??= value;
         }
 
+        private static MonoNodeManager _monoNode;
+
+        public static MonoNodeManager MonoNode
+        {
+            get { return _monoNode ??= ManagerCenter.Create(() => MonoNodeManager.Instance); }
+            set => _monoNode ??= value;
+        }
+
         private static Debugger _debugger;
 
         public static Debugger Debugger
