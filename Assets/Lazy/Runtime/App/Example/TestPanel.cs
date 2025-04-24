@@ -1,4 +1,4 @@
-using Lazy.Rx;
+using Lazy;
 using UnityEngine;
 
 namespace Lazy

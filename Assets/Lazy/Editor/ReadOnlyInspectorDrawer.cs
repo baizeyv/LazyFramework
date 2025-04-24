@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.Pool
+namespace LazyEditor
 {
     [CustomPropertyDrawer(typeof(ReadOnlyInspectorFieldAttribute))]
     public sealed class ReadOnlyInspectorDrawer : PropertyDrawer

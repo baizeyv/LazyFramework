@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lazy.Res.Loader
+namespace Lazy
 {
     public class EditorLoader : ABSLoader
     {

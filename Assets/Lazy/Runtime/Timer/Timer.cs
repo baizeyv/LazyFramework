@@ -1,6 +1,7 @@
 ﻿using System;
+using Lazy;
 
-namespace Lazy.Timer
+namespace Lazy
 {
     public class Timer
     {

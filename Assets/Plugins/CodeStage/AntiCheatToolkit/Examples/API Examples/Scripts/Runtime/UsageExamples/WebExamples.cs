@@ -4,14 +4,11 @@
 // ------------------------------------------------------
 #endregion
 
-using UnityEngine;
 using CodeStage.AntiCheat.Genuine.Android;
 using CodeStage.AntiCheat.Utils;
+using UnityEngine;
 
 namespace CodeStage.AntiCheat.Examples
 {
-	internal partial class WebExamples : MonoBehaviour
-	{
-		
-	}
+    internal partial class WebExamples : MonoBehaviour { }
 }

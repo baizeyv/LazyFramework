@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Lazy;
+using LazyEditor;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.ExcelImporter
+namespace LazyEditor
 {
     public class ExcelConvert
     {
@@ -89,7 +91,7 @@ namespace Lazy.Editor.ExcelImporter
 
             foreach (var sheetName in sheetNames)
             {
-                Log.Log.MsgD($"{sheetName} ->name");
+                Log.MsgD($"{sheetName} ->name");
                 var fieldString = string.Copy(fieldStringTemplate);
                 fieldString = fieldString.Replace("#FIELDNAME#", sheetName);
                 fieldString += "\n#ENTITYFIELDS#";

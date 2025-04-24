@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace Lazy.Editor.RedDotEditor
+namespace LazyEditor
 {
     public class RedDotTreeViewWindow : EditorWindow
     {

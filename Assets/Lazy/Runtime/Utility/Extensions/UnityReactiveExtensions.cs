@@ -1,5 +1,5 @@
 ﻿using System;
-using Lazy.Rx;
+using Lazy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

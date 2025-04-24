@@ -1,6 +1,7 @@
 using System;
+using Lazy;
 
-namespace Lazy.Rx.Operator
+namespace Lazy
 {
     /// <summary>
     /// * 筛选过滤器

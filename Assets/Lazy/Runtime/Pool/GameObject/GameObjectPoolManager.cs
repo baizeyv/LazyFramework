@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Event;
-using Lazy.Pool;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Lazy
 {
-    public class GameObjectPoolManager : Singleton.Singleton<GameObjectPoolManager>, IManager
+    public class GameObjectPoolManager : Singleton<GameObjectPoolManager>, IManager
     {
         internal GlobalPoolInstaller installer = null;
 
@@ -98,7 +96,7 @@ namespace Lazy
 #if DEBUG
                 if (prefab == null)
                 {
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         $"名称为{nameof(PoolsConfig)}的'{config}'预设中有一个或多个空的预制体!",
                         config
                     );
@@ -126,7 +124,7 @@ namespace Lazy
                     if (cfg.DontDestroyOnLoad && pool.HasRegisteredAsPersistent)
                         continue;
 #if DEBUG
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         $"您正在尝试通过{nameof(PoolsConfig)} '{config}'安装的池 '{pool}' 已经存在!",
                         pool
                     );
@@ -242,7 +240,7 @@ namespace Lazy
             else
             {
 #if DEBUG
-                Log.Log.MsgD(
+                Log.MsgD(
                     $"可池化对象 '{poolable.GameObject}' 尚未设置并将被销毁！",
                     poolable.GameObject
                 );
@@ -268,7 +266,7 @@ namespace Lazy
                 else
                 {
                     if (pool.sendWarnings)
-                        Log.Log.MsgD($"您正在尝试注册持久池 '{pool.name}' 两次！", pool);
+                        Log.MsgD($"您正在尝试注册持久池 '{pool.name}' 两次！", pool);
                 }
 #endif
             }
@@ -280,7 +278,7 @@ namespace Lazy
                 _allPoolsMap.Add(pool.prefab, pool);
 #if DEBUG
             else
-                Log.Log.MsgE(
+                Log.MsgE(
                     $"您正在尝试注册另一个使用相同预制体 '{pool.prefab}' 的池 '{pool.name}'!",
                     pool
                 );
@@ -357,7 +355,7 @@ namespace Lazy
                     {
                         CreateInstallerInstance();
 #if DEBUG
-                        Log.Log.MsgD(
+                        Log.MsgD(
                             $"<{nameof(GlobalPoolInstaller)}> 实例已自动创建。也可以手动添加以修改默认参数。"
                         );
 #endif
@@ -395,7 +393,7 @@ namespace Lazy
                 {
                     for (var i = 1; i < length; i++)
                         Object.Destroy(ins[i]);
-                    Log.Log.MsgE($"场景中 {nameof(GlobalPoolInstaller)} 实例的数量大于一个！");
+                    Log.MsgE($"场景中 {nameof(GlobalPoolInstaller)} 实例的数量大于一个！");
                 }
 #endif
                 installer = ins[0];
@@ -412,7 +410,7 @@ namespace Lazy
             {
 #if UNITY_EDITOR
                 if (UnityEditor.EditorSettings.enterPlayModeOptionsEnabled && installer == null)
-                    Log.Log.MsgE($"<{nameof(GlobalPoolInstaller)}> 实例为空！");
+                    Log.MsgE($"<{nameof(GlobalPoolInstaller)}> 实例为空！");
 #endif
                 return false;
             }
@@ -421,7 +419,7 @@ namespace Lazy
             {
 #if DEBUG
                 if (!Application.isPlaying)
-                    Log.Log.MsgE("在应用程序未运行时，您正在尝试执行生成或取消生成操作！");
+                    Log.MsgE("在应用程序未运行时，您正在尝试执行生成或取消生成操作！");
 #endif
                 InitializePool();
             }
@@ -522,7 +520,7 @@ namespace Lazy
 #if DEBUG
             if (poolable.Pool._cachedTransform.lossyScale != Vector3.one)
             {
-                Log.Log.MsgE(
+                Log.MsgE(
                     $"池及其父物体在 F8 池 '{nameof(PoolMode.Performance)}' 模式下必须具有相同的缩放，即 'Vector3.one'！",
                     poolable.Pool
                 );
@@ -543,7 +541,7 @@ namespace Lazy
             if (!CanFirePoolAction())
             {
 #if DEBUG
-                Log.Log.MsgE($"在应用程序退出时，您正在尝试生成预制体 '{prefab}'！", prefab);
+                Log.MsgE($"在应用程序退出时，您正在尝试生成预制体 '{prefab}'！", prefab);
 #endif
                 haveToGetComponent = false;
                 return null;
@@ -559,7 +557,7 @@ namespace Lazy
 #if DEBUG
             if (checkClonesForNull)
                 if (arguments.Poolable.GameObject == null)
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         $"您正在尝试生成一个已经在没有 {nameof(GameObjectPoolManager)} 的情况下被销毁的克隆！预制体: '{prefab}'",
                         pool
                     );
@@ -600,7 +598,7 @@ namespace Lazy
             if (!CanFirePoolAction())
             {
 #if DEBUG
-                Log.Log.MsgE($"在应用程序退出时，您正在尝试取消生成 '{gameObject}'！", gameObject);
+                Log.MsgE($"在应用程序退出时，您正在尝试取消生成 '{gameObject}'！", gameObject);
 #endif
                 return;
             }
@@ -611,7 +609,7 @@ namespace Lazy
                 {
 #if DEBUG
                     if (poolable.Pool.sendWarnings)
-                        Log.Log.MsgD("您要取消生成的游戏对象已经被取消生成！", gameObject);
+                        Log.MsgD("您要取消生成的游戏对象已经被取消生成！", gameObject);
 #endif
                     return;
                 }
@@ -624,7 +622,7 @@ namespace Lazy
             else
             {
 #if DEBUG
-                Log.Log.MsgD(
+                Log.MsgD(
                     $"'{gameObject}' 未使用 {nameof(GameObjectPoolManager)}（或池已销毁）生成，并将被销毁！",
                     gameObject
                 );
@@ -659,10 +657,7 @@ namespace Lazy
                         case ReactionOnRepeatedDelayedDespawn.ThrowException:
 #if DEBUG
                             if (HasDespawnRequest(poolable, out _))
-                                Log.Log.MsgE(
-                                    "延迟取消生成请求已经存在于该克隆！",
-                                    poolable.GameObject
-                                );
+                                Log.MsgE("延迟取消生成请求已经存在于该克隆！", poolable.GameObject);
 #endif
                             break;
                     }
@@ -741,17 +736,14 @@ namespace Lazy
 #if DEBUG
                 else
                 {
-                    Log.Log.MsgE($"克隆 '{clone}' 尚未设置！", clone);
+                    Log.MsgE($"克隆 '{clone}' 尚未设置！", clone);
                 }
 #endif
             }
             else
             {
 #if DEBUG
-                Log.Log.MsgD(
-                    $"克隆 '{clone}' 并非由 {nameof(GameObjectPoolManager)} 生成！",
-                    clone
-                );
+                Log.MsgD($"克隆 '{clone}' 并非由 {nameof(GameObjectPoolManager)} 生成！", clone);
 #endif
                 Object.Destroy(clone);
             }
@@ -769,7 +761,7 @@ namespace Lazy
             var pool = GetPoolByPrefabName(prefabName);
             if (!pool)
             {
-                Log.Log.MsgE("对象池未创建，通过名称生成对象失败。");
+                Log.MsgE("对象池未创建，通过名称生成对象失败。");
                 return null;
             }
 
@@ -969,7 +961,7 @@ namespace Lazy
                 var poolKey in _allPoolsMap.Keys.Where(poolKey => poolKey.name.Equals(prefabName))
             )
                 return _allPoolsMap[poolKey];
-            Log.Log.MsgE($"未通过预制体名称 '{prefabName}' 找到池!");
+            Log.MsgE($"未通过预制体名称 '{prefabName}' 找到池!");
             return null;
         }
 
@@ -1017,7 +1009,7 @@ namespace Lazy
             var hasPool = TryGetPoolByClone(clone, out var pool);
 #if DEBUG
             if (!hasPool)
-                Log.Log.MsgE($"克隆 '{clone}' 未找到对应的池!", clone);
+                Log.MsgE($"克隆 '{clone}' 未找到对应的池!", clone);
 #endif
             return pool;
         }
@@ -1032,7 +1024,7 @@ namespace Lazy
             var hasPool = TryGetPoolByPrefab(prefab, out var pool);
 #if DEBUG
             if (!hasPool)
-                Log.Log.MsgE($"未通过预制体 '{prefab}' 找到池!", prefab);
+                Log.MsgE($"未通过预制体 '{prefab}' 找到池!", prefab);
 #endif
             return pool;
         }
@@ -1062,7 +1054,7 @@ namespace Lazy
             if (ClonesMap.TryGetValue(clone.gameObject, out var poolable))
                 return poolable.Status;
 #if DEBUG
-            Log.Log.MsgE($"克隆 '{clone}' 不是可池化的!", clone);
+            Log.MsgE($"克隆 '{clone}' 不是可池化的!", clone);
 #endif
             return default;
         }
@@ -1117,7 +1109,7 @@ namespace Lazy
             if (!CanFirePoolAction())
             {
 #if DEBUG
-                Log.Log.MsgE("在应用程序退出时，您正在尝试销毁所有池！");
+                Log.MsgE("在应用程序退出时，您正在尝试销毁所有池！");
 #endif
                 return;
             }

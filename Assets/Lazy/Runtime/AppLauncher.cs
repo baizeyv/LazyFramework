@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Lazy;
-using Lazy.Pool;
-using Lazy.RedDot;
-using Lazy.Res;
-using Lazy.Serializer;
-using Lazy.Singleton;
-using Lazy.Timer;
-using Lazy.UI;
 
 namespace Lazy
 {
@@ -40,7 +33,7 @@ namespace Lazy
 
             // ! 这里的顺序不能改变
 #if DEBUG
-            App.Debugger = ManagerCenter.CreateMono(() => Debugger.Debugger.Instance);
+            App.Debugger = ManagerCenter.CreateMono(() => Lazy.Debugger.Instance);
 #endif
             App.Storage = ManagerCenter.Create(() => StorageManager.Instance);
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);

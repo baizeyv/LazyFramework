@@ -1,4 +1,4 @@
-﻿namespace Lazy.Res.Loader
+﻿namespace Lazy
 {
     /// <summary>
     /// * 加载器加载类型
@@ -8,6 +8,7 @@
         None,
         Sync, // # 同步加载
         Async // # 异步加载
+        ,
     }
 
     public enum AssetBundleLoaderType
@@ -16,5 +17,6 @@
         LocalSync, // # 本地同步加载
         LocalAsync, // # 本地异步加载
         RemoteAsync // # 远程异步加载
+        ,
     }
 }

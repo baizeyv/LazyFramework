@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Lazy.Editor.CrackEditor
+namespace LazyEditor
 {
     public class ByteArray
     {

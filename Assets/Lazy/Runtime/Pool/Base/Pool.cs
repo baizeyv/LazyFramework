@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Lazy;
 
-namespace Lazy.Pool
+namespace Lazy
 {
     public abstract class Pool<T> : IPool<T>
     {

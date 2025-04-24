@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Excel
+namespace Lazy
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class ExcelAssetAttribute : Attribute

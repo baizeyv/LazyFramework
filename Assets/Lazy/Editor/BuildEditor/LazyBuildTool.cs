@@ -4,17 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Lazy;
-using Lazy.Res;
-using Lazy.Res.HotUpdate;
-using Lazy.Runtime.Utility;
+using LazyEditor;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
-using HotUpdateManager = Lazy.Res.HotUpdateManager;
+using HotUpdateManager = Lazy.HotUpdateManager;
 
-namespace Lazy.Editor.Build
+namespace LazyEditor
 {
     public class LazyBuildTool : ScriptableObject
     {
@@ -167,7 +165,7 @@ namespace Lazy.Editor.Build
                     ZipUtility.Zip(paths, zipName, null, zipCallback);
 
                     FileUtility.SafeDeleteDir(packagePath);
-                    Log.Log.MsgI("分包输出目录：" + zipName + " ，手动上传至CDN资源服务器。");
+                    Log.MsgI("分包输出目录：" + zipName + " ，手动上传至CDN资源服务器。");
                 }
 
                 AssetDatabase.Refresh();
@@ -209,7 +207,7 @@ namespace Lazy.Editor.Build
                 }
 
                 if (buildReport.summary.result != BuildResult.Succeeded)
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         $"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}"
                     );
                 if (Directory.Exists(toPath))
@@ -218,7 +216,7 @@ namespace Lazy.Editor.Build
                     FileUtility.SafeDeleteDir(toPath);
                 }
 
-                Log.Log.MsgI("游戏分包打包成功! " + locationPathName);
+                Log.MsgI("游戏分包打包成功! " + locationPathName);
             }
             else
             {
@@ -257,9 +255,9 @@ namespace Lazy.Editor.Build
                     };
                     var buildReport = BuildPipeline.BuildPlayer(options);
                     if (buildReport.summary.result != BuildResult.Succeeded)
-                        Log.Log.MsgE("Build Failed!");
+                        Log.MsgE("Build Failed!");
                     else
-                        Log.Log.MsgI("全量包导出成功");
+                        Log.MsgI("全量包导出成功");
                 }
                 else
                 {
@@ -279,11 +277,11 @@ namespace Lazy.Editor.Build
                         BuildOptions.None
                     );
                     if (buildReport.summary.result != BuildResult.Succeeded)
-                        Log.Log.MsgE(
+                        Log.MsgE(
                             $"导出失败了，检查一下 Unity 内置的 Build Settings 导出的路径是否存在，Unity 没有给我清理缓存！: {buildReport.summary.result}"
                         );
 
-                    Log.Log.MsgI("游戏全量包打包成功! " + locationPathName);
+                    Log.MsgI("游戏全量包打包成功! " + locationPathName);
                 }
             }
 
@@ -382,7 +380,7 @@ namespace Lazy.Editor.Build
                 + ".json";
             if (!File.Exists(appVersionPath) || !File.Exists(assetBundleMappingPath))
             {
-                Log.Log.MsgE("请先构建一个游戏版本，再构建热更新文件！~");
+                Log.MsgE("请先构建一个游戏版本，再构建热更新文件！~");
                 return;
             }
 
@@ -452,7 +450,7 @@ namespace Lazy.Editor.Build
                 hotUpdateMapPath
             );
 
-            Log.Log.MsgD("构建热更新包版本成功！版本：" + toVersion);
+            Log.MsgD("构建热更新包版本成功！版本：" + toVersion);
             AssetDatabase.Refresh();
         }
 
@@ -693,7 +691,7 @@ namespace Lazy.Editor.Build
                 appVersionResourcesPath,
                 buildPath + HotUpdateManager.RemoteDirName + "/" + nameof(AppVersion) + ".json"
             );
-            Log.Log.MsgD($"写入游戏版本: {appVersion.Version}");
+            Log.MsgD($"写入游戏版本: {appVersion.Version}");
             AssetDatabase.Refresh();
         }
 

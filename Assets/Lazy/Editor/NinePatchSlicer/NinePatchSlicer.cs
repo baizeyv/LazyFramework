@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Editor.NinePatchSlicer
+namespace LazyEditor
 {
     public class NinePatchSlicer : UnityEditor.Editor
     {
@@ -18,7 +18,7 @@ namespace Lazy.Editor.NinePatchSlicer
         [MenuItem("Assets/Lazy/AutoNinePatchSlice", false, 1030)]
         public static void NinePatchSlice()
         {
-            _texture2DList = new();
+            _texture2DList = new List<string>();
 
             // 获取所有选中 文件、文件夹的 GUID
             var guids = Selection.assetGUIDs;
@@ -27,12 +27,8 @@ namespace Lazy.Editor.NinePatchSlicer
                 // 将 GUID 转换为 路径
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 if (AssetDatabase.LoadMainAssetAtPath(assetPath) is Texture2D)
-                {
                     if (!assetPath.Contains(".original"))
-                    {
                         _texture2DList.Add(assetPath);
-                    }
-                }
             }
 
             foreach (var target in _texture2DList)
@@ -46,15 +42,22 @@ namespace Lazy.Editor.NinePatchSlicer
                         continue;
                     }
 
-                    var fullPath = Path.Combine(Path.GetDirectoryName(Application.dataPath) ?? "", target);
+                    var fullPath = Path.Combine(
+                        Path.GetDirectoryName(Application.dataPath) ?? "",
+                        target
+                    );
                     var bytes = File.ReadAllBytes(fullPath);
 
                     if (CreateBackup)
                     {
                         var fileName = Path.GetFileNameWithoutExtension(fullPath);
                         File.WriteAllBytes(
-                            Path.Combine(Path.GetDirectoryName(fullPath) ?? "",
-                                fileName + ".original" + Path.GetExtension(fullPath)), bytes);
+                            Path.Combine(
+                                Path.GetDirectoryName(fullPath) ?? "",
+                                fileName + ".original" + Path.GetExtension(fullPath)
+                            ),
+                            bytes
+                        );
                     }
 
                     var targetTexture = new Texture2D(2, 2);
@@ -63,11 +66,16 @@ namespace Lazy.Editor.NinePatchSlicer
                     var slicedTexture = Slicer.Slice(targetTexture, Options);
                     textureImporter.textureType = TextureImporterType.Sprite;
                     textureImporter.spriteBorder = slicedTexture.Border.ToVector4();
-                    if (fullPath.EndsWith(".png")) File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToPNG());
-                    if (fullPath.EndsWith(".jpg")) File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToJPG());
-                    if (fullPath.EndsWith(".jpeg")) File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToJPG());
+                    if (fullPath.EndsWith(".png"))
+                        File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToPNG());
+                    if (fullPath.EndsWith(".jpg"))
+                        File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToJPG());
+                    if (fullPath.EndsWith(".jpeg"))
+                        File.WriteAllBytes(fullPath, slicedTexture.Texture.EncodeToJPG());
 
-                    Debug.Log($"图片九宫格切割完成！{Path.GetFileName(target)} = {textureImporter.spriteBorder}");
+                    Debug.Log(
+                        $"图片九宫格切割完成！{Path.GetFileName(target)} = {textureImporter.spriteBorder}"
+                    );
                 }
             }
 
@@ -76,8 +84,8 @@ namespace Lazy.Editor.NinePatchSlicer
             ////////////////////////
 
             // 获取所有选中的图片
-            var selectedTextures = Selection.objects
-                .Where(obj => obj is Texture2D) // 过滤出 Texture2D
+            var selectedTextures = Selection
+                .objects.Where(obj => obj is Texture2D) // 过滤出 Texture2D
                 .Cast<Texture2D>()
                 .ToList();
 
@@ -96,7 +104,7 @@ namespace Lazy.Editor.NinePatchSlicer
                 if (importer != null)
                 {
                     // 计算九宫格边界
-                    Vector4 border = CalculateNineSliceBorder(texture);
+                    var border = CalculateNineSliceBorder(texture);
 
                     // 设置九宫格边界
                     importer.spriteBorder = border;

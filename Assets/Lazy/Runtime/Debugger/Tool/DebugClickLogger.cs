@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Lazy.Debugger.Tool
+namespace Lazy
 {
     /// <summary>
     /// * 使用这个脚本可以输出当前点击的对象的名称

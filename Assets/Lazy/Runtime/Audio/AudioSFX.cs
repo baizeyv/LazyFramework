@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lazy;
-using Lazy.Res;
 using UnityEngine;
 
 namespace Lazy

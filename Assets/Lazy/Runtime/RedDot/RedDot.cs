@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Lazy.RedDot
+namespace Lazy
 {
     public class RedDot : MonoBehaviour
     {
@@ -26,7 +26,7 @@ namespace Lazy.RedDot
 
         private void OnCountChange(int count)
         {
-            Log.Log.MsgI("RRRRRRRRRRRRRRRRRRRRR");
+            Log.MsgI("RRRRRRRRRRRRRRRRRRRRR");
             if (count > 0)
             {
                 this.SetVisible(true);

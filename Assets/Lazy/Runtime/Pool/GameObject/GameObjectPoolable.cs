@@ -31,7 +31,7 @@ namespace Lazy
         {
 #if DEBUG
             if (IsSetup)
-                Log.Log.MsgE("池对象已经设置！");
+                Log.MsgE("池对象已经设置！");
 #endif
             GameObjectPoolManager.Instance.ClonesMap.Add(GameObject, this);
             Status = PoolableStatus.Despawned;
@@ -42,7 +42,7 @@ namespace Lazy
         {
 #if DEBUG
             if (IsSetup)
-                Log.Log.MsgE("池对象已经设置！");
+                Log.MsgE("池对象已经设置！");
 #endif
             GameObjectPoolManager.Instance.ClonesMap.Add(GameObject, this);
             Status = PoolableStatus.SpawnedOverCapacity;

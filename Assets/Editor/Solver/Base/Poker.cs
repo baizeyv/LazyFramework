@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lazy;
-using Lazy.Log;
 
 namespace Solver
 {

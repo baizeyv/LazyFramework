@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Lazy;
-using Lazy.Singleton;
 
-namespace Lazy.RedDot
+namespace Lazy
 {
     [ManagerUpdate]
     public class RedDotManager : Singleton<RedDotManager>, IManager
@@ -133,7 +132,7 @@ namespace Lazy.RedDot
         {
             if (string.IsNullOrEmpty(path))
             {
-                Log.Log.MsgE("路径不合法，不能为空");
+                Log.MsgE("路径不合法，不能为空");
                 return null;
             }
 
@@ -150,16 +149,14 @@ namespace Lazy.RedDot
                     // # 找到分隔符了
                     if (i == length - 1)
                     {
-                        Log.Log.MsgE("路径不合法，不能以路径分隔符结尾：" + path);
+                        Log.MsgE("路径不合法，不能以路径分隔符结尾：" + path);
                         return null;
                     }
 
                     var endIndex = i - 1;
                     if (endIndex < startIndex)
                     {
-                        Log.Log.MsgE(
-                            "路径不合法，不能存在连续的路径分隔符或以路径分隔符开头：" + path
-                        );
+                        Log.MsgE("路径不合法，不能存在连续的路径分隔符或以路径分隔符开头：" + path);
                         return null;
                     }
 

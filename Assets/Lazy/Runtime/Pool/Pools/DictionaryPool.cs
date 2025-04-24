@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Lazy.Pool
+namespace Lazy
 {
     public static class DictionaryPool<TKey, TValue>
     {
@@ -9,9 +9,7 @@ namespace Lazy.Pool
         public static Dictionary<TKey, TValue> Obtain()
         {
             if (_dictionaryStack.Count == 0)
-            {
                 return new Dictionary<TKey, TValue>(8);
-            }
 
             return _dictionaryStack.Pop();
         }

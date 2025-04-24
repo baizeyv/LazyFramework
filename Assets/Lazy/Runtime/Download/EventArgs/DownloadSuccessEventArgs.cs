@@ -1,6 +1,5 @@
 ﻿using System;
 using Lazy;
-using Lazy.Ref;
 
 namespace Lazy
 {

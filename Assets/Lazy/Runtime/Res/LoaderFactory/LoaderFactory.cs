@@ -1,7 +1,6 @@
-﻿using Lazy.Pool;
-using Lazy.Res.Loader;
+﻿using Lazy;
 
-namespace Lazy.Res
+namespace Lazy
 {
     public static class LoaderFactory
     {

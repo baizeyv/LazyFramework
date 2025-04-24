@@ -1,6 +1,6 @@
 using System;
 
-namespace Lazy.Singleton
+namespace Lazy
 {
     public abstract class Singleton<T> : ISingleton, IDisposable
         where T : Singleton<T>
@@ -9,7 +9,7 @@ namespace Lazy.Singleton
 
         private static bool _disposed;
 
-        static object _lock = new();
+        private static object _lock = new();
 
         public static T Instance
         {
@@ -29,9 +29,7 @@ namespace Lazy.Singleton
             }
         }
 
-        public virtual void OnSingletonInitialize()
-        {
-        }
+        public virtual void OnSingletonInitialize() { }
 
         public virtual void Dispose()
         {

@@ -1,6 +1,6 @@
-﻿using Lazy.Debugger.Module;
+﻿using Lazy;
 
-namespace Lazy.Debugger.Misc
+namespace Lazy
 {
     public class WindowWrapper
     {

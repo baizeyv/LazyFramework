@@ -1,9 +1,9 @@
-﻿namespace Lazy.Rx.Variables
+﻿namespace Lazy
 {
     public class IntVariable : ReactiveVariable<int>
     {
-
-        public IntVariable(int value) : base(value) { }
+        public IntVariable(int value)
+            : base(value) { }
 
         /// <summary>
         /// * 隐式转换 从 IntVariable 到 int
@@ -14,6 +14,5 @@
         {
             return v.Value;
         }
-
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     /// <summary>
     /// * 实现这个接口的类需要继承自 Observable<T>

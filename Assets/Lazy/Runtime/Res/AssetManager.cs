@@ -2,21 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Lazy;
-using Lazy.Res.Loader;
 using Newtonsoft.Json;
 using UnityEngine;
-using AssetBundleManager = Lazy.Res.Manager.AssetBundleManager;
-using EditorLoader = Lazy.Res.Loader.EditorLoader;
 using Object = UnityEngine.Object;
-using ResourcesManager = Lazy.Res.Manager.ResourcesManager;
 
-namespace Lazy.Res
+namespace Lazy
 {
     public delegate void AssetLoadedCallback<T>(T obj)
         where T : Object;
 
-    public class AssetManager : Singleton.Singleton<AssetManager>, IManager
+    public class AssetManager : Singleton<AssetManager>, IManager
     {
         /// <summary>
         /// * 强制更改资产加载模式为远程（微信小游戏使用）
@@ -1114,7 +1109,7 @@ namespace Lazy.Res
 
                 if (IsLegal(ref info))
                     return info;
-                Log.Log.MsgE("AssetBundle和Resource都找不到指定资源可用的索引：" + assetName);
+                Log.MsgE("AssetBundle和Resource都找不到指定资源可用的索引：" + assetName);
                 return new AssetInfo();
             }
             else if (accessMode.HasFlag(AssetAccessMode.RemoteAssetBundle))
@@ -1125,7 +1120,7 @@ namespace Lazy.Res
 
                 if (IsLegal(ref info))
                     return info;
-                Log.Log.MsgE("AssetBundle和Resource都找不到指定远程资源可用的索引：" + assetName);
+                Log.MsgE("AssetBundle和Resource都找不到指定远程资源可用的索引：" + assetName);
                 return new AssetInfo();
             }
 
@@ -1136,7 +1131,7 @@ namespace Lazy.Res
         {
             if (ResourceMapping.Mappings.TryGetValue(assetName, out var value))
                 return new AssetInfo(AssetType.Resource, assetName, value, null, null);
-            Log.Log.MsgE($"Resource找不到指定资源可用的索引: {assetName}");
+            Log.MsgE($"Resource找不到指定资源可用的索引: {assetName}");
             return new AssetInfo(AssetType.Resource, assetName);
         }
 
@@ -1162,7 +1157,7 @@ namespace Lazy.Res
                     );
             }
 
-            Log.Log.MsgE($"AssetBundle找不到指定资源可用的索引: {assetName}");
+            Log.MsgE($"AssetBundle找不到指定资源可用的索引: {assetName}");
             return new AssetInfo(AssetType.AssetBundle, assetName);
         }
 
@@ -1289,7 +1284,7 @@ namespace Lazy.Res
                 );
                 if (o != null)
                     return o;
-                Log.Log.MsgE("获取不到资产或者类型错误！");
+                Log.MsgE("获取不到资产或者类型错误！");
             }
 
             return null;
@@ -1345,7 +1340,7 @@ namespace Lazy.Res
                 if (o != null)
                     return o;
 
-                Log.Log.MsgE("获取不到资产或者类型错误！");
+                Log.MsgE("获取不到资产或者类型错误！");
             }
 
             return null;
@@ -1472,7 +1467,7 @@ namespace Lazy.Res
                     else if (accessMode == AssetAccessMode.LocalAssetBundle)
                         _assetBundlesFindAssetPaths[assetName] = assetPath;
 
-                    Log.Log.MsgD("GET:" + assetPath);
+                    Log.MsgD("GET:" + assetPath);
                     return assetPath;
                 }
             }

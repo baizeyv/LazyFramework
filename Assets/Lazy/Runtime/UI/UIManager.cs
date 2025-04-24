@@ -3,9 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Res;
-using Lazy.Runtime.Utility;
-using Lazy.Singleton;
 using UnityEngine;
 
 namespace Lazy
@@ -130,7 +127,7 @@ namespace Lazy
         {
             if (typeof(IDialog).IsAssignableFrom(typeof(T)))
             {
-                Log.Log.MsgE("Dialog 不支持异步打开!");
+                Log.MsgE("Dialog 不支持异步打开!");
                 return;
             }
 
@@ -175,7 +172,7 @@ namespace Lazy
             }
             else
             {
-                Log.Log.W(this).Tag(this).Msg("当前不存在界面以及弹窗,却正在尝试隐藏!").Do();
+                Log.W(this).Tag(this).Msg("当前不存在界面以及弹窗,却正在尝试隐藏!").Do();
             }
         }
 
@@ -216,7 +213,7 @@ namespace Lazy
             }
             else
             {
-                Log.Log.W(this).Tag(this).Msg("当前不存在界面以及弹窗,却正在尝试关闭!").Do();
+                Log.W(this).Tag(this).Msg("当前不存在界面以及弹窗,却正在尝试关闭!").Do();
             }
         }
 
@@ -264,7 +261,7 @@ namespace Lazy
             }
             else
             {
-                Log.Log.W(this).Tag(this).Msg("当前不存在界面以及弹窗,却正在尝试返回!").Do();
+                Log.W(this).Tag(this).Msg("当前不存在界面以及弹窗,却正在尝试返回!").Do();
             }
         }
 

@@ -1,4 +1,4 @@
-using Lazy.Singleton;
+using Lazy;
 
 namespace Lazy
 {

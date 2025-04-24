@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Lazy.Editor
+namespace LazyEditor
 {
     public static class TemplateUtility
     {

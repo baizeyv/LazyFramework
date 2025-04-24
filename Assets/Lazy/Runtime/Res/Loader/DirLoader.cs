@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Lazy;
 
-namespace Lazy.Res.Loader
+namespace Lazy
 {
     public class DirLoader : IEnumerator
     {
@@ -45,7 +45,7 @@ namespace Lazy.Res.Loader
             get
             {
                 if (LoadSuccess)
-                    Log.Log.MsgE("加载已完成，请使用GetAssetObject方法获取资产！");
+                    Log.MsgE("加载已完成，请使用GetAssetObject方法获取资产！");
 
                 return null;
             }
@@ -86,7 +86,7 @@ namespace Lazy.Res.Loader
                 }
                 catch (Exception e)
                 {
-                    Log.Log.MsgE(e.Message);
+                    Log.MsgE(e.Message);
                 }
             });
         }

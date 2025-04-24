@@ -4,13 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Lazy;
-using Lazy.Editor.Build;
-using Lazy.Res;
+using LazyEditor;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.AssetEditor
+namespace LazyEditor
 {
     public class AssetBundleBuildTool : ScriptableObject
     {

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy;
 
-namespace Lazy.RedDot
+namespace Lazy
 {
     /// <summary>
     /// * 前缀树节点
@@ -131,7 +132,7 @@ namespace Lazy.RedDot
         {
             if (_children != null && _children.Count != 0)
             {
-                Log.Log.MsgE("不允许直接改变非叶子节点的值：" + FullPath);
+                Log.MsgE("不允许直接改变非叶子节点的值：" + FullPath);
                 return;
             }
 
@@ -197,7 +198,7 @@ namespace Lazy.RedDot
             }
             else if (_children.ContainsKey(key))
             {
-                Log.Log.MsgE("子节点添加失败，不允许重复添加：" + FullPath);
+                Log.MsgE("子节点添加失败，不允许重复添加：" + FullPath);
                 return _children[key];
             }
 

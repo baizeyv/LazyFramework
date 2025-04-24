@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lazy;
-using Lazy.Serializer;
-using Lazy.Singleton;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -98,7 +96,7 @@ namespace Lazy
         {
             if (_channels.ContainsKey(channelName))
             {
-                Log.Log.MsgE($"已存在通道:{channelName}");
+                Log.MsgE($"已存在通道:{channelName}");
                 return;
             }
 

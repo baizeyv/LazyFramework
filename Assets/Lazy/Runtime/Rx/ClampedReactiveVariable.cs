@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public sealed class ClampedReactiveVariable<T> : ReactiveVariable<T>
         where T : IComparable<T>

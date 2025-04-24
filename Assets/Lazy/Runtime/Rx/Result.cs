@@ -1,12 +1,15 @@
 using System;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public readonly struct Result
     {
         public static Result Success => default;
 
-        public static Result Failure(Exception exception) => new(exception);
+        public static Result Failure(Exception exception)
+        {
+            return new Result(exception);
+        }
 
         public Exception Exception { get; }
 
@@ -24,13 +27,9 @@ namespace Lazy.Rx
         public override string ToString()
         {
             if (IsSuccess)
-            {
                 return $"Success";
-            }
             else
-            {
                 return $"Failure{{{Exception.Message}}}";
-            }
         }
     }
 }

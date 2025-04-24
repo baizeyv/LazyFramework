@@ -44,7 +44,7 @@ namespace Lazy
             }
 
             sb.Append("]");
-            Log.Log.MsgD(sb.ToString());
+            Log.MsgD(sb.ToString());
         }
     }
 }

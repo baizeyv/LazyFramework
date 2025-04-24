@@ -2,13 +2,14 @@
 using System.IO;
 using System.Linq;
 using Lazy;
+using LazyEditor;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     [CustomEditor(typeof(ViewPresenter), true)]
     public class ViewPresenterInspector : UnityEditor.Editor
@@ -19,7 +20,7 @@ namespace Lazy.Editor.UIEditor
             var gameObject = Selection.objects.First() as GameObject;
             if (!gameObject)
             {
-                Log.Log.MsgE("需要选择GameObject");
+                Log.MsgE("需要选择GameObject");
                 return;
             }
 
@@ -195,13 +196,13 @@ namespace Lazy.Editor.UIEditor
                     EditorGUILayout.LabelField(string.Empty);
                     if (
                         (
-                            UnityEngine.Event.current.type == EventType.DragUpdated
-                            || UnityEngine.Event.current.type == EventType.DragPerform
-                        ) && pathRect.Contains(UnityEngine.Event.current.mousePosition)
+                            Event.current.type == EventType.DragUpdated
+                            || Event.current.type == EventType.DragPerform
+                        ) && pathRect.Contains(Event.current.mousePosition)
                     )
                     {
                         DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
-                        if (UnityEngine.Event.current.type == EventType.DragPerform)
+                        if (Event.current.type == EventType.DragPerform)
                             if (DragAndDrop.paths != null && DragAndDrop.paths.Length > 0)
                             {
                                 var newPath = DragAndDrop.paths[0];
@@ -211,7 +212,7 @@ namespace Lazy.Editor.UIEditor
                                 EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
                             }
 
-                        UnityEngine.Event.current.Use();
+                        Event.current.Use();
                     }
                 }
                 GUILayout.EndVertical();
@@ -245,8 +246,8 @@ namespace Lazy.Editor.UIEditor
                         GUI.Box(dragRect, string.Empty);
                         EditorGUILayout.LabelField(string.Empty);
                         if (
-                            UnityEngine.Event.current.type == EventType.DragUpdated
-                            && dragRect.Contains(UnityEngine.Event.current.mousePosition)
+                            Event.current.type == EventType.DragUpdated
+                            && dragRect.Contains(Event.current.mousePosition)
                         )
                         {
                             DragAndDrop.visualMode = DragAndDropVisualMode.Generic;

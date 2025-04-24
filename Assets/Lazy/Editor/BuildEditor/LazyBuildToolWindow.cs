@@ -4,14 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Lazy;
-using Lazy.Editor.AssetEditor;
+using LazyEditor;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditorInternal;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Lazy.Editor.Build
+namespace LazyEditor
 {
     public class LazyBuildToolWindow : EditorWindow
     {
@@ -456,7 +456,7 @@ namespace Lazy.Editor.Build
             }
             else
             {
-                Log.Log.MsgE($"Could not find BuildTargetGroup for BuildTarget {target}");
+                Log.MsgE($"Could not find BuildTargetGroup for BuildTarget {target}");
                 return default;
             }
         }

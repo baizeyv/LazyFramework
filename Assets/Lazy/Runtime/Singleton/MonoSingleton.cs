@@ -1,11 +1,11 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Lazy.Singleton
+namespace Lazy
 {
-    public class MonoSingleton<T> : MonoBehaviour, ISingleton, IDisposable where T : MonoSingleton<T>
+    public class MonoSingleton<T> : MonoBehaviour, ISingleton, IDisposable
+        where T : MonoSingleton<T>
     {
-
         protected static T _instance;
 
         private static bool _applicationIsQuitting;
@@ -17,17 +17,13 @@ namespace Lazy.Singleton
                 if (_applicationIsQuitting)
                     return null;
                 if (_instance == null)
-                {
                     _instance = SingletonCreator.CreateMonoSingleton<T>();
-                }
 
                 return _instance;
             }
         }
 
-        public virtual void OnSingletonInitialize()
-        {
-        }
+        public virtual void OnSingletonInitialize() { }
 
         public virtual void Dispose()
         {

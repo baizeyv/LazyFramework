@@ -1,4 +1,4 @@
-namespace Lazy.Pool
+namespace Lazy
 {
     public interface IPool<T>
     {

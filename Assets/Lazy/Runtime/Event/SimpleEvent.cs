@@ -1,12 +1,10 @@
 using System;
 using System.Threading;
-using Lazy.Rx;
+using Lazy;
 
-namespace Lazy.Event
+namespace Lazy
 {
-    public interface ISimpleEvent : IDisposable
-    {
-    }
+    public interface ISimpleEvent : IDisposable { }
 
     public class SimpleEvent<T> : Observable<T>, ISubject<T>, ISimpleEvent
     {
@@ -34,7 +32,7 @@ namespace Lazy.Event
 
         private Exception error;
 
-        internal ObserverNode<T> root;
+        internal SimpleObserverNode<T> root;
 
         private T value;
 
@@ -60,9 +58,7 @@ namespace Lazy.Event
         public bool IsCompletedOrDisposed => IsCompleted || IsDisposed;
 
         public SimpleEvent()
-            : this(default)
-        {
-        }
+            : this(default) { }
 
         public SimpleEvent(T value)
         {
@@ -86,21 +82,15 @@ namespace Lazy.Event
             {
                 ThrowIfDisposed();
                 if (IsCompleted)
-                {
-                    completedResult = (error == null) ? Result.Success : Result.Failure(error);
-                }
+                    completedResult = error == null ? Result.Success : Result.Failure(error);
                 else
-                {
                     completedResult = null;
-                }
             }
 
             if (completedResult != null)
             {
                 if (completedResult.Value.IsSuccess)
-                {
                     observer.OnNext(value);
-                }
 
                 observer.OnCompleted(completedResult.Value);
                 return Disposable.Empty;
@@ -114,16 +104,14 @@ namespace Lazy.Event
                 ThrowIfDisposed();
                 if (IsCompleted)
                 {
-                    completedResult = (error == null) ? Result.Success : Result.Failure(error);
+                    completedResult = error == null ? Result.Success : Result.Failure(error);
                     if (completedResult != null)
-                    {
                         observer.OnCompleted(completedResult.Value);
-                    }
 
                     return Disposable.Empty;
                 }
 
-                var subscription = new ObserverNode<T>(this, observer);
+                var subscription = new SimpleObserverNode<T>(this, observer);
                 return subscription;
             }
         }
@@ -168,7 +156,7 @@ namespace Lazy.Event
             if (IsCompleted)
                 return;
 
-            ObserverNode<T> node = null;
+            SimpleObserverNode<T> node = null;
             lock (this)
             {
                 if (completeState == NotCompleted)
@@ -197,16 +185,14 @@ namespace Lazy.Event
 
         public void Dispose(bool callOnCompleted)
         {
-            ObserverNode<T> node = null;
+            SimpleObserverNode<T> node = null;
             lock (this)
             {
                 if (completeState == Disposed)
                     return;
 
                 if (callOnCompleted && !IsCompleted)
-                {
                     node = Volatile.Read(ref root);
-                }
 
                 Volatile.Write(ref root, null);
                 completeState = Disposed;
@@ -219,7 +205,7 @@ namespace Lazy.Event
             }
         }
 
-        void ThrowIfDisposed()
+        private void ThrowIfDisposed()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException("");
@@ -231,24 +217,22 @@ namespace Lazy.Event
         }
     }
 
-    public sealed class SimpleEvent : SimpleEvent<Unit>
-    {
-    }
+    public sealed class SimpleEvent : SimpleEvent<Unit> { }
 
-    sealed class ObserverNode<T> : IDisposable
+    internal sealed class SimpleObserverNode<T> : IDisposable
     {
         public readonly Observer<T> Observer;
 
         private SimpleEvent<T> parent;
 
-        public ObserverNode<T> Previous { get; set; }
+        public SimpleObserverNode<T> Previous { get; set; }
 
-        public ObserverNode<T> Next { get; set; }
+        public SimpleObserverNode<T> Next { get; set; }
 
-        public ObserverNode(SimpleEvent<T> parent, Observer<T> observer)
+        public SimpleObserverNode(SimpleEvent<T> parent, Observer<T> observer)
         {
             this.parent = parent;
-            this.Observer = observer;
+            Observer = observer;
 
             if (parent.root == null)
             {
@@ -259,7 +243,7 @@ namespace Lazy.Event
                 var lastNode = parent.root.Previous ?? parent.root;
 
                 lastNode.Next = this;
-                this.Previous = lastNode;
+                Previous = lastNode;
                 parent.root.Previous = this;
             }
         }
@@ -279,7 +263,7 @@ namespace Lazy.Event
 
                 if (this == p.root)
                 {
-                    if (this.Previous == null || this.Next == null)
+                    if (Previous == null || Next == null)
                     {
                         // case of single list
                         p.root = null;
@@ -287,17 +271,13 @@ namespace Lazy.Event
                     else
                     {
                         // otherwise, root is next node.
-                        var root = this.Next;
+                        var root = Next;
 
                         // single list.
                         if (root.Next == null)
-                        {
                             root.Previous = null;
-                        }
                         else
-                        {
-                            root.Previous = this.Previous; // as last.
-                        }
+                            root.Previous = Previous; // as last.
 
                         p.root = root;
                     }
@@ -305,16 +285,12 @@ namespace Lazy.Event
                 else
                 {
                     // node is not root, previous must exists
-                    this.Previous!.Next = this.Next;
-                    if (this.Next != null)
-                    {
-                        this.Next.Previous = this.Previous;
-                    }
+                    Previous!.Next = Next;
+                    if (Next != null)
+                        Next.Previous = Previous;
                     else
-                    {
                         // next does not exists, previous is last node so modify root
-                        p.root!.Previous = this.Previous;
-                    }
+                        p.root!.Previous = Previous;
                 }
             }
         }

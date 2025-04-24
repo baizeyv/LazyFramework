@@ -1,7 +1,7 @@
 using UnityEngine;
 using Lazy;
 
-namespace Lazy.Melody
+namespace Lazy.Example
 {
     public partial class Heel 
     {

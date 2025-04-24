@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.cysharp.r3": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.feature.2d": "2.0.1",
     "com.unity.ide.rider": "3.0.35",
@@ -10,7 +9,6 @@
     "com.unity.timeline": "1.8.7",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.5",
-    "dev.kyubuns.auto9slicer": "https://github.com/kyubuns/Auto9Slicer.git?path=Assets/Auto9Slicer",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",

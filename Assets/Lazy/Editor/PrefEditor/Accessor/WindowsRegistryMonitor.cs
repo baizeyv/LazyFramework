@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.Win32;
 
 namespace Editor.Lazy.PrefEditor
@@ -15,10 +15,22 @@ namespace Editor.Lazy.PrefEditor
         #region P/Invoke
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern int RegOpenKeyEx(IntPtr hKey, string subKey, uint options, int samDesired, out IntPtr phkResult);
+        private static extern int RegOpenKeyEx(
+            IntPtr hKey,
+            string subKey,
+            uint options,
+            int samDesired,
+            out IntPtr phkResult
+        );
 
         [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern int RegNotifyChangeKeyValue(IntPtr hKey, bool bWatchSubtree, RegChangeNotifyFilter dwNotifyFilter, IntPtr hEvent, bool fAsynchronous);
+        private static extern int RegNotifyChangeKeyValue(
+            IntPtr hKey,
+            bool bWatchSubtree,
+            RegChangeNotifyFilter dwNotifyFilter,
+            IntPtr hEvent,
+            bool fAsynchronous
+        );
 
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern int RegCloseKey(IntPtr hKey);
@@ -31,7 +43,9 @@ namespace Editor.Lazy.PrefEditor
         private static readonly IntPtr HKEY_CURRENT_USER = new IntPtr(unchecked((int)0x80000001));
         private static readonly IntPtr HKEY_LOCAL_MACHINE = new IntPtr(unchecked((int)0x80000002));
         private static readonly IntPtr HKEY_USERS = new IntPtr(unchecked((int)0x80000003));
-        private static readonly IntPtr HKEY_PERFORMANCE_DATA = new IntPtr(unchecked((int)0x80000004));
+        private static readonly IntPtr HKEY_PERFORMANCE_DATA = new IntPtr(
+            unchecked((int)0x80000004)
+        );
         private static readonly IntPtr HKEY_CURRENT_CONFIG = new IntPtr(unchecked((int)0x80000005));
         private static readonly IntPtr HKEY_DYN_DATA = new IntPtr(unchecked((int)0x80000006));
 
@@ -99,7 +113,11 @@ namespace Editor.Lazy.PrefEditor
         private bool _disposed = false;
         private ManualResetEvent _eventTerminate = new ManualResetEvent(false);
 
-        private RegChangeNotifyFilter _regFilter = RegChangeNotifyFilter.Key | RegChangeNotifyFilter.Attribute | RegChangeNotifyFilter.Value | RegChangeNotifyFilter.Security;
+        private RegChangeNotifyFilter _regFilter =
+            RegChangeNotifyFilter.Key
+            | RegChangeNotifyFilter.Attribute
+            | RegChangeNotifyFilter.Value
+            | RegChangeNotifyFilter.Security;
 
         #endregion
 
@@ -233,7 +251,10 @@ namespace Editor.Lazy.PrefEditor
 
                 default:
                     _registryHive = IntPtr.Zero;
-                    throw new ArgumentException("The registry hive '" + nameParts[0] + "' is not supported", "value");
+                    throw new ArgumentException(
+                        "The registry hive '" + nameParts[0] + "' is not supported",
+                        "value"
+                    );
             }
 
             _registrySubName = String.Join("\\", nameParts, 1, nameParts.Length - 1);
@@ -304,7 +325,13 @@ namespace Editor.Lazy.PrefEditor
         private void ThreadLoop()
         {
             IntPtr registryKey;
-            int result = RegOpenKeyEx(_registryHive, _registrySubName, 0, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_NOTIFY, out registryKey);
+            int result = RegOpenKeyEx(
+                _registryHive,
+                _registrySubName,
+                0,
+                STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_NOTIFY,
+                out registryKey
+            );
             if (result != 0)
             {
                 throw new Win32Exception(result);
@@ -316,7 +343,13 @@ namespace Editor.Lazy.PrefEditor
                 WaitHandle[] waitHandles = new WaitHandle[] { _eventNotify, _eventTerminate };
                 while (!_eventTerminate.WaitOne(0, true))
                 {
-                    result = RegNotifyChangeKeyValue(registryKey, true, _regFilter, _eventNotify.SafeWaitHandle.DangerousGetHandle(), true);
+                    result = RegNotifyChangeKeyValue(
+                        registryKey,
+                        true,
+                        _regFilter,
+                        _eventNotify.SafeWaitHandle.DangerousGetHandle(),
+                        true
+                    );
                     if (result != 0)
                     {
                         throw new Win32Exception(result);
@@ -346,12 +379,15 @@ namespace Editor.Lazy.PrefEditor
     {
         /// <summary>Notify the caller if a subkey is added or deleted.</summary>
         Key = 1,
+
         /// <summary>Notify the caller of changes to the attributes of the key,
         /// such as the security descriptor information.</summary>
         Attribute = 2,
+
         /// <summary>Notify the caller of changes to a value of the key. This can
         /// include adding or deleting a value, or changing an existing value.</summary>
         Value = 4,
+
         /// <summary>Notify the caller of changes to the security descriptor
         /// of the key.</summary>
         Security = 8,

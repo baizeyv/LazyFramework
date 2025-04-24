@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Lazy;
-using Lazy.Excel;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -10,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Editor.ExcelImporter
+namespace LazyEditor
 {
     /// <summary>
     /// ! 对于数组类型的, string[] 分隔符是"," 应该这样填表: "test","hello","which"
@@ -163,7 +162,7 @@ namespace Lazy.Editor.ExcelImporter
             }
 
             if (info.Attribute.LogOnImport)
-                Log.Log.MsgD($"Imported {sheetCount} sheets form {excelPath}.");
+                Log.MsgD($"Imported {sheetCount} sheets form {excelPath}.");
 
             EditorUtility.SetDirty(asset);
         }

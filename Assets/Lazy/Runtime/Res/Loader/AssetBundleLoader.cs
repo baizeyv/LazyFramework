@@ -3,12 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Pool;
-using Lazy.Res.Manager;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Res.Loader
+namespace Lazy
 {
     public class AssetBundleLoader : ABSLoader
     {
@@ -209,7 +207,7 @@ namespace Lazy.Res.Loader
                 if (_assetBundleDownloadRequest != null)
                     return;
                 _assetBundleLoadState = LoaderState.Loaded;
-                Log.Log.MsgE($"找不到远程AssetBundle:{_assetBundlePath}");
+                Log.MsgE($"找不到远程AssetBundle:{_assetBundlePath}");
             }
             else
             {
@@ -218,7 +216,7 @@ namespace Lazy.Res.Loader
                 if (AssetBundleLoadRequest != null)
                     return;
                 _assetBundleLoadState = LoaderState.Loaded;
-                Log.Log.MsgE($"找不到本地AssetBundle:{_assetBundlePath}");
+                Log.MsgE($"找不到本地AssetBundle:{_assetBundlePath}");
             }
         }
 
@@ -404,7 +402,7 @@ namespace Lazy.Res.Loader
             if (assetType.IsAssignableFrom(o.GetType()))
                 return o;
 
-            Log.Log.MsgE($"与输入的资产类型不一致:{assetPath}");
+            Log.MsgE($"与输入的资产类型不一致:{assetPath}");
             return null;
         }
 
@@ -524,7 +522,7 @@ namespace Lazy.Res.Loader
                     }
                     else
                     {
-                        Log.Log.MsgE($"与输入的资产类型不一致:{assetPath}");
+                        Log.MsgE($"与输入的资产类型不一致:{assetPath}");
                         End();
                     }
                 }
@@ -761,7 +759,7 @@ namespace Lazy.Res.Loader
         {
             if (string.IsNullOrEmpty(assetPath) || obj == null)
             {
-                Log.Log.MsgE($"加载资产对象Object为空:{assetPath}");
+                Log.MsgE($"加载资产对象Object为空:{assetPath}");
                 return;
             }
 
@@ -895,7 +893,7 @@ namespace Lazy.Res.Loader
                                 if (!AssetBundleLoadRequest.assetBundle)
                                 {
                                     _assetBundleLoadState = LoaderState.Loaded;
-                                    Log.Log.MsgE($"无法加载本地资产捆绑包 {_assetBundlePath} ");
+                                    Log.MsgE($"无法加载本地资产捆绑包 {_assetBundlePath} ");
                                 }
                                 else
                                 {
@@ -913,7 +911,7 @@ namespace Lazy.Res.Loader
                                 if (!_assetBundleDownloadRequest.DownloadedAssetBundle)
                                 {
                                     _assetBundleLoadState = LoaderState.Loaded;
-                                    Log.Log.MsgE($"无法加载远程资产捆绑包 {_assetBundlePath} ");
+                                    Log.MsgE($"无法加载远程资产捆绑包 {_assetBundlePath} ");
                                 }
                                 else
                                 {

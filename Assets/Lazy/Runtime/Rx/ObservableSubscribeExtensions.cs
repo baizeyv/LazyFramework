@@ -1,7 +1,7 @@
 using System;
 using Lazy;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public static class ObservableSubscribeExtensions
     {

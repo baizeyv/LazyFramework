@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lazy.Editor.NinePatchSlicer
+namespace LazyEditor
 {
     public class SlicedTexture
     {

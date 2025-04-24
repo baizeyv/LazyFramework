@@ -1,5 +1,4 @@
-﻿using Lazy.Res;
-using Lazy.Res.HotUpdate;
+﻿using Lazy;
 using UnityEngine;
 
 namespace Lazy

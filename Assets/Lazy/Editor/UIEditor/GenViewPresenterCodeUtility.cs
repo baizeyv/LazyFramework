@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     /// <summary>
     /// * 代码生成工具
@@ -118,13 +119,16 @@ namespace Lazy.Editor.UIEditor
     {
         static ViewPresenterTemplate()
         {
-            GenViewPresenterCodeUtility.RegisterTemplate("ViewPresenter", new ViewPresenterTemplate());
+            GenViewPresenterCodeUtility.RegisterTemplate(
+                "ViewPresenter",
+                new ViewPresenterTemplate()
+            );
         }
 
         public GenCodeTask CreateTask(IBindGroup bindGroup)
         {
             var viewPresenter = bindGroup as ViewPresenter;
-            return new GenCodeTask()
+            return new GenCodeTask
             {
                 gameObject = viewPresenter.gameObject,
                 className = viewPresenter.scriptName,

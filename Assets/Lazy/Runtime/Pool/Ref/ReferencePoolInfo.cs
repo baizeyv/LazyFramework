@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Ref
+namespace Lazy
 {
     /// <summary>
     /// * 引用池信息
@@ -21,8 +21,15 @@ namespace Lazy.Ref
 
         private readonly int _removeReferenceCount;
 
-        public ReferencePoolInfo(Type type, int unusedReferenceCount, int usingReferenceCount, int obtainReferenceCount,
-            int freeReferenceCount, int addReferenceCount, int removeReferenceCount)
+        public ReferencePoolInfo(
+            Type type,
+            int unusedReferenceCount,
+            int usingReferenceCount,
+            int obtainReferenceCount,
+            int freeReferenceCount,
+            int addReferenceCount,
+            int removeReferenceCount
+        )
         {
             _type = type;
             _unusedReferenceCount = unusedReferenceCount;

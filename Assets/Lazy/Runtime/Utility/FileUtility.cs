@@ -26,7 +26,7 @@ namespace Lazy
             }
             catch (Exception ex)
             {
-                Log.Log.MsgD(
+                Log.MsgD(
                     $"SafeCopyFile failed! formFile = {fromFile}, toFile = {toFile}, with err = {ex.Message}"
                 );
                 return false;
@@ -44,7 +44,7 @@ namespace Lazy
             }
             catch (Exception e)
             {
-                Log.Log.MsgE($"ReadAllText Failed: {file}, error: {e.Message}");
+                Log.MsgE($"ReadAllText Failed: {file}, error: {e.Message}");
                 return null;
             }
         }
@@ -85,7 +85,7 @@ namespace Lazy
             }
             catch (Exception ex)
             {
-                Log.Log.MsgE($"SafeClearDir failed! path = {folderPath} with err = {ex.Message}");
+                Log.MsgE($"SafeClearDir failed! path = {folderPath} with err = {ex.Message}");
                 return false;
             }
         }
@@ -136,7 +136,7 @@ namespace Lazy
             }
             catch (Exception ex)
             {
-                Log.Log.MsgE(
+                Log.MsgE(
                     string.Format(
                         "SafeCopyDirectory failed! sourceDirName = {0}, destDirName = {1}, with err = {2}",
                         sourceDirName,

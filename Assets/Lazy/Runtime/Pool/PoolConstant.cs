@@ -1,7 +1,7 @@
 ﻿using Lazy;
 using UnityEngine;
 
-namespace Lazy.Pool
+namespace Lazy
 {
     public static class PoolConstant
     {

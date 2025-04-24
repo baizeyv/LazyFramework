@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Singleton;
+using Lazy;
 
-namespace Lazy.Ref
+namespace Lazy
 {
     public class ReferencePool : Singleton<ReferencePool>
     {
@@ -82,7 +82,7 @@ namespace Lazy.Ref
         {
             if (reference == null)
             {
-                Log.Log.MsgE("Reference is invalid.");
+                Log.MsgE("Reference is invalid.");
                 return;
             }
 
@@ -159,25 +159,25 @@ namespace Lazy.Ref
         {
             if (referenceType == null)
             {
-                Log.Log.MsgE("Reference type is invalid.");
+                Log.MsgE("Reference type is invalid.");
                 return;
             }
 
             if (!referenceType.IsClass || referenceType.IsAbstract)
             {
-                Log.Log.MsgE("Reference type is not a non-abstract class type.");
+                Log.MsgE("Reference type is not a non-abstract class type.");
                 return;
             }
 
             if (!typeof(IReference).IsAssignableFrom(referenceType))
-                Log.Log.MsgE($"Reference type '{referenceType.FullName}' is invalid.");
+                Log.MsgE($"Reference type '{referenceType.FullName}' is invalid.");
         }
 
         private ReferenceCollection GetReferenceCollection(Type referenceType)
         {
             if (referenceType == null)
             {
-                Log.Log.MsgE("ReferenceType is invalid.");
+                Log.MsgE("ReferenceType is invalid.");
                 return null;
             }
 

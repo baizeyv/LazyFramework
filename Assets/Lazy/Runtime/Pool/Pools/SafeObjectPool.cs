@@ -1,7 +1,7 @@
 using System;
-using Lazy.Singleton;
+using Lazy;
 
-namespace Lazy.Pool
+namespace Lazy
 {
     public class SafeObjectPool<T> : Pool<T>, ISingleton, IDisposable
         where T : IPoolable, new()

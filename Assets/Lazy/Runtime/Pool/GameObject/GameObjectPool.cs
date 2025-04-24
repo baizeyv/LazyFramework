@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Event;
-using Lazy.Pool;
+using Lazy;
 using UnityEditor;
 using UnityEngine;
 
@@ -246,17 +245,17 @@ namespace Lazy
 #if DEBUG
             if (_isSetup)
                 if (sendWarnings)
-                    Log.Log.MsgD("池已经初始化完毕！", this);
+                    Log.MsgD("池已经初始化完毕！", this);
 
             if (prefab == null)
             {
-                Log.Log.MsgE("您正在尝试使用空预制体初始化此池！", this);
+                Log.MsgE("您正在尝试使用空预制体初始化此池！", this);
                 return;
             }
 
             if (hasPreloadedGameObjects && prefab != this.prefab)
             {
-                Log.Log.MsgE(
+                Log.MsgE(
                     "此池已预加载游戏对象，而您正在尝试使用另一个预制体初始化此池！"
                         + "清除此池或使用正确的预制体进行初始化。",
                     this
@@ -282,7 +281,7 @@ namespace Lazy
 #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
-                Log.Log.MsgE("应用程序未运行时，无法设置池！", this);
+                Log.MsgE("应用程序未运行时，无法设置池！", this);
                 return false;
             }
 
@@ -360,7 +359,7 @@ namespace Lazy
                     if (capacityReachedBehaviour == CapacityReachedBehaviour.ThrowException)
                     {
 #if DEBUG
-                        Log.Log.MsgE("已达到容量上限！无法生成新的克隆！", this);
+                        Log.MsgE("已达到容量上限！无法生成新的克隆！", this);
 #endif
                         arguments = new GetPoolableArgument(null, true);
                         return;
@@ -391,7 +390,7 @@ namespace Lazy
 #if DEBUG
                 if (clone == null)
                 {
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         $"其中一个预加载的游戏对象已被销毁！在应用程序未运行时，从组件上下文菜单清除 '{name}' 池 "
                             + "以解决此问题！",
                         this
@@ -501,7 +500,7 @@ namespace Lazy
 #if DEBUG
                 if (_cachedTransform.parent != null)
                 {
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         "池不能是持久的！"
                             + "因为此 GameObject 有父 Transform，"
                             + "而 DontDestroyOnLoad 只对根 GameObject 或根 GameObject 上的组件有效。",
@@ -538,19 +537,19 @@ namespace Lazy
 #if DEBUG
             if (!_isSetup)
             {
-                Log.Log.MsgE($"池 '{name}' 未设置！", this);
+                Log.MsgE($"池 '{name}' 未设置！", this);
                 return;
             }
 
             if (!Application.isPlaying)
             {
-                Log.Log.MsgE($"在应用程序未运行时，您正在尝试填充池 '{name}'！", this);
+                Log.MsgE($"在应用程序未运行时，您正在尝试填充池 '{name}'！", this);
                 return;
             }
 
             if (count < 0)
             {
-                Log.Log.MsgE("填充数量不能小于零！", this);
+                Log.MsgE("填充数量不能小于零！", this);
                 return;
             }
 #endif
@@ -560,7 +559,7 @@ namespace Lazy
                 {
 #if DEBUG
                     if (sendWarnings)
-                        Log.Log.MsgD($"池 {name} 达到最大容量！");
+                        Log.MsgD($"池 {name} 达到最大容量！");
 #endif
                     return;
                 }
@@ -629,10 +628,7 @@ namespace Lazy
             {
 #if DEBUG
                 if (sendWarnings)
-                    Log.Log.MsgD(
-                        $"池对象 '{poolable.GameObject}' 已经取消生成！",
-                        poolable.GameObject
-                    );
+                    Log.MsgD($"池对象 '{poolable.GameObject}' 已经取消生成！", poolable.GameObject);
 #endif
                 return;
             }
@@ -667,24 +663,24 @@ namespace Lazy
 #if DEBUG
             if (capacity < 0)
             {
-                Log.Log.MsgE($"池 '{name}' 的容量不能小于零！", this);
+                Log.MsgE($"池 '{name}' 的容量不能小于零！", this);
                 return;
             }
 
             if (capacity < allClonesCount)
             {
-                Log.Log.MsgE($"池 '{name}' 的容量不能小于所有克隆的数量！", this);
+                Log.MsgE($"池 '{name}' 的容量不能小于所有克隆的数量！", this);
                 return;
             }
 
             if (hasPreloadedGameObjects && this.capacity < gameObjectsToPreload.Count)
             {
-                Log.Log.MsgE($"池 '{name}' 的容量不能小于预加载克隆的数量！", this);
+                Log.MsgE($"池 '{name}' 的容量不能小于预加载克隆的数量！", this);
                 return;
             }
 
             if (sendWarnings && capacity == 0)
-                Log.Log.MsgD($"池 '{name}' 的容量为零。", this);
+                Log.MsgD($"池 '{name}' 的容量为零。", this);
 #endif
             this.capacity = capacity;
             preloadSize = Mathf.Clamp(preloadSize, 0, this.capacity);
@@ -928,14 +924,14 @@ namespace Lazy
         {
             if (hasPreloadedGameObjects && capacity < gameObjectsToPreload.Count)
             {
-                Log.Log.MsgE("容量不能小于预加载克隆的数量！", this);
+                Log.MsgE("容量不能小于预加载克隆的数量！", this);
                 capacity = gameObjectsToPreload.Count;
             }
 
             if (_despawnedPoolables != null)
                 if (capacity < allClonesCount)
                 {
-                    Log.Log.MsgE("容量不能小于所有克隆的数量！", this);
+                    Log.MsgE("容量不能小于所有克隆的数量！", this);
                     capacity = allClonesCount;
                 }
         }
@@ -951,7 +947,7 @@ namespace Lazy
             if (hasPreloadedGameObjects)
             {
                 if (prefab == null)
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         "此池中已预加载游戏对象，但现在预制体为空！"
                             + "设置正确的预制体以解决此问题或清除此池。",
                         this
@@ -961,10 +957,7 @@ namespace Lazy
                     var clone = gameObjectsToPreload[i];
                     if (clone == null)
                     {
-                        Log.Log.MsgE(
-                            "此池的预加载游戏对象之一为空！" + "清除此池以解决此问题。",
-                            this
-                        );
+                        Log.MsgE("此池的预加载游戏对象之一为空！" + "清除此池以解决此问题。", this);
                         return;
                     }
 
@@ -973,7 +966,7 @@ namespace Lazy
                         && PrefabUtility.GetCorrespondingObjectFromSource(clone) != prefab
                     )
                     {
-                        Log.Log.MsgE(
+                        Log.MsgE(
                             "您预加载的游戏对象与预制体不匹配。" + "清除此池或设置正确的预制体。",
                             this
                         );
@@ -996,14 +989,14 @@ namespace Lazy
                 return false;
             if (gameObjectToCheck.scene.isLoaded)
             {
-                Log.Log.MsgE("您不能将场景中的游戏对象设置为预制体！", this);
+                Log.MsgE("您不能将场景中的游戏对象设置为预制体！", this);
                 prefab = null;
                 return false;
             }
 
             if (PrefabUtility.IsPartOfAnyPrefab(gameObjectToCheck))
             {
-                Log.Log.MsgE($"'{gameObjectToCheck}' 不是一个预制体！", this);
+                Log.MsgE($"'{gameObjectToCheck}' 不是一个预制体！", this);
                 prefab = null;
                 return false;
             }
@@ -1040,7 +1033,7 @@ namespace Lazy
         {
             if (prefab == null)
             {
-                Log.Log.MsgE($"池 '{name}' 的预制体为空！", this);
+                Log.MsgE($"池 '{name}' 的预制体为空！", this);
                 return false;
             }
 
@@ -1050,7 +1043,7 @@ namespace Lazy
             if (gameObjectsToPreload.Count > capacity || allClonesCount >= capacity)
             {
                 if (sendWarnings)
-                    Log.Log.MsgD("已达到容量上限！无法预加载更多游戏对象！", this);
+                    Log.MsgD("已达到容量上限！无法预加载更多游戏对象！", this);
                 return false;
             }
 

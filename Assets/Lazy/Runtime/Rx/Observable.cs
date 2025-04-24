@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public abstract class Observable<T>
     {
@@ -27,8 +27,8 @@ namespace Lazy.Rx
     {
         internal SingleAssignmentDisposable SourceSubscription;
 
-        int calledOnCompleted;
-        int disposed;
+        private int calledOnCompleted;
+        private int disposed;
 
         /// <summary>
         /// * 是否已经终结了
@@ -61,9 +61,7 @@ namespace Lazy.Rx
             finally
             {
                 if (disposeOnFinally)
-                {
                     Dispose();
-                }
             }
         }
 
@@ -109,8 +107,6 @@ namespace Lazy.Rx
             SourceSubscription.Dispose();
         }
 
-        protected virtual void DisposeCore()
-        {
-        }
+        protected virtual void DisposeCore() { }
     }
 }

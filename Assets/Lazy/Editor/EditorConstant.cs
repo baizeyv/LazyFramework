@@ -1,4 +1,4 @@
-﻿namespace Lazy.Editor
+﻿namespace LazyEditor
 {
     public static class EditorConstant
     {

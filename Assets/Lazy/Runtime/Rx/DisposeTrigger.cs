@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Lazy;
 using UnityEngine;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public abstract class DisposeTrigger : MonoBehaviour, IDisposable
     {

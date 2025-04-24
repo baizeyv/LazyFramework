@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Lazy.Res;
+using Lazy;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.AssetEditor
+namespace LazyEditor
 {
     public static class AssetBundleSetName
     {

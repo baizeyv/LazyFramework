@@ -9,7 +9,7 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     public static class CodeGenUtility
     {

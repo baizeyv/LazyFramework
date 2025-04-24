@@ -7,7 +7,7 @@ using System.Reflection;
 using NPOI.SS.UserModel;
 using UnityEngine;
 
-namespace Lazy.Excel
+namespace Lazy
 {
     /// <summary>
     /// !!!!! 不建议在运行时中使用 (但还是留了方法)
@@ -416,7 +416,7 @@ namespace Lazy.Excel
             var book = WorkbookFactory.Create(stream);
             var targetType = typeof(T);
             var attribute = targetType.GetCustomAttribute<ExcelAssetAttribute>();
-            var info = new ExcelAssetInfo() { AssetType = targetType, Attribute = attribute };
+            var info = new ExcelAssetInfo { AssetType = targetType, Attribute = attribute };
             var assetFields = info.AssetType.GetFields();
             var sheetCount = 0;
 
@@ -441,7 +441,7 @@ namespace Lazy.Excel
             }
 
             if (info.Attribute.LogOnImport)
-                Log.Log.MsgD($"Imported {sheetCount} sheets.");
+                Log.MsgD($"Imported {sheetCount} sheets.");
 
             return asset;
         }
@@ -454,7 +454,7 @@ namespace Lazy.Excel
             var book = WorkbookFactory.Create(stream);
             var targetType = typeof(T);
             var attribute = targetType.GetCustomAttribute<ExcelAssetAttribute>();
-            var info = new ExcelAssetInfo() { AssetType = targetType, Attribute = attribute };
+            var info = new ExcelAssetInfo { AssetType = targetType, Attribute = attribute };
             var assetFields = info.AssetType.GetFields();
             var sheetCount = 0;
 

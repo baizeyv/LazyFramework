@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Scripting;
 
-namespace Lazy.Res
+namespace Lazy
 {
     [Preserve] // * 防止该类被代码裁剪
     public class AssetMapping

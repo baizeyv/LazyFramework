@@ -1,6 +1,4 @@
 ﻿using Lazy;
-using Lazy.Pool;
-using Lazy.Ref;
 
 namespace Lazy
 {

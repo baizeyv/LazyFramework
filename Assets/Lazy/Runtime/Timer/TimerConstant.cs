@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Lazy;
 
-namespace Lazy.Timer
+namespace Lazy
 {
     public static class TimerConstant
     {

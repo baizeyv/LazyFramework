@@ -1,4 +1,4 @@
-namespace Lazy.Singleton
+namespace Lazy
 {
     public static class SingletonProperty<T>
         where T : class, ISingleton

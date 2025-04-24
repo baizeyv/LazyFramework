@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lazy.Editor
+namespace LazyEditor
 {
     public class Styles
     {

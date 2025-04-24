@@ -1,4 +1,4 @@
-namespace Lazy.Ref
+namespace Lazy
 {
     /// <summary>
     /// * 引用接口

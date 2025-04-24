@@ -1,4 +1,4 @@
-﻿namespace Lazy.Res.Loader
+﻿namespace Lazy
 {
     /// <summary>
     /// * 加载器状态
@@ -7,6 +7,7 @@
     {
         Idle, // # 待机态
         Loading, // # 正在加载态
-        Loaded, // # 加载完成态
+        Loaded // # 加载完成态
+        ,
     }
 }

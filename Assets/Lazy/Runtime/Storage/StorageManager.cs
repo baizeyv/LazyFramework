@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using Lazy;
-using Lazy.Singleton;
 
-namespace Lazy.Serializer
+namespace Lazy
 {
     [ManagerLateUpdate]
     public class StorageManager : Singleton<StorageManager>, IManager

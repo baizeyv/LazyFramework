@@ -1,4 +1,4 @@
-﻿using Lazy.Serializer;
+﻿using Lazy;
 using Newtonsoft.Json;
 
 namespace Lazy

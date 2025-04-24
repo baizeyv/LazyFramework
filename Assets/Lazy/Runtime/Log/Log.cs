@@ -1,8 +1,8 @@
 using System.Text;
-using Lazy.Pool;
+using Lazy;
 using UnityEngine;
 
-namespace Lazy.Log
+namespace Lazy
 {
     public static class Log
     {

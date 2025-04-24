@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lazy;
-using Lazy.Pool;
-using Lazy.Res;
-using Lazy.Timer;
 using UnityEngine;
 using UnityEngine.Audio;
 using Object = UnityEngine.Object;

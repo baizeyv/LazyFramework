@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Singleton
+namespace Lazy
 {
     internal static class SingletonCreator
     {

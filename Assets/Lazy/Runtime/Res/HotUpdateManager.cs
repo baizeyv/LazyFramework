@@ -5,14 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Lazy;
-using Lazy.Res.HotUpdate;
-using Lazy.Runtime.Utility;
-using Lazy.Singleton;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Lazy.Res
+namespace Lazy
 {
     public class HotUpdateManager : Singleton<HotUpdateManager>, IManager
     {
@@ -92,7 +89,7 @@ namespace Lazy.Res
                 yield break;
 
             var path = $"{AppConfig.LocalVersion.AssetRemoteAddress}/{nameof(AppVersion)}.json";
-            Log.Log.MsgD($"Initialize remote version: {path}");
+            Log.MsgD($"Initialize remote version: {path}");
 
             var request = UnityWebRequest.Get(path);
             yield return request.SendWebRequest();
@@ -102,7 +99,7 @@ namespace Lazy.Res
             if (request.isNetworkError || request.isHttpError)
 #endif
             {
-                Log.Log.MsgE($"获取远程版本失败: {path}, ERROR: {request.error}");
+                Log.MsgE($"获取远程版本失败: {path}, ERROR: {request.error}");
             }
             else
             {
@@ -129,7 +126,7 @@ namespace Lazy.Res
                 yield break;
             var path =
                 $"{AppConfig.LocalVersion.AssetRemoteAddress}/HotUpdate{Separator}{nameof(AssetBundleMapping)}.json";
-            Log.Log.MsgD($"初始化资源版本: {path}");
+            Log.MsgD($"初始化资源版本: {path}");
             var request = UnityWebRequest.Get(path);
             yield return request.SendWebRequest();
 #if UNITY_2020_2_OR_NEWER
@@ -138,7 +135,7 @@ namespace Lazy.Res
             if (request.isNetworkError || request.isHttpError)
 #endif
             {
-                Log.Log.MsgE($"获取资源版本失败: {path}, ERROR: {request.error}");
+                Log.MsgE($"获取资源版本失败: {path}, ERROR: {request.error}");
             }
             else
             {
@@ -349,18 +346,18 @@ namespace Lazy.Res
             );
             _hotUpdatePartDownloader.OnDownloadSuccess += (evt) =>
             {
-                Log.Log.MsgD($"获取部分热更资源完成: {evt.DownloadInfo.DownloadURL}");
+                Log.MsgD($"获取部分热更资源完成: {evt.DownloadInfo.DownloadURL}");
             };
             _hotUpdatePartDownloader.OnDownloadFailure += (evt) =>
             {
-                Log.Log.MsgD(
+                Log.MsgD(
                     $"获取部分热更资源失败: {evt.DownloadInfo.DownloadURL}\n{evt.ErrorMessage}"
                 );
                 onFailed.Fire();
             };
             _hotUpdatePartDownloader.OnDownloadStart += (evt) =>
             {
-                Log.Log.MsgD($"开始获取部分热更资源: {evt.DownloadInfo.DownloadURL}");
+                Log.MsgD($"开始获取部分热更资源: {evt.DownloadInfo.DownloadURL}");
             };
             _hotUpdatePartDownloader.OnDownloadUpdate += (evt) =>
             {
@@ -371,7 +368,7 @@ namespace Lazy.Res
             };
             _hotUpdatePartDownloader.OnDownloadTasksCompleted += (evt) =>
             {
-                Log.Log.MsgD($"指定的所有热更资源获取完成, 用时: {evt.TimeSpan}");
+                Log.MsgD($"指定的所有热更资源获取完成, 用时: {evt.TimeSpan}");
                 foreach (var assetName in hotUpdateAssetUrl.Keys)
                     if (
                         AppConfig.RemoteAssetBundleMapping.TryGetValue(
@@ -451,18 +448,16 @@ namespace Lazy.Res
             _hotUpdateDownloader = DownloadManager.Instance.CreateDownloader("hotUpdateDownloader");
             _hotUpdateDownloader.OnDownloadSuccess += (evt) =>
             {
-                Log.Log.MsgD($"获取热更资源完成: {evt.DownloadInfo.DownloadURL}");
+                Log.MsgD($"获取热更资源完成: {evt.DownloadInfo.DownloadURL}");
             };
             _hotUpdateDownloader.OnDownloadFailure += (evt) =>
             {
-                Log.Log.MsgD(
-                    $"获取热更资源失败: {evt.DownloadInfo.DownloadURL}\n{evt.ErrorMessage}"
-                );
+                Log.MsgD($"获取热更资源失败: {evt.DownloadInfo.DownloadURL}\n{evt.ErrorMessage}");
                 onFailed.Fire();
             };
             _hotUpdateDownloader.OnDownloadStart += (evt) =>
             {
-                Log.Log.MsgD($"开始获取热更资源: {evt.DownloadInfo.DownloadURL}");
+                Log.MsgD($"开始获取热更资源: {evt.DownloadInfo.DownloadURL}");
             };
             _hotUpdateDownloader.OnDownloadUpdate += (evt) =>
             {
@@ -474,7 +469,7 @@ namespace Lazy.Res
             var jsonSettings = Constant.JsonSetting;
             _hotUpdateDownloader.OnDownloadTasksCompleted += (evt) =>
             {
-                Log.Log.MsgD($"所有热更资源获取完成, 用时: {evt.TimeSpan}");
+                Log.MsgD($"所有热更资源获取完成, 用时: {evt.TimeSpan}");
                 AppConfig.LocalVersion.Version = AppConfig.RemoteVersion.Version;
                 AppConfig.LocalVersion.HotUpdateVersions = new List<string>();
                 FileUtility.SafeWriteAllText(
@@ -551,19 +546,17 @@ namespace Lazy.Res
             _packageDownloader = DownloadManager.Instance.CreateDownloader("PackageDownloader");
             _packageDownloader.OnDownloadSuccess += (evt) =>
             {
-                Log.Log.MsgD($"获取分包资源完成: {evt.DownloadInfo.DownloadURL}");
+                Log.MsgD($"获取分包资源完成: {evt.DownloadInfo.DownloadURL}");
                 downloadPaths.Add(evt.DownloadInfo.DownloadPath);
             };
             _packageDownloader.OnDownloadFailure += (evt) =>
             {
-                Log.Log.MsgE(
-                    $"获取分包资源失败: {evt.DownloadInfo.DownloadURL}\n{evt.ErrorMessage}"
-                );
+                Log.MsgE($"获取分包资源失败: {evt.DownloadInfo.DownloadURL}\n{evt.ErrorMessage}");
                 onFailure.Fire();
             };
             _packageDownloader.OnDownloadStart += (evt) =>
             {
-                Log.Log.MsgD($"开始获取分包资源: {evt.DownloadInfo.DownloadURL}");
+                Log.MsgD($"开始获取分包资源: {evt.DownloadInfo.DownloadURL}");
             };
             _packageDownloader.OnDownloadUpdate += (evt) =>
             {
@@ -574,7 +567,7 @@ namespace Lazy.Res
             };
             _packageDownloader.OnDownloadTasksCompleted += (evt) =>
             {
-                Log.Log.MsgD($"所有分包资源获取完成! 用时 {evt.TimeSpan}");
+                Log.MsgD($"所有分包资源获取完成! 用时 {evt.TimeSpan}");
 #if UNITY_WEBGL
                 CoroutineCenter.StartCoroutine(UnZipPackagePathsCo(downloadPaths, onCompleted));
 #else

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Singleton
+namespace Lazy
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class MonoSingletonPathAttribute : Attribute

@@ -1,4 +1,4 @@
-namespace Lazy.Res
+namespace Lazy
 {
     /// <summary>
     /// * 下载类型
@@ -8,5 +8,6 @@ namespace Lazy.Res
         None,
         File, // # 下载文件
         AssetBundle // # 下载AssetBundle
+        ,
     }
 }

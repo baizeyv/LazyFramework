@@ -1,6 +1,7 @@
 ﻿using System;
+using Lazy;
 
-namespace Lazy.Rx.Operator
+namespace Lazy
 {
     internal sealed class Skip<T> : Observable<T>
     {

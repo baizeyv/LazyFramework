@@ -5,9 +5,7 @@ using System.Net;
 using System.Net.Http;
 using DG.Tweening.Core;
 using Lazy;
-using Lazy.Log;
-using Lazy.Serializer;
-using Lazy.UI.Example;
+using Lazy.Example;
 using UnityEngine;
 using UnityEngine.UI;
 

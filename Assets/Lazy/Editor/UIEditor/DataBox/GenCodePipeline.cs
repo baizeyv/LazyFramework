@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Lazy;
+using LazyEditor;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     /// <summary>
     /// * 代码生成管道
@@ -173,11 +174,11 @@ namespace Lazy.Editor.UIEditor
                     .FirstOrDefault();
                 if (type == null)
                 {
-                    Log.Log.MsgE("Compile ERROR !");
+                    Log.MsgE("Compile ERROR !");
                     return;
                 }
 
-                Log.Log.MsgI($"Compile {type}");
+                Log.MsgI($"Compile {type}");
                 var gameObject = currentTask.gameObject;
                 var scriptComponent = gameObject.GetComponent(type);
                 if (!scriptComponent)

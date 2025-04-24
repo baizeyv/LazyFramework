@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     internal sealed class Empty<T> : Observable<T>
     {

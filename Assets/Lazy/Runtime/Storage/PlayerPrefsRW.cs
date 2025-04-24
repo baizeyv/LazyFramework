@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lazy.Serializer
+namespace Lazy
 {
     /// <summary>
     /// * PlayerPrefs Reader And Writer

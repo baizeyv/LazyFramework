@@ -5,14 +5,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Lazy;
-using Lazy.Event;
-using Lazy.Rx;
 using UnityEngine;
 
-namespace Lazy.Timer
+namespace Lazy
 {
     [ManagerUpdate]
-    public class TimerManager : Singleton.Singleton<TimerManager>, IManager
+    public class TimerManager : Singleton<TimerManager>, IManager
     {
         /// <summary>
         /// * 时间类型
@@ -100,7 +98,7 @@ namespace Lazy.Timer
                     GetLocalTime(out _, out time);
                     return true;
                 default:
-                    Log.Log.MsgE($"TimeType: {TimeType} ERROR !");
+                    Log.MsgE($"TimeType: {TimeType} ERROR !");
                     time = DateTimeOffset.MinValue;
                     return true;
             }
@@ -260,7 +258,7 @@ namespace Lazy.Timer
                 var networkDateTime = completedTask.Result;
                 if (networkDateTime != DateTime.MinValue)
                 {
-                    Log.Log.MsgD($"获取网络时间：{networkDateTime}");
+                    Log.MsgD($"获取网络时间：{networkDateTime}");
                     SetServerTime(((DateTimeOffset)networkDateTime).ToUnixTimeMilliseconds());
                     return;
                 }
@@ -310,7 +308,7 @@ namespace Lazy.Timer
             catch (Exception e)
             {
                 // 出现异常，返回 null 或抛出错误，视情况而定
-                Log.Log.MsgE($"获取网络时间失败: {e.Message}");
+                Log.MsgE($"获取网络时间失败: {e.Message}");
                 return DateTime.MinValue;
             }
         }

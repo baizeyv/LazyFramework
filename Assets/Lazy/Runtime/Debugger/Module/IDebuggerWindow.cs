@@ -1,4 +1,4 @@
-﻿namespace Lazy.Debugger.Module
+﻿namespace Lazy
 {
     public interface IDebuggerWindow
     {

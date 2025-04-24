@@ -3,12 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Res.Loader;
-using Lazy.Singleton;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Res.Manager
+namespace Lazy
 {
     public class ResourcesManager : Singleton<ResourcesManager>, IManager
     {

@@ -1,4 +1,4 @@
-﻿namespace Lazy.Debugger
+﻿namespace Lazy
 {
     public enum DebuggerShowType
     {

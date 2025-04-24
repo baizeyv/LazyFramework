@@ -4,7 +4,7 @@ using Lazy;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Lazy.Res
+namespace Lazy
 {
     /// <summary>
     /// * 资源文件下载器
@@ -92,7 +92,7 @@ namespace Lazy.Res
             }
             catch (Exception e)
             {
-                Log.Log.MsgE($"无法发送URI:{uri}文件下载请求,Exception:{e.Message}");
+                Log.MsgE($"无法发送URI:{uri}文件下载请求,Exception:{e.Message}");
                 LoadFail();
             }
         }
@@ -147,7 +147,7 @@ namespace Lazy.Res
             }
             catch (Exception e)
             {
-                Log.Log.MsgE($"无法为URI:{uri} AssetBundle下载请求,Exception:{e.Message}");
+                Log.MsgE($"无法为URI:{uri} AssetBundle下载请求,Exception:{e.Message}");
                 LoadFail();
             }
         }
@@ -167,7 +167,7 @@ namespace Lazy.Res
         {
             if (!URLUtility.IsLegalUri(uri))
             {
-                Log.Log.MsgE($"无法为URI:{uri} AssetBundle下载请求。无效的URI");
+                Log.MsgE($"无法为URI:{uri} AssetBundle下载请求。无效的URI");
                 LoadFail();
                 yield break;
             }
@@ -181,7 +181,7 @@ namespace Lazy.Res
             }
             catch (Exception e)
             {
-                Log.Log.MsgE($"无法创建UnityWebRequest,URI:{uri}.Exception:{e.Message}");
+                Log.MsgE($"无法创建UnityWebRequest,URI:{uri}.Exception:{e.Message}");
                 LoadFail();
                 yield break;
             }
@@ -193,7 +193,7 @@ namespace Lazy.Res
             if (_request.isNetworkError || _request.isHttpError)
 #endif
             {
-                Log.Log.MsgE($"无法对URI:{uri}发起资源包下载请求。Error: {_request.error}");
+                Log.MsgE($"无法对URI:{uri}发起资源包下载请求。Error: {_request.error}");
                 LoadFail();
             }
         }

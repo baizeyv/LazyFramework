@@ -1,7 +1,8 @@
+using Lazy;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     [CustomEditor(typeof(UIDialog), true)]
     public class UIDialogInspector : UnityEditor.Editor

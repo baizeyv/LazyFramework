@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lazy;
-using Lazy.Res.Loader;
-using Lazy.Singleton;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Res.Manager
+namespace Lazy
 {
     [ManagerUpdate]
     public class AssetBundleManager : Singleton<AssetBundleManager>, IManager
@@ -626,7 +624,7 @@ namespace Lazy.Res.Manager
             }
             else
             {
-                Log.Log.MsgE("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                Log.MsgE("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
             }
         }
 
@@ -652,7 +650,7 @@ namespace Lazy.Res.Manager
             }
             else
             {
-                Log.Log.MsgE("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
+                Log.MsgE("如果游戏中没有使用任何AB包加载资源，可以删除此方法的调用！");
             }
 #endif
         }

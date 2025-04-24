@@ -1,4 +1,4 @@
-﻿namespace Lazy.Timer
+﻿namespace Lazy
 {
     public enum TimeType
     {

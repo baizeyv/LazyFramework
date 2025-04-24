@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Lazy.Res;
+using Lazy;
 using UnityEngine;
 using UnityEngine.UI;
 

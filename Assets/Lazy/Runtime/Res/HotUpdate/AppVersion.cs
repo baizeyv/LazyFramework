@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lazy.Res.HotUpdate
+namespace Lazy
 {
     public class AppVersion
     {

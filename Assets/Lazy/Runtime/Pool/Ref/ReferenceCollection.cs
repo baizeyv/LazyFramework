@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lazy.Ref
+namespace Lazy
 {
     internal sealed class ReferenceCollection
     {
@@ -46,7 +46,7 @@ namespace Lazy.Ref
         /// <param name="referenceType">引用类型</param>
         public ReferenceCollection(Type referenceType)
         {
-            _referencesQueue = new();
+            _referencesQueue = new Queue<IReference>();
             _referenceType = referenceType;
             _usingReferenceCount = 0;
             _obtainReferenceCount = 0;
@@ -72,11 +72,12 @@ namespace Lazy.Ref
 
         public int RemoveReferenceCount => _removeReferenceCount;
 
-        public T Obtain<T>() where T : class, IReference, new()
+        public T Obtain<T>()
+            where T : class, IReference, new()
         {
             if (typeof(T) != _referenceType)
             {
-                Log.Log.MsgE("Type is invalid.");
+                Log.MsgE("Type is invalid.");
                 return null;
             }
 
@@ -86,9 +87,7 @@ namespace Lazy.Ref
             lock (_referencesQueue)
             {
                 if (_referencesQueue.Count > 0)
-                {
                     return _referencesQueue.Dequeue() as T;
-                }
             }
 
             _addReferenceCount++;
@@ -102,9 +101,7 @@ namespace Lazy.Ref
             lock (_referencesQueue)
             {
                 if (_referencesQueue.Count > 0)
-                {
                     return _referencesQueue.Dequeue();
-                }
             }
 
             _addReferenceCount++;
@@ -118,9 +115,10 @@ namespace Lazy.Ref
             {
                 if (_referencesQueue.Contains(reference))
                 {
-                    Log.Log.MsgE("Reference is already freed.");
+                    Log.MsgE("Reference is already freed.");
                     return;
                 }
+
                 _referencesQueue.Enqueue(reference);
             }
 
@@ -128,21 +126,20 @@ namespace Lazy.Ref
             _usingReferenceCount--;
         }
 
-        public void Add<T>(int count) where T : class, IReference, new()
+        public void Add<T>(int count)
+            where T : class, IReference, new()
         {
             if (typeof(T) != _referenceType)
             {
-                Log.Log.MsgE("Type is invalid.");
-                return ;
+                Log.MsgE("Type is invalid.");
+                return;
             }
 
             lock (_referencesQueue)
             {
                 _addReferenceCount += count;
                 while (count-- > 0)
-                {
                     _referencesQueue.Enqueue(new T());
-                }
             }
         }
 
@@ -151,10 +148,10 @@ namespace Lazy.Ref
             lock (_referencesQueue)
             {
                 _addReferenceCount += count;
-                while (count -- > 0)
-                {
-                    _referencesQueue.Enqueue(Activator.CreateInstance(_referenceType) as IReference);
-                }
+                while (count-- > 0)
+                    _referencesQueue.Enqueue(
+                        Activator.CreateInstance(_referenceType) as IReference
+                    );
             }
         }
 
@@ -163,16 +160,12 @@ namespace Lazy.Ref
             lock (_referencesQueue)
             {
                 if (count > _referencesQueue.Count)
-                {
                     count = _referencesQueue.Count;
-                }
 
                 _removeReferenceCount += count;
 
-                while (count -- > 0)
-                {
+                while (count-- > 0)
                     _referencesQueue.Dequeue();
-                }
             }
         }
 

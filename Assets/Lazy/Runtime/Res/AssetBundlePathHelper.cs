@@ -1,9 +1,8 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
 using Lazy;
-using Lazy.Res.HotUpdate;
 
-namespace Lazy.Res
+namespace Lazy
 {
     public static class AssetBundlePathHelper
     {
@@ -49,11 +48,11 @@ namespace Lazy.Res
                     break;
                 case SourceType.RemoteAddress:
                     if (string.IsNullOrEmpty(AppConfig.LocalVersion.AssetRemoteAddress))
-                        Log.Log.MsgE("加载远程包需要配置远程地址：AssetRemoteAddress");
+                        Log.MsgE("加载远程包需要配置远程地址：AssetRemoteAddress");
                     assetBundlePath = PathSetting.RemoteAddress;
                     break;
                 default:
-                    Log.Log.MsgE("AssetBundle的源类型不能为空 TODO!");
+                    Log.MsgE("AssetBundle的源类型不能为空 TODO!");
                     return null;
             }
 

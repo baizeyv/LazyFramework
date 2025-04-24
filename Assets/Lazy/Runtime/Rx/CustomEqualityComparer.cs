@@ -2,21 +2,18 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public static class CustomEqualityComparer
     {
-        public static ColorEqualityComparer Color = new ColorEqualityComparer();
+        public static ColorEqualityComparer Color = new();
     }
 
     public class ColorEqualityComparer : IEqualityComparer<Color>
     {
         public bool Equals(Color x, Color y)
         {
-            return x.r.Equals(y.r)
-                   && x.g.Equals(y.g)
-                   && x.b.Equals(y.b)
-                   && x.a.Equals(y.a);
+            return x.r.Equals(y.r) && x.g.Equals(y.g) && x.b.Equals(y.b) && x.a.Equals(y.a);
         }
 
         public int GetHashCode(Color obj)

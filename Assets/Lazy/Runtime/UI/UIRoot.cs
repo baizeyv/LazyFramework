@@ -1,5 +1,5 @@
 ﻿using System;
-using Lazy.Res;
+using Lazy;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

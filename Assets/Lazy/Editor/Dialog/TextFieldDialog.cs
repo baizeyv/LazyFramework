@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Editor.EditorRes;
-using Lazy.Editor.Extensions;
+using LazyEditor;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor
+namespace LazyEditor
 {
     public class TextFieldDialog : EditorWindow
     {
@@ -24,10 +23,15 @@ namespace Lazy.Editor
         [NonSerialized]
         private TextValidator _errorValidator = null;
 
-        public static void OpenDialog(string title, string description, List<TextValidator> validatorList,
-            Action<string> callback, EditorWindow targetWin = null)
+        public static void OpenDialog(
+            string title,
+            string description,
+            List<TextValidator> validatorList,
+            Action<string> callback,
+            EditorWindow targetWin = null
+        )
         {
-            TextFieldDialog window = ScriptableObject.CreateInstance<TextFieldDialog>();
+            var window = CreateInstance<TextFieldDialog>();
 
             window.name = "TextFieldDialog '" + title + "'";
             window.titleContent = new GUIContent(title);
@@ -47,7 +51,7 @@ namespace Lazy.Editor
         {
             _errorValidator = null;
 
-            Color defaultColor = GUI.contentColor;
+            var defaultColor = GUI.contentColor;
 
             GUILayout.Space(20);
             EditorGUILayout.LabelField(_description);
@@ -58,15 +62,16 @@ namespace Lazy.Editor
             GUILayout.FlexibleSpace();
 
             foreach (var val in _validatorList)
-            {
                 if (!val.Validate(_resultString))
                 {
                     _errorValidator = val;
                     break;
                 }
-            }
 
-            var lockOkButton = !(_errorValidator != null && _errorValidator.errorType == TextValidator.ErrorType.Error);
+            var lockOkButton = !(
+                _errorValidator != null
+                && _errorValidator.errorType == TextValidator.ErrorType.Error
+            );
 
             GUILayout.BeginHorizontal();
             if (_errorValidator != null)
@@ -75,15 +80,30 @@ namespace Lazy.Editor
                 {
                     case TextValidator.ErrorType.Info:
                         GUI.contentColor = Styles.Colors.Blue;
-                        GUILayout.Box(new GUIContent(EditorImageManager.Info, _errorValidator.failureMsg), Styles.icon);
+                        GUILayout.Box(
+                            new GUIContent(EditorImageManager.Info, _errorValidator.failureMsg),
+                            Styles.icon
+                        );
                         break;
                     case TextValidator.ErrorType.Warning:
                         GUI.contentColor = Styles.Colors.Yellow;
-                        GUILayout.Box(new GUIContent(EditorImageManager.Exclamation, _errorValidator.failureMsg), Styles.icon);
+                        GUILayout.Box(
+                            new GUIContent(
+                                EditorImageManager.Exclamation,
+                                _errorValidator.failureMsg
+                            ),
+                            Styles.icon
+                        );
                         break;
                     case TextValidator.ErrorType.Error:
                         GUI.contentColor = Styles.Colors.Red;
-                        GUILayout.Box(new GUIContent(EditorImageManager.Exclamation, _errorValidator.failureMsg), Styles.icon);
+                        GUILayout.Box(
+                            new GUIContent(
+                                EditorImageManager.Exclamation,
+                                _errorValidator.failureMsg
+                            ),
+                            Styles.icon
+                        );
                         break;
                 }
 
@@ -93,9 +113,7 @@ namespace Lazy.Editor
             GUILayout.FlexibleSpace();
 
             if (GUILayout.Button("Cancel", GUILayout.Width(75f)))
-            {
                 Close();
-            }
 
             GUI.enabled = lockOkButton;
             if (GUILayout.Button("OK", GUILayout.Width(75f)))
@@ -112,15 +130,12 @@ namespace Lazy.Editor
             // set focus only if element exist
             try
             {
-                EditorGUI.FocusTextInControl(name+"_textInput");
+                EditorGUI.FocusTextInControl(name + "_textInput");
             }
-            catch (MissingReferenceException)
-            {
-            }
+            catch (MissingReferenceException) { }
 
-            if (UnityEngine.Event.current != null && UnityEngine.Event.current.isKey)
-            {
-                switch (UnityEngine.Event.current.keyCode)
+            if (Event.current != null && Event.current.isKey)
+                switch (Event.current.keyCode)
                 {
                     case KeyCode.Return:
                         if (lockOkButton)
@@ -128,12 +143,12 @@ namespace Lazy.Editor
                             _callback?.Invoke(_resultString);
                             Close();
                         }
+
                         break;
                     case KeyCode.Escape:
                         Close();
                         break;
                 }
-            }
         }
     }
 }

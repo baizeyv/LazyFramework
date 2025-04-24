@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Lazy;
 using UnityEngine;
-using IPoolable = Lazy.Pool.IPoolable;
+using IPoolable = Lazy.IPoolable;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Res.Loader
+namespace Lazy
 {
     public class ResourcesLoader : ABSLoader, IPoolable
     {
@@ -177,7 +178,7 @@ namespace Lazy.Res.Loader
                     }
                     else
                     {
-                        Log.Log.MsgE($"Resource Type Error: {_resourcePath}");
+                        Log.MsgE($"Resource Type Error: {_resourcePath}");
                         End();
                     }
                 };
@@ -387,7 +388,7 @@ namespace Lazy.Res.Loader
         {
             if (string.IsNullOrEmpty(resourcePath) || obj == null)
             {
-                Log.Log.MsgE("加载资产对象Object为空，请检查类型和路径：" + resourcePath);
+                Log.MsgE("加载资产对象Object为空，请检查类型和路径：" + resourcePath);
                 return;
             }
 

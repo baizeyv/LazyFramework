@@ -2,8 +2,9 @@ using System;
 using System.IO;
 using System.Text;
 using Lazy;
+using LazyEditor;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     public static class CodeGenTemplate
     {

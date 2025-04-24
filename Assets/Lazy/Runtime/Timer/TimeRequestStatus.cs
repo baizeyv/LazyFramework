@@ -1,4 +1,6 @@
-﻿namespace Lazy.Timer
+﻿using Lazy;
+
+namespace Lazy
 {
     public enum TimeRequestStatus
     {

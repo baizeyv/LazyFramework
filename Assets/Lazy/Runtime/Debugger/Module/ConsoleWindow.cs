@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Debugger.Misc;
-using Lazy.Runtime.Utility;
+using Lazy;
 using UnityEngine;
 
-namespace Lazy.Debugger.Module
+namespace Lazy
 {
     [Serializable]
     public class ConsoleWindow : IDebuggerWindow
@@ -345,7 +344,7 @@ namespace Lazy.Debugger.Module
                                 "label"
                             )
                         )
-                            Debugger.CopyToClipboard(
+                            Lazy.Debugger.CopyToClipboard(
                                 TextUtility.Format(
                                     "{0}{2}{2}{1}",
                                     _selectedLog.LOGMessage,

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace Lazy.Excel
+namespace Lazy
 {
     public class FileChangeDetector
     {
@@ -38,7 +38,7 @@ namespace Lazy.Excel
                 }
                 else
                 {
-                    Log.Log.MsgE(
+                    Log.MsgE(
                         $"FileChangeDetector.Detect error:{e} stack:{e.StackTrace}\nfilePath:{_filePath}"
                     );
                     return false;

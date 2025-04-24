@@ -1,10 +1,9 @@
 ﻿using System;
-using Lazy.Debugger.Misc;
-using Lazy.Runtime.Utility;
+using Lazy;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace Lazy.Debugger.Module
+namespace Lazy
 {
     [Serializable]
     public class ProfilerWindow : ScrollableDebuggerWindowBase

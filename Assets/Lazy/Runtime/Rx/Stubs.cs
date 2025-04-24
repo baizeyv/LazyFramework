@@ -1,7 +1,7 @@
 using System;
 using Lazy;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     internal static class Stubs
     {

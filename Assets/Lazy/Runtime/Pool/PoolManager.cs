@@ -1,8 +1,6 @@
 ﻿using Lazy;
-using Lazy.Ref;
-using Lazy.Singleton;
 
-namespace Lazy.Pool
+namespace Lazy
 {
     public class PoolManager : Singleton<PoolManager>, IManager
     {

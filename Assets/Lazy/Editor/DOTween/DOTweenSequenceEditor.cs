@@ -7,7 +7,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Editor
+namespace LazyEditor
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(DOTweenSequence))]

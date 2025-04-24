@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lazy.Pool;
+using Lazy;
 using UnityEngine;
 
 namespace Lazy

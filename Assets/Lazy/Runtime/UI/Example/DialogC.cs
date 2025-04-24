@@ -1,11 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.UI.Example
+namespace Lazy.Example
 {
     public class DialogC : UIDialog
     {
-
         [SerializeField]
         public Button mBtn;
 

@@ -1,14 +1,5 @@
 {
   "dependencies": {
-    "com.cysharp.r3": {
-      "version": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.modules.imgui": "1.0.0"
-      },
-      "hash": "dd0db5d885d572f7d359434ba82faecd4fc4bf29"
-    },
     "com.unity.2d.animation": {
       "version": "10.1.4",
       "depth": 1,
@@ -243,13 +234,6 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "dev.kyubuns.auto9slicer": {
-      "version": "https://github.com/kyubuns/Auto9Slicer.git?path=Assets/Auto9Slicer",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "c466144f5af0f20b504fbe76d562bc1e32614b90"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

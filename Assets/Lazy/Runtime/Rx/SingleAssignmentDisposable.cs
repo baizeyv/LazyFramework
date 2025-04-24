@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public struct SingleAssignmentDisposable
     {
@@ -15,7 +15,7 @@ namespace Lazy.Rx
             {
                 var field = Volatile.Read(ref current);
                 if (field == DisposedSentinel.Instance)
-                    return Rx.Disposable.Empty;
+                    return Lazy.Disposable.Empty;
 
                 return field;
             }

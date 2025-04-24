@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Editor.NinePatchSlicer
+namespace LazyEditor
 {
     [Serializable]
     public class SliceOptions
@@ -11,6 +11,6 @@ namespace Lazy.Editor.NinePatchSlicer
 
         public int margin = 2;
 
-        public static SliceOptions Default => new SliceOptions();
+        public static SliceOptions Default => new();
     }
 }

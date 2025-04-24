@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Lazy;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     [CustomEditor(typeof(ExtraBinds))]
     public class ExtraBindsInspector : UnityEditor.Editor
@@ -39,13 +40,13 @@ namespace Lazy.Editor.UIEditor
                 EditorGUILayout.LabelField(string.Empty);
                 if (
                     (
-                        UnityEngine.Event.current.type == EventType.DragUpdated
-                        || UnityEngine.Event.current.type == EventType.DragPerform
-                    ) && pathRect.Contains(UnityEngine.Event.current.mousePosition)
+                        Event.current.type == EventType.DragUpdated
+                        || Event.current.type == EventType.DragPerform
+                    ) && pathRect.Contains(Event.current.mousePosition)
                 )
                 {
                     DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-                    if (UnityEngine.Event.current.type == EventType.DragPerform)
+                    if (Event.current.type == EventType.DragPerform)
                     {
                         DragAndDrop.AcceptDrag();
                         foreach (var o in DragAndDrop.objectReferences)
@@ -55,7 +56,7 @@ namespace Lazy.Editor.UIEditor
                                 AddReference(dataProperty, RemoveString(o.name, " ", "-", "@"), o);
                     }
 
-                    UnityEngine.Event.current.Use();
+                    Event.current.Use();
                 }
 
                 var delList = new List<int>();

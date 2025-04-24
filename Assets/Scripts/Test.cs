@@ -1,5 +1,4 @@
-﻿using Lazy.Rx.Operator;
-using Lazy.Rx.Variables;
+﻿using Lazy;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;

@@ -1,4 +1,4 @@
-﻿namespace Lazy.Runtime.Utility
+﻿namespace Lazy
 {
     public static class ScreenConvertUtility
     {

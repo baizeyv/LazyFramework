@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 
-namespace Lazy.Excel
+namespace Lazy
 {
     /// <summary>
     /// * Excel表格资产信息

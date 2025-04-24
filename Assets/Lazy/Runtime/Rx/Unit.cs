@@ -1,14 +1,20 @@
 using System;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public readonly struct Unit : IEquatable<Unit>
     {
         public static readonly Unit Default = default;
 
-        public static bool operator ==(Unit first, Unit second) => true;
+        public static bool operator ==(Unit first, Unit second)
+        {
+            return true;
+        }
 
-        public static bool operator !=(Unit first, Unit second) => false;
+        public static bool operator !=(Unit first, Unit second)
+        {
+            return false;
+        }
 
         public bool Equals(Unit other)
         {

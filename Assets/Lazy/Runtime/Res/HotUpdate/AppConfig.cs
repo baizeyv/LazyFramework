@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lazy;
 
-namespace Lazy.Res.HotUpdate
+namespace Lazy
 {
     public static class AppConfig
     {

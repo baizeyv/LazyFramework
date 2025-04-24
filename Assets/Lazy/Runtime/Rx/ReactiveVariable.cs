@@ -2,21 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public abstract class ReadOnlyReactiveVariable<T> : Observable<T>, IDisposable
     {
         public abstract T CurrentValue { get; }
 
-        protected virtual void OnValueChanged(T value)
-        {
-        }
+        protected virtual void OnValueChanged(T value) { }
 
-        protected virtual void OnReceiveError(Exception exception)
-        {
-        }
+        protected virtual void OnReceiveError(Exception exception) { }
 
-        public ReadOnlyReactiveVariable<T> ToReadOnlyReactiveProperty() => this;
+        public ReadOnlyReactiveVariable<T> ToReadOnlyReactiveProperty()
+        {
+            return this;
+        }
 
         public abstract void Dispose();
     }
@@ -80,19 +79,15 @@ namespace Lazy.Rx
 
         public virtual T Value
         {
-            get => this.currentValue;
+            get => currentValue;
             set
             {
                 OnValueChanging(ref value);
                 if (EqualityComparer != null)
-                {
-                    if (EqualityComparer.Equals(this.currentValue, value))
-                    {
+                    if (EqualityComparer.Equals(currentValue, value))
                         return;
-                    }
-                }
 
-                this.currentValue = value;
+                currentValue = value;
                 OnValueChanged(value);
 
                 OnNextCore(value);
@@ -102,33 +97,23 @@ namespace Lazy.Rx
         private bool _subscribeWithInit;
 
         public ReactiveVariable()
-            : this(default!)
-        {
-        }
+            : this(default!) { }
 
         public ReactiveVariable(T value)
-            : this(value, EqualityComparer<T>.Default)
-        {
-        }
+            : this(value, EqualityComparer<T>.Default) { }
 
         public ReactiveVariable(T value, bool subscribeWithInit)
-            : this(value, EqualityComparer<T>.Default, true, subscribeWithInit)
-        {
-        }
+            : this(value, EqualityComparer<T>.Default, true, subscribeWithInit) { }
 
         public ReactiveVariable(T value, IEqualityComparer<T> equalityComparer)
-            : this(value, equalityComparer, true, true)
-        {
-        }
+            : this(value, equalityComparer, true, true) { }
 
         public ReactiveVariable(
             T value,
             IEqualityComparer<T> equalityComparer,
             bool subscribeWithInit
         )
-            : this(value, equalityComparer, true, subscribeWithInit)
-        {
-        }
+            : this(value, equalityComparer, true, subscribeWithInit) { }
 
         public ReactiveVariable(
             T value,
@@ -140,22 +125,19 @@ namespace Lazy.Rx
             _subscribeWithInit = subscribeWithInit;
             this.equalityComparer = equalityComparer;
             if (callOnValueChangeInBaseConstructor)
-            {
                 OnValueChanging(ref value);
-            }
 
             currentValue = value;
             if (callOnValueChangeInBaseConstructor)
-            {
                 OnValueChanged(value);
-            }
         }
 
-        protected virtual void OnValueChanging(ref T value)
+        protected virtual void OnValueChanging(ref T value) { }
+
+        protected ref T GetValueRef()
         {
+            return ref currentValue;
         }
-
-        protected ref T GetValueRef() => ref currentValue;
 
         public virtual void ForceNotify()
         {
@@ -186,22 +168,16 @@ namespace Lazy.Rx
             {
                 ThrowIfDisposed();
                 if (IsCompleted)
-                {
-                    completedResult = (error == null) ? Result.Success : Result.Failure(error);
-                }
+                    completedResult = error == null ? Result.Success : Result.Failure(error);
                 else
-                {
                     completedResult = null;
-                }
             }
 
             if (completedResult != null)
             {
                 if (completedResult.Value.IsSuccess)
-                {
                     if (_subscribeWithInit)
                         observer.OnNext(currentValue);
-                }
 
                 observer.OnCompleted(completedResult.Value);
                 return Disposable.Empty;
@@ -215,11 +191,9 @@ namespace Lazy.Rx
                 ThrowIfDisposed();
                 if (IsCompleted)
                 {
-                    completedResult = (error == null) ? Result.Success : Result.Failure(error);
+                    completedResult = error == null ? Result.Success : Result.Failure(error);
                     if (completedResult != null)
-                    {
                         observer.OnCompleted(completedResult.Value);
-                    }
 
                     return Disposable.Empty;
                 }
@@ -237,7 +211,7 @@ namespace Lazy.Rx
         public void OnNext(T value)
         {
             OnValueChanging(ref value);
-            this.currentValue = value;
+            currentValue = value;
             OnValueChanged(value);
 
             OnNextCore(value);
@@ -286,9 +260,7 @@ namespace Lazy.Rx
             }
 
             if (result.IsFailure)
-            {
                 OnReceiveError(result.Exception);
-            }
 
             var last = node?.Previous;
             while (node != null)
@@ -309,9 +281,7 @@ namespace Lazy.Rx
                     return;
 
                 if (callOnCompleted && !IsCompleted)
-                {
                     node = Volatile.Read(ref root);
-                }
 
                 Volatile.Write(ref root, null);
                 completeState = Disposed;
@@ -326,18 +296,16 @@ namespace Lazy.Rx
             DisposeCore();
         }
 
-        protected virtual void DisposeCore()
-        {
-        }
+        protected virtual void DisposeCore() { }
 
-        void ThrowIfDisposed()
+        private void ThrowIfDisposed()
         {
             if (IsDisposed)
                 throw new ObjectDisposedException("");
         }
     }
 
-    sealed class ObserverNode<T> : IDisposable
+    internal sealed class ObserverNode<T> : IDisposable
     {
         public readonly Observer<T> Observer;
 
@@ -350,7 +318,7 @@ namespace Lazy.Rx
         public ObserverNode(ReactiveVariable<T> parent, Observer<T> observer)
         {
             this.parent = parent;
-            this.Observer = observer;
+            Observer = observer;
 
             if (parent.root == null)
             {
@@ -361,7 +329,7 @@ namespace Lazy.Rx
                 var lastNode = parent.root.Previous ?? parent.root;
 
                 lastNode.Next = this;
-                this.Previous = lastNode;
+                Previous = lastNode;
                 parent.root.Previous = this;
             }
         }
@@ -381,7 +349,7 @@ namespace Lazy.Rx
 
                 if (this == p.root)
                 {
-                    if (this.Previous == null || this.Next == null)
+                    if (Previous == null || Next == null)
                     {
                         // case of single list
                         p.root = null;
@@ -389,17 +357,13 @@ namespace Lazy.Rx
                     else
                     {
                         // otherwise, root is next node.
-                        var root = this.Next;
+                        var root = Next;
 
                         // single list.
                         if (root.Next == null)
-                        {
                             root.Previous = null;
-                        }
                         else
-                        {
-                            root.Previous = this.Previous; // as last.
-                        }
+                            root.Previous = Previous; // as last.
 
                         p.root = root;
                     }
@@ -407,16 +371,12 @@ namespace Lazy.Rx
                 else
                 {
                     // node is not root, previous must exists
-                    this.Previous!.Next = this.Next;
-                    if (this.Next != null)
-                    {
-                        this.Next.Previous = this.Previous;
-                    }
+                    Previous!.Next = Next;
+                    if (Next != null)
+                        Next.Previous = Previous;
                     else
-                    {
                         // next does not exists, previous is last node so modify root
-                        p.root!.Previous = this.Previous;
-                    }
+                        p.root!.Previous = Previous;
                 }
             }
         }

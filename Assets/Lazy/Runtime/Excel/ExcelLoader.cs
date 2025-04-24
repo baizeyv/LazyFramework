@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Lazy.Excel
+namespace Lazy
 {
     internal interface Reloadable
     {

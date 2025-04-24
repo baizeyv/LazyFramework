@@ -7,7 +7,7 @@ using Lazy;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
-using Log = Lazy.Log.Log;
+using Log = Lazy.Log;
 using Random = System.Random;
 
 namespace Editor

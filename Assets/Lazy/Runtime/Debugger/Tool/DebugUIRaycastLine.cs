@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Debugger.Tool
+namespace Lazy
 {
     /// <summary>
     /// * 使用这个来在Scene中显示激活了raycastTarget的对象 (将被蓝线框住)

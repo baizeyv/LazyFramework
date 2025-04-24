@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Lazy.Runtime.Utility;
-using Lazy.Singleton;
 using Lazy;
 using UnityEngine.Networking;
 
@@ -74,7 +72,7 @@ namespace Lazy
                         || !long.TryParse(contentLengthHeader, out var fileLength)
                     )
                     {
-                        Log.Log.MsgE("Content-Length 标头找不到或无效: " + request.error);
+                        Log.MsgE("Content-Length 标头找不到或无效: " + request.error);
                         callback?.Invoke(-1);
                     }
                     else
@@ -84,7 +82,7 @@ namespace Lazy
                 }
                 else
                 {
-                    Log.Log.MsgE("检索文件大小时出错: " + request.error);
+                    Log.MsgE("检索文件大小时出错: " + request.error);
                     callback?.Invoke(-1);
                 }
             }
@@ -100,7 +98,7 @@ namespace Lazy
             Downloader downloader;
             if (_downloaders.TryAdd(downloaderName, downloader = new Downloader()))
                 return downloader;
-            Log.Log.MsgE($"已存在同名的下载器:{downloaderName}");
+            Log.MsgE($"已存在同名的下载器:{downloaderName}");
             return null;
         }
 

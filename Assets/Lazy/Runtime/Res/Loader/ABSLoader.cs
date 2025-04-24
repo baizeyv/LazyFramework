@@ -6,7 +6,7 @@ using Lazy;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Res.Loader
+namespace Lazy
 {
     /// <summary>
     /// * 抽象加载器
@@ -67,9 +67,7 @@ namespace Lazy.Res.Loader
             get
             {
                 if (LoadSuccess)
-                    Log.Log.MsgE(
-                        "Load Completed, Please use 'GetAssetObject' method to get asset."
-                    );
+                    Log.MsgE("Load Completed, Please use 'GetAssetObject' method to get asset.");
 
                 return null;
             }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Res
+namespace Lazy
 {
     /// <summary>
     /// * 资产信息结构体

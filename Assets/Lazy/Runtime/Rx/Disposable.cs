@@ -1,6 +1,6 @@
 using System;
 
-namespace Lazy.Rx
+namespace Lazy
 {
     public class Disposable
     {
@@ -9,8 +9,6 @@ namespace Lazy.Rx
 
     internal sealed class EmptyDisposable : IDisposable
     {
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }

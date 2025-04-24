@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Lazy.Log
+namespace Lazy
 {
     public class _LogExample : MonoBehaviour
     {

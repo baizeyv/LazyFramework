@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.Debugger.Module
+namespace Lazy
 {
     /// <summary>
     /// * 帧率计数器

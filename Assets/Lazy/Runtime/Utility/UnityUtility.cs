@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
 using Lazy;
-using Lazy.Runtime.Utility.Coroutine;
 
-namespace Lazy.Runtime.Utility
+namespace Lazy
 {
     public static class CoroutineCenter
     {

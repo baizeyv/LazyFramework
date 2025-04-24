@@ -1,4 +1,4 @@
-namespace Lazy.Rx
+namespace Lazy
 {
     public static class ObserverExtensions
     {

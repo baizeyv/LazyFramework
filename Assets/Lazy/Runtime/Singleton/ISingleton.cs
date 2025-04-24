@@ -1,4 +1,4 @@
-namespace Lazy.Singleton
+namespace Lazy
 {
     /// <summary>
     /// * 单例接口

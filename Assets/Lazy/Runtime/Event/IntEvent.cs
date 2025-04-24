@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Lazy.Rx;
+using Lazy;
 
-namespace Lazy.Event
+namespace Lazy
 {
     public class IntEvent : IDisposable
     {

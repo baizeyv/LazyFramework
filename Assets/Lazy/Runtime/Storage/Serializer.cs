@@ -1,4 +1,4 @@
-﻿namespace Lazy.Serializer
+﻿namespace Lazy
 {
     public abstract class Serializer<T>
     {

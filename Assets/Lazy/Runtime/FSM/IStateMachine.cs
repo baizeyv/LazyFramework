@@ -1,4 +1,4 @@
-﻿using Lazy.Pool;
+﻿using Lazy;
 
 namespace Lazy
 {

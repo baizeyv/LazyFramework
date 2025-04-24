@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Lazy.Debugger.Tool
+namespace Lazy
 {
     /// <summary>
     /// * 使用这个脚本可以捕捉到哪些元素在何时会导致Canvas重建

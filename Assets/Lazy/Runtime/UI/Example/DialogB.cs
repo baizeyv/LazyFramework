@@ -1,10 +1,9 @@
 using UnityEngine.UI;
 
-namespace Lazy.UI.Example
+namespace Lazy.Example
 {
     public class DialogB : UIDialog
     {
-
         public Button btn;
 
         protected override void OnSetup()

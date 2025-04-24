@@ -1,7 +1,5 @@
 ﻿using System;
 using Lazy;
-using Lazy.Pool;
-using Lazy.Singleton;
 using UnityEngine;
 
 namespace Lazy
@@ -91,10 +89,10 @@ namespace Lazy
                 GameObjectPoolManager.Instance.installer != null
                 && GameObjectPoolManager.Instance.installer != this
             )
-                Log.Log.MsgE($"场景中的 {nameof(GameObjectPoolManager)} 实例数量大于一个！");
+                Log.MsgE($"场景中的 {nameof(GameObjectPoolManager)} 实例数量大于一个！");
 
             if (!enabled)
-                Log.Log.MsgD(
+                Log.MsgD(
                     $"<{nameof(GlobalPoolInstaller)}> 实例已禁用！"
                         + "因此，某些功能可能无法正常工作！",
                     this

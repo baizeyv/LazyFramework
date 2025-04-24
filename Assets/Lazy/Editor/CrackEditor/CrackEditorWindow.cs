@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.CrackEditor
+namespace LazyEditor
 {
     public class CrackEditorWindow : EditorWindow
     {

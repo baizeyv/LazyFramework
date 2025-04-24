@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using Lazy;
 
-namespace Lazy.Runtime.Utility
+namespace Lazy
 {
     public static class ZipUtility
     {
@@ -39,7 +39,7 @@ namespace Lazy.Runtime.Utility
 
             public void OnFinished(string result)
             {
-                Log.Log.MsgD($"Zip Finished: {result}");
+                Log.MsgD($"Zip Finished: {result}");
             }
         }
 
@@ -61,7 +61,7 @@ namespace Lazy.Runtime.Utility
             var result = false;
             if (!File.Exists(sourceFile))
             {
-                Log.Log.MsgE($"要解压的文件不存在: {sourceFile}");
+                Log.MsgE($"要解压的文件不存在: {sourceFile}");
                 return false;
             }
 
@@ -141,11 +141,11 @@ namespace Lazy.Runtime.Utility
             catch (Exception e)
             {
                 GC.Collect();
-                Log.Log.MsgE($"文件解压错误: {e.Message}");
+                Log.MsgE($"文件解压错误: {e.Message}");
                 return result;
             }
 
-            Log.Log.MsgD($"解压完成: {sourceFile}");
+            Log.MsgD($"解压完成: {sourceFile}");
             GC.Collect();
             return true;
         }
@@ -159,7 +159,7 @@ namespace Lazy.Runtime.Utility
         {
             if (!File.Exists(sourceFile))
             {
-                Log.Log.MsgE($"要解压的文件不存在: {sourceFile}");
+                Log.MsgE($"要解压的文件不存在: {sourceFile}");
                 yield break;
             }
 
@@ -226,7 +226,7 @@ namespace Lazy.Runtime.Utility
                                 }
                                 catch (Exception e)
                                 {
-                                    Log.Log.MsgE($"解压错误: {e.Message}");
+                                    Log.MsgE($"解压错误: {e.Message}");
                                 }
 
                                 // # 解压一个等待一帧
@@ -242,7 +242,7 @@ namespace Lazy.Runtime.Utility
                 zipStream.Close();
             }
 
-            Log.Log.MsgD($"解压完成: {sourceFile}");
+            Log.MsgD($"解压完成: {sourceFile}");
             GC.Collect();
         }
 
@@ -358,7 +358,7 @@ namespace Lazy.Runtime.Utility
             }
             catch (Exception e)
             {
-                Log.Log.MsgE($"压缩失败: {e.Message}");
+                Log.MsgE($"压缩失败: {e.Message}");
                 return false;
             }
             finally
@@ -409,7 +409,7 @@ namespace Lazy.Runtime.Utility
             }
             catch (Exception e)
             {
-                Log.Log.MsgE($"压缩失败, {e.Message}");
+                Log.MsgE($"压缩失败, {e.Message}");
                 return false;
             }
 

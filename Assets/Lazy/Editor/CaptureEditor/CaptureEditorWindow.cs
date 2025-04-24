@@ -1,9 +1,10 @@
 ﻿using System;
-using Lazy.Editor.EditorRes;
+using Lazy;
+using LazyEditor;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor.CaptureEditor
+namespace LazyEditor
 {
     public class CaptureEditorWindow : EditorWindow
     {
@@ -33,7 +34,7 @@ namespace Lazy.Editor.CaptureEditor
                 + DateTime.Now.ToString($"{x}x{y}_yyyy_MM_dd_HH_mm_ss")
                 + ".png";
             ScreenCapture.CaptureScreenshot(outputPath);
-            Log.Log.I().Tag("Capture").Msg($"Save Path: {outputPath}").Do();
+            Log.I().Tag("Capture").Msg($"Save Path: {outputPath}").Do();
         }
 
         private void OnGUI()
@@ -75,7 +76,7 @@ namespace Lazy.Editor.CaptureEditor
                     + DateTime.Now.ToString($"{x}x{y}_yyyy_MM_dd_HH_mm_ss")
                     + ".png";
                 ScreenCapture.CaptureScreenshot(outputPath);
-                Log.Log.I().Tag(this).Msg($"Save Path: {outputPath}").Do();
+                Log.I().Tag(this).Msg($"Save Path: {outputPath}").Do();
             }
         }
 

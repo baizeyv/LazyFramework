@@ -1,10 +1,4 @@
 ﻿using Lazy;
-using Lazy.Pool;
-using Lazy.RedDot;
-using Lazy.Res;
-using Lazy.Serializer;
-using Lazy.Timer;
-using Lazy.UI;
 
 namespace Lazy
 {
@@ -125,16 +119,11 @@ namespace Lazy
             set => _redDotManager ??= value;
         }
 
-        private static Debugger.Debugger _debugger;
+        private static Debugger _debugger;
 
-        public static Debugger.Debugger Debugger
+        public static Debugger Debugger
         {
-            get
-            {
-                return _debugger ??= ManagerCenter.CreateMono(
-                    () => Lazy.Debugger.Debugger.Instance
-                );
-            }
+            get { return _debugger ??= ManagerCenter.CreateMono(() => Debugger.Instance); }
             set => _debugger ??= value;
         }
     }

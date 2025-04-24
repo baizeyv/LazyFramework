@@ -5,8 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Editor.Lazy.PrefEditor.SearchField;
-using Lazy.Editor;
-using Lazy.Editor.EditorRes;
+using LazyEditor;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -23,7 +22,18 @@ namespace Editor.Lazy.PrefEditor
         private const int ErrorValueINT = int.MinValue;
 
 #if UNITY_EDITOR_LINUX
-        private readonly char[] invalidFilenameChars = { '"', '\\', '*', '/', ':', '<', '>', '?', '|' };
+        private readonly char[] invalidFilenameChars =
+        {
+            '"',
+            '\\',
+            '*',
+            '/',
+            ':',
+            '<',
+            '>',
+            '?',
+            '|',
+        };
 #elif UNITY_EDITOR_OSX
         private readonly char[] invalidFilenameChars = { '$', '%', '&', '\\', '/', ':', '<', '>', '|', '~' };
 #else
@@ -78,15 +88,23 @@ namespace Editor.Lazy.PrefEditor
 
         private bool _showSystemGroup = false;
 
-        private readonly List<TextValidator> _prefKeyValidatorList = new()
-        {
-            new TextValidator(TextValidator.ErrorType.Error,
-                @"Invalid character detected. Only letters, numbers, space and ,.;:<>_|!§$%&/()=?*+~#-]+$ are allowed",
-                @"(^$)|(^[a-zA-Z0-9 ,.;:<>_|!§$%&/()=?*+~#-]+$)"),
-            new TextValidator(TextValidator.ErrorType.Warning,
-                @"The given key already exist. The existing entry would be overwritten!",
-                (key) => { return !PlayerPrefs.HasKey(key); })
-        };
+        private readonly List<TextValidator> _prefKeyValidatorList =
+            new()
+            {
+                new TextValidator(
+                    TextValidator.ErrorType.Error,
+                    @"Invalid character detected. Only letters, numbers, space and ,.;:<>_|!§$%&/()=?*+~#-]+$ are allowed",
+                    @"(^$)|(^[a-zA-Z0-9 ,.;:<>_|!§$%&/()=?*+~#-]+$)"
+                ),
+                new TextValidator(
+                    TextValidator.ErrorType.Warning,
+                    @"The given key already exist. The existing entry would be overwritten!",
+                    (key) =>
+                    {
+                        return !PlayerPrefs.HasKey(key);
+                    }
+                ),
+            };
 
         [MenuItem("Lazy/Preferences Editor", false, 100)]
         public static void ShowWindow()
@@ -94,7 +112,8 @@ namespace Editor.Lazy.PrefEditor
             if (HasOpenInstances<PreferencesEditorWindow>())
             {
                 // # 如果已经打开了就关闭
-                GetWindow<PreferencesEditorWindow>(WindowName).Close();
+                GetWindow<PreferencesEditorWindow>(WindowName)
+                    .Close();
             }
             else
             {
@@ -119,19 +138,30 @@ namespace Editor.Lazy.PrefEditor
             _entryAccessor.onStartLoading = () => { _showLoadingIndicatorOverlay = true; };
             _entryAccessor.onStopLoading = () => { _showLoadingIndicatorOverlay = false };
 #elif UNITY_EDITOR_LINUX
-            pathToPrefs = @".config/unity3d/" + MakeValidFileName(PlayerSettings.companyName) + "/" +
-                          MakeValidFileName(PlayerSettings.productName) + "/prefs";
+            pathToPrefs =
+                @".config/unity3d/"
+                + MakeValidFileName(PlayerSettings.companyName)
+                + "/"
+                + MakeValidFileName(PlayerSettings.productName)
+                + "/prefs";
             _entryAccessor = new LinuxPreferencesStorageAccessor(pathToPrefs);
 #endif
 
-            _entryAccessor.onPrefEntryChanged += () => { _updateView = true; };
+            _entryAccessor.onPrefEntryChanged += () =>
+            {
+                _updateView = true;
+            };
             _monitoring = LazyEditorPrefs.GetBool(EditorConstant.KeyWatchingForChanges, true);
             if (_monitoring)
                 _entryAccessor.StartMonitoring();
 
-            _sortOrder = (PreferencesEntrySortOrderType)LazyEditorPrefs.GetInt(EditorConstant.KeySortOrder, 0);
-            _searchField = new();
-            _searchField.OnDropdownSelection = () => { PrepareData(); };
+            _sortOrder = (PreferencesEntrySortOrderType)
+                LazyEditorPrefs.GetInt(EditorConstant.KeySortOrder, 0);
+            _searchField = new PreferencesSearchField();
+            _searchField.OnDropdownSelection = () =>
+            {
+                PrepareData();
+            };
 
             // Fix for serialisation issue of static fields
             if (_userDefList == null)
@@ -152,29 +182,40 @@ namespace Editor.Lazy.PrefEditor
             {
                 var tmp = Resources.FindObjectsOfTypeAll<PreferenceEntrySet>();
                 if (tmp.Length > 0)
-                {
                     _prefEntrySet = tmp[0];
-                }
                 else
-                {
-                    _prefEntrySet = ScriptableObject.CreateInstance<PreferenceEntrySet>();
-                }
+                    _prefEntrySet = CreateInstance<PreferenceEntrySet>();
             }
 
             if (_serializedObject == null)
+                _serializedObject = new SerializedObject(_prefEntrySet);
+
+            _userDefList = new ReorderableList(
+                _serializedObject,
+                _serializedObject.FindProperty("userDefList"),
+                false,
+                true,
+                true,
+                true
+            );
+            _unityDefList = new ReorderableList(
+                _serializedObject,
+                _serializedObject.FindProperty("unityDefList"),
+                false,
+                true,
+                false,
+                false
+            );
+
+            _relativeSplitterPos = LazyEditorPrefs.GetFloat(
+                EditorConstant.KeyRelativeSplitterPosition,
+                100 / position.width
+            );
+
+            _userDefList.drawHeaderCallback = (rect) =>
             {
-                _serializedObject = new(_prefEntrySet);
-            }
-
-            _userDefList = new(_serializedObject, _serializedObject.FindProperty("userDefList"), false, true, true,
-                true);
-            _unityDefList = new(_serializedObject, _serializedObject.FindProperty("unityDefList"), false, true, false,
-                false);
-
-            _relativeSplitterPos =
-                LazyEditorPrefs.GetFloat(EditorConstant.KeyRelativeSplitterPosition, 100 / position.width);
-
-            _userDefList.drawHeaderCallback = (rect) => { EditorGUI.LabelField(rect, "User Defined"); };
+                EditorGUI.LabelField(rect, "User Defined");
+            };
             _userDefList.drawElementBackgroundCallback = OnDrawElementBackgroundCallback;
             _userDefList.drawElementCallback = (rect, index, isActive, isFocused) =>
             {
@@ -206,29 +247,59 @@ namespace Editor.Lazy.PrefEditor
 
                 EditorGUI.BeginChangeCheck();
                 var prefKeyName = key.stringValue;
-                EditorGUI.LabelField(new(rect.x, rect.y, splitterPos - 1, EditorGUIUtility.singleLineHeight),
-                    new GUIContent(prefKeyName, prefKeyName));
+                EditorGUI.LabelField(
+                    new Rect(rect.x, rect.y, splitterPos - 1, EditorGUIUtility.singleLineHeight),
+                    new GUIContent(prefKeyName, prefKeyName)
+                );
                 GUI.enabled = false;
-                EditorGUI.EnumPopup(new(rect.x + splitterPos + 1, rect.y, 60, EditorGUIUtility.singleLineHeight),
-                    (PreferenceEntry.PrefType)type.enumValueIndex);
+                EditorGUI.EnumPopup(
+                    new Rect(
+                        rect.x + splitterPos + 1,
+                        rect.y,
+                        60,
+                        EditorGUIUtility.singleLineHeight
+                    ),
+                    (PreferenceEntry.PrefType)type.enumValueIndex
+                );
                 GUI.enabled = !_showLoadingIndicatorOverlay;
 
                 switch ((PreferenceEntry.PrefType)type.enumValueIndex)
                 {
                     case PreferenceEntry.PrefType.Float:
                         EditorGUI.DelayedFloatField(
-                            new(rect.x + splitterPos + 62, rect.y, rect.width - splitterPos - 60,
-                                EditorGUIUtility.singleLineHeight), value, GUIContent.none);
+                            new Rect(
+                                rect.x + splitterPos + 62,
+                                rect.y,
+                                rect.width - splitterPos - 60,
+                                EditorGUIUtility.singleLineHeight
+                            ),
+                            value,
+                            GUIContent.none
+                        );
                         break;
                     case PreferenceEntry.PrefType.Int:
                         EditorGUI.DelayedIntField(
-                            new(rect.x + splitterPos + 62, rect.y, rect.width - splitterPos - 60,
-                                EditorGUIUtility.singleLineHeight), value, GUIContent.none);
+                            new Rect(
+                                rect.x + splitterPos + 62,
+                                rect.y,
+                                rect.width - splitterPos - 60,
+                                EditorGUIUtility.singleLineHeight
+                            ),
+                            value,
+                            GUIContent.none
+                        );
                         break;
                     case PreferenceEntry.PrefType.String:
                         EditorGUI.DelayedTextField(
-                            new(rect.x + splitterPos + 62, rect.y, rect.width - splitterPos - 60,
-                                EditorGUIUtility.singleLineHeight), value, GUIContent.none);
+                            new Rect(
+                                rect.x + splitterPos + 62,
+                                rect.y,
+                                rect.width - splitterPos - 60,
+                                EditorGUIUtility.singleLineHeight
+                            ),
+                            value,
+                            GUIContent.none
+                        );
                         break;
                 }
 
@@ -257,11 +328,18 @@ namespace Editor.Lazy.PrefEditor
                 _userDefList.ReleaseKeyboardFocus();
                 _unityDefList.ReleaseKeyboardFocus();
 
-                var prefKey = l.serializedProperty.GetArrayElementAtIndex(l.index).FindPropertyRelative("key")
+                var prefKey = l
+                    .serializedProperty.GetArrayElementAtIndex(l.index)
+                    .FindPropertyRelative("key")
                     .stringValue;
-                if (EditorUtility.DisplayDialog("Warning!",
-                        $"Are you sure you want to delete this entry from PlayerPrefs?\n\nEntry: {prefKey}", "Yes",
-                        "No"))
+                if (
+                    EditorUtility.DisplayDialog(
+                        "Warning!",
+                        $"Are you sure you want to delete this entry from PlayerPrefs?\n\nEntry: {prefKey}",
+                        "Yes",
+                        "No"
+                    )
+                )
                 {
                     _entryAccessor.IgnoreNextChange();
                     PlayerPrefs.DeleteKey(prefKey);
@@ -275,35 +353,45 @@ namespace Editor.Lazy.PrefEditor
             _userDefList.onAddDropdownCallback = (buttonRect, l) =>
             {
                 var menu = new GenericMenu();
-                foreach (PreferenceEntry.PrefType type in Enum.GetValues(typeof(PreferenceEntry.PrefType)))
-                {
-                    menu.AddItem(new GUIContent(type.ToString()), false, () =>
-                    {
-                        TextFieldDialog.OpenDialog("Create new property", "Key for the new property:",
-                            _prefKeyValidatorList,
-                            key =>
-                            {
-                                _entryAccessor.IgnoreNextChange();
-
-                                switch (type)
+                foreach (
+                    PreferenceEntry.PrefType type in Enum.GetValues(
+                        typeof(PreferenceEntry.PrefType)
+                    )
+                )
+                    menu.AddItem(
+                        new GUIContent(type.ToString()),
+                        false,
+                        () =>
+                        {
+                            TextFieldDialog.OpenDialog(
+                                "Create new property",
+                                "Key for the new property:",
+                                _prefKeyValidatorList,
+                                key =>
                                 {
-                                    case PreferenceEntry.PrefType.Float:
-                                        PlayerPrefs.SetFloat(key, 0f);
-                                        break;
-                                    case PreferenceEntry.PrefType.Int:
-                                        PlayerPrefs.SetInt(key, 0);
-                                        break;
-                                    case PreferenceEntry.PrefType.String:
-                                        PlayerPrefs.SetString(key, string.Empty);
-                                        break;
-                                }
+                                    _entryAccessor.IgnoreNextChange();
 
-                                PlayerPrefs.Save();
-                                PrepareData();
-                                Focus();
-                            }, this);
-                    });
-                }
+                                    switch (type)
+                                    {
+                                        case PreferenceEntry.PrefType.Float:
+                                            PlayerPrefs.SetFloat(key, 0f);
+                                            break;
+                                        case PreferenceEntry.PrefType.Int:
+                                            PlayerPrefs.SetInt(key, 0);
+                                            break;
+                                        case PreferenceEntry.PrefType.String:
+                                            PlayerPrefs.SetString(key, string.Empty);
+                                            break;
+                                    }
+
+                                    PlayerPrefs.Save();
+                                    PrepareData();
+                                    Focus();
+                                },
+                                this
+                            );
+                        }
+                    );
 
                 menu.ShowAsContext();
             };
@@ -339,32 +427,65 @@ namespace Editor.Lazy.PrefEditor
 
                 GUI.enabled = false;
                 var prefKeyName = key.stringValue;
-                EditorGUI.LabelField(new(rect.x, rect.y, splitterPos - 1, EditorGUIUtility.singleLineHeight),
-                    new GUIContent(prefKeyName, prefKeyName));
-                EditorGUI.EnumPopup(new(rect.x + splitterPos + 1, rect.y, 60, EditorGUIUtility.singleLineHeight),
-                    (PreferenceEntry.PrefType)type.enumValueIndex);
+                EditorGUI.LabelField(
+                    new Rect(rect.x, rect.y, splitterPos - 1, EditorGUIUtility.singleLineHeight),
+                    new GUIContent(prefKeyName, prefKeyName)
+                );
+                EditorGUI.EnumPopup(
+                    new Rect(
+                        rect.x + splitterPos + 1,
+                        rect.y,
+                        60,
+                        EditorGUIUtility.singleLineHeight
+                    ),
+                    (PreferenceEntry.PrefType)type.enumValueIndex
+                );
                 switch ((PreferenceEntry.PrefType)type.enumValueIndex)
                 {
                     case PreferenceEntry.PrefType.Float:
                         EditorGUI.DelayedFloatField(
-                            new Rect(rect.x + splitterPos + 62, rect.y, rect.width - splitterPos - 60,
-                                EditorGUIUtility.singleLineHeight), value, GUIContent.none);
+                            new Rect(
+                                rect.x + splitterPos + 62,
+                                rect.y,
+                                rect.width - splitterPos - 60,
+                                EditorGUIUtility.singleLineHeight
+                            ),
+                            value,
+                            GUIContent.none
+                        );
                         break;
                     case PreferenceEntry.PrefType.Int:
                         EditorGUI.DelayedIntField(
-                            new Rect(rect.x + splitterPos + 62, rect.y, rect.width - splitterPos - 60,
-                                EditorGUIUtility.singleLineHeight), value, GUIContent.none);
+                            new Rect(
+                                rect.x + splitterPos + 62,
+                                rect.y,
+                                rect.width - splitterPos - 60,
+                                EditorGUIUtility.singleLineHeight
+                            ),
+                            value,
+                            GUIContent.none
+                        );
                         break;
                     case PreferenceEntry.PrefType.String:
                         EditorGUI.DelayedTextField(
-                            new Rect(rect.x + splitterPos + 62, rect.y, rect.width - splitterPos - 60,
-                                EditorGUIUtility.singleLineHeight), value, GUIContent.none);
+                            new Rect(
+                                rect.x + splitterPos + 62,
+                                rect.y,
+                                rect.width - splitterPos - 60,
+                                EditorGUIUtility.singleLineHeight
+                            ),
+                            value,
+                            GUIContent.none
+                        );
                         break;
                 }
 
                 GUI.enabled = !_showLoadingIndicatorOverlay;
             };
-            _unityDefList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, "Unity Defined"); };
+            _unityDefList.drawHeaderCallback = rect =>
+            {
+                EditorGUI.LabelField(rect, "Unity Defined");
+            };
         }
 
         private void PrepareData(bool reloadKeys = true)
@@ -382,11 +503,14 @@ namespace Editor.Lazy.PrefEditor
 
         private void CreatePrefEntries(string[] keySource, ref List<PreferenceEntry> listDest)
         {
-            if (!string.IsNullOrEmpty(_searchText) && _searchField.SearchMode ==
-                PreferencesSearchField.SearchModePreferencesEditorWindow.Key)
-            {
-                keySource = keySource.Where(keyEntry => keyEntry.ToLower().Contains(_searchText.ToLower())).ToArray();
-            }
+            if (
+                !string.IsNullOrEmpty(_searchText)
+                && _searchField.SearchMode
+                    == PreferencesSearchField.SearchModePreferencesEditorWindow.Key
+            )
+                keySource = keySource
+                    .Where(keyEntry => keyEntry.ToLower().Contains(_searchText.ToLower()))
+                    .ToArray();
 
             foreach (var key in keySource)
             {
@@ -411,7 +535,7 @@ namespace Editor.Lazy.PrefEditor
                     continue;
                 }
 
-                int i = PlayerPrefs.GetInt(key, ErrorValueINT);
+                var i = PlayerPrefs.GetInt(key, ErrorValueINT);
                 if (i != ErrorValueINT)
                 {
                     entry.intValue = i;
@@ -421,12 +545,14 @@ namespace Editor.Lazy.PrefEditor
                 }
             }
 
-            if (!string.IsNullOrEmpty(_searchText) && _searchField.SearchMode ==
-                PreferencesSearchField.SearchModePreferencesEditorWindow.Value)
-            {
-                listDest = listDest.Where(entry => entry.ValueAsString().ToLower().Contains(_searchText.ToLower()))
+            if (
+                !string.IsNullOrEmpty(_searchText)
+                && _searchField.SearchMode
+                    == PreferencesSearchField.SearchModePreferencesEditorWindow.Value
+            )
+                listDest = listDest
+                    .Where(entry => entry.ValueAsString().ToLower().Contains(_searchText.ToLower()))
                     .ToList();
-            }
 
             switch (_sortOrder)
             {
@@ -439,51 +565,73 @@ namespace Editor.Lazy.PrefEditor
             }
         }
 
-        private SerializedProperty GetUserDefListElementAtIndex(int index, SerializedProperty listProperty)
+        private SerializedProperty GetUserDefListElementAtIndex(
+            int index,
+            SerializedProperty listProperty
+        )
         {
             Assert.IsTrue(listProperty.isArray, "Given 'listProperties' is not type of array");
             if (_userDefListCache[index] == null)
-            {
                 _userDefListCache[index] = listProperty.GetArrayElementAtIndex(index);
-            }
 
             return _userDefListCache[index];
         }
 
-        private void OnDrawElementBackgroundCallback(Rect rect, int index, bool isActive, bool isFocused)
+        private void OnDrawElementBackgroundCallback(
+            Rect rect,
+            int index,
+            bool isActive,
+            bool isFocused
+        )
         {
             if (Event.current.type == EventType.Repaint)
-            {
-                ReorderableList.defaultBehaviours.elementBackground.Draw(rect, false, isActive, isActive, isFocused);
-            }
+                ReorderableList.defaultBehaviours.elementBackground.Draw(
+                    rect,
+                    false,
+                    isActive,
+                    isActive,
+                    isFocused
+                );
 
-            var splitterRect = new Rect(rect.x + _relativeSplitterPos * rect.width, rect.y, 2, rect.height);
+            var splitterRect = new Rect(
+                rect.x + _relativeSplitterPos * rect.width,
+                rect.y,
+                2,
+                rect.height
+            );
             EditorGUIUtility.AddCursorRect(splitterRect, MouseCursor.ResizeHorizontal);
-            if (Event.current.type == EventType.MouseDown && splitterRect.Contains(Event.current.mousePosition))
-            {
+            if (
+                Event.current.type == EventType.MouseDown
+                && splitterRect.Contains(Event.current.mousePosition)
+            )
                 _moveSplitterPos = true;
-            }
 
             if (_moveSplitterPos)
-            {
-                if (Event.current.mousePosition.x > 100 && Event.current.mousePosition.x < rect.width - 120)
+                if (
+                    Event.current.mousePosition.x > 100
+                    && Event.current.mousePosition.x < rect.width - 120
+                )
                 {
                     _relativeSplitterPos = Event.current.mousePosition.x / rect.width;
                     Repaint();
                 }
-            }
 
             if (Event.current.type == EventType.MouseUp)
             {
                 _moveSplitterPos = false;
-                LazyEditorPrefs.SetFloat(EditorConstant.KeyRelativeSplitterPosition, _relativeSplitterPos);
+                LazyEditorPrefs.SetFloat(
+                    EditorConstant.KeyRelativeSplitterPosition,
+                    _relativeSplitterPos
+                );
             }
         }
 
         private void LoadKeys(out string[] userDef, out string[] unityDef, bool reloadKeys)
         {
             var keys = _entryAccessor.GetKeys(reloadKeys);
-            var groups = keys.GroupBy(key => key.StartsWith("unity.") || key.StartsWith("UnityGraphicsQuality"))
+            var groups = keys.GroupBy(key =>
+                    key.StartsWith("unity.") || key.StartsWith("UnityGraphicsQuality")
+                )
                 .ToDictionary(g => g.Key, g => g.ToList());
             userDef = groups.ContainsKey(false) ? groups[false].ToArray() : Array.Empty<string>();
             unityDef = groups.ContainsKey(true) ? groups[true].ToArray() : Array.Empty<string>();
@@ -511,24 +659,18 @@ namespace Editor.Lazy.PrefEditor
             try
             {
                 if (_showLoadingIndicatorOverlay)
-                {
                     GUI.enabled = false;
-                }
 
                 var defaultColor = GUI.contentColor;
                 if (!EditorGUIUtility.isProSkin)
-                {
                     GUI.contentColor = Styles.Colors.DarkGray;
-                }
 
                 GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
                 EditorGUI.BeginChangeCheck();
                 _searchText = _searchField.OnToolbarGUI(_searchText);
                 if (EditorGUI.EndChangeCheck())
-                {
                     PrepareData(false);
-                }
 
                 GUILayout.FlexibleSpace();
                 EditorGUIUtility.SetIconSize(new Vector2(14f, 14f));
@@ -537,30 +679,40 @@ namespace Editor.Lazy.PrefEditor
                 switch (_sortOrder)
                 {
                     case PreferencesEntrySortOrderType.Ascending:
-                        sortOrderContent = new GUIContent(EditorImageManager.SortAsscending, "Ascending sorted");
+                        sortOrderContent = new GUIContent(
+                            EditorImageManager.SortAsscending,
+                            "Ascending sorted"
+                        );
                         break;
                     case PreferencesEntrySortOrderType.Descending:
-                        sortOrderContent = new GUIContent(EditorImageManager.SortDescending, "Descending sorted");
+                        sortOrderContent = new GUIContent(
+                            EditorImageManager.SortDescending,
+                            "Descending sorted"
+                        );
                         break;
                     case PreferencesEntrySortOrderType.None:
                     default:
-                        sortOrderContent = new GUIContent(EditorImageManager.SortDisabled, "Not sorted");
+                        sortOrderContent = new GUIContent(
+                            EditorImageManager.SortDisabled,
+                            "Not sorted"
+                        );
                         break;
                 }
 
                 if (GUILayout.Button(sortOrderContent, EditorStyles.toolbarButton))
                 {
                     _sortOrder++;
-                    if ((int)_sortOrder >= Enum.GetValues(typeof(PreferencesEntrySortOrderType)).Length)
-                    {
+                    if (
+                        (int)_sortOrder
+                        >= Enum.GetValues(typeof(PreferencesEntrySortOrderType)).Length
+                    )
                         _sortOrder = 0;
-                    }
 
                     LazyEditorPrefs.SetInt(EditorConstant.KeySortOrder, (int)_sortOrder);
                     PrepareData(false);
                 }
 
-                var watcherContent = (_entryAccessor.IsMonitoring())
+                var watcherContent = _entryAccessor.IsMonitoring()
                     ? new GUIContent(EditorImageManager.Watching, "Watching changes")
                     : new GUIContent(EditorImageManager.NotWatching, "Not watching changes");
                 if (GUILayout.Button(watcherContent, EditorStyles.toolbarButton))
@@ -568,35 +720,43 @@ namespace Editor.Lazy.PrefEditor
                     _monitoring = !_monitoring;
                     LazyEditorPrefs.SetBool(EditorConstant.KeyWatchingForChanges, _monitoring);
                     if (_monitoring)
-                    {
                         _entryAccessor.StartMonitoring();
-                    }
                     else
-                    {
                         _entryAccessor.StopMonitoring();
-                    }
 
                     Repaint();
                 }
 
-                if (GUILayout.Button(new GUIContent(EditorImageManager.Refresh, "Refresh"), EditorStyles.toolbarButton))
+                if (
+                    GUILayout.Button(
+                        new GUIContent(EditorImageManager.Refresh, "Refresh"),
+                        EditorStyles.toolbarButton
+                    )
+                )
                 {
                     PlayerPrefs.Save();
                     PrepareData();
                 }
 
-                if (GUILayout.Button(new GUIContent(EditorImageManager.Trash, "Delete all"),
-                        EditorStyles.toolbarButton))
-                {
-                    if (EditorUtility.DisplayDialog("Warning!",
+                if (
+                    GUILayout.Button(
+                        new GUIContent(EditorImageManager.Trash, "Delete all"),
+                        EditorStyles.toolbarButton
+                    )
+                )
+                    if (
+                        EditorUtility.DisplayDialog(
+                            "Warning!",
                             "Are you sure you want to delete ALL entries from PlayerPrefs?\n\nUse with caution! Unity defined keys are affected too.",
-                            "YES", "NO"))
+                            "YES",
+                            "NO"
+                        )
+                    )
                     {
                         PlayerPrefs.DeleteAll();
                         PrepareData();
                         GUIUtility.ExitGUI();
                     }
-                }
 
                 EditorGUIUtility.SetIconSize(new Vector2(0f, 0f));
                 GUILayout.EndHorizontal();
@@ -606,8 +766,10 @@ namespace Editor.Lazy.PrefEditor
                 GUILayout.BeginHorizontal();
 
                 GUILayout.Box(EditorImageManager.GetOsIcon(), Styles.icon);
-                GUILayout.TextField(platformPathPrefix + Path.DirectorySeparatorChar + pathToPrefs,
-                    GUILayout.MinWidth(200));
+                GUILayout.TextField(
+                    platformPathPrefix + Path.DirectorySeparatorChar + pathToPrefs,
+                    GUILayout.MinWidth(200)
+                );
                 GUILayout.EndHorizontal();
 
                 GUILayout.Space(3);
@@ -619,11 +781,12 @@ namespace Editor.Lazy.PrefEditor
 
                 GUILayout.FlexibleSpace();
 
-                _showSystemGroup = EditorGUILayout.Foldout(_showSystemGroup, new GUIContent("Show System"));
+                _showSystemGroup = EditorGUILayout.Foldout(
+                    _showSystemGroup,
+                    new GUIContent("Show System")
+                );
                 if (_showSystemGroup)
-                {
                     _unityDefList.DoLayoutList();
-                }
 
                 GUILayout.EndScrollView();
                 GUILayout.EndVertical();
@@ -632,13 +795,18 @@ namespace Editor.Lazy.PrefEditor
 
                 if (_showLoadingIndicatorOverlay)
                 {
-                    GUILayout.BeginArea(new Rect(position.size.x * 0.5f - 30, position.size.y * 0.5f - 25, 60, 50),
-                        GUI.skin.box);
+                    GUILayout.BeginArea(
+                        new Rect(position.size.x * 0.5f - 30, position.size.y * 0.5f - 25, 60, 50),
+                        GUI.skin.box
+                    );
                     GUILayout.FlexibleSpace();
 
                     GUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
-                    GUILayout.Box(EditorImageManager.SpinWheelIcons[_loadingSpinnerFrame], Styles.icon);
+                    GUILayout.Box(
+                        EditorImageManager.SpinWheelIcons[_loadingSpinnerFrame],
+                        Styles.icon
+                    );
                     GUILayout.FlexibleSpace();
                     GUILayout.EndHorizontal();
 
@@ -654,28 +822,26 @@ namespace Editor.Lazy.PrefEditor
 
                 GUI.contentColor = defaultColor;
             }
-            catch (InvalidOperationException)
-            {
-            }
+            catch (InvalidOperationException) { }
         }
 
         private string MakeValidFileName(string unsafeFileName)
         {
-            string normalizedFileName = unsafeFileName.Trim().Normalize(NormalizationForm.FormD);
-            StringBuilder stringBuilder = new StringBuilder();
+            var normalizedFileName = unsafeFileName.Trim().Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
 
             // We need to use a TextElementEmumerator in order to support UTF16 characters that may take up more than one char(case 1169358)
-            TextElementEnumerator charEnum = StringInfo.GetTextElementEnumerator(normalizedFileName);
+            var charEnum = StringInfo.GetTextElementEnumerator(normalizedFileName);
             while (charEnum.MoveNext())
             {
-                string c = charEnum.GetTextElement();
+                var c = charEnum.GetTextElement();
                 if (c.Length == 1 && invalidFilenameChars.Contains(c[0]))
                 {
                     stringBuilder.Append('_');
                     continue;
                 }
 
-                UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c, 0);
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c, 0);
                 if (unicodeCategory != UnicodeCategory.NonSpacingMark)
                     stringBuilder.Append(c);
             }

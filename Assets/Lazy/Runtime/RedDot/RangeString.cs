@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lazy.RedDot
+namespace Lazy
 {
     public class RangeString : IEquatable<RangeString>
     {

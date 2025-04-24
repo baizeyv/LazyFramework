@@ -8,223 +8,230 @@ using UnityEngine.Serialization;
 
 namespace CodeStage.AntiCheat.EditorCode
 {
-	using Common;
-	using System;
-	using System.Collections.Generic;
-	using System.IO;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using Common;
+    using UnityEditor;
+    using UnityEngine;
+    using Object = UnityEngine.Object;
 
-	using UnityEditor;
-	using UnityEngine;
-	using Object = UnityEngine.Object;
+    /// <summary>
+    /// Represents settings scriptable object. Used mostly internally.
+    /// </summary>
+    /// Not intended for usage from user code,
+    /// touch at your peril since API can change and break backwards compatibility!
+    [Serializable]
+    public class ACTkSettings : ScriptableObject
+    {
+        private const string Directory = "ProjectSettings";
+        private const string Path = Directory + "/ACTkSettings.asset";
 
-	/// <summary>
-	/// Represents settings scriptable object. Used mostly internally.
-	/// </summary>
-	/// Not intended for usage from user code,
-	/// touch at your peril since API can change and break backwards compatibility!
-	[Serializable]
-	public class ACTkSettings : ScriptableObject
-	{
-		private const string Directory = "ProjectSettings";
-		private const string Path = Directory + "/ACTkSettings.asset";
+        [SerializeField]
+        private bool injectionDetectorEnabled;
 
-		[SerializeField]
-		private bool injectionDetectorEnabled;
+        [SerializeField]
+        private bool preGenerateBuildHash;
 
-		[SerializeField]
-		private bool preGenerateBuildHash;
+        [SerializeField]
+        private bool disableInjectionDetectorValidation;
 
-		[SerializeField]
-		private bool disableInjectionDetectorValidation;
+        [FormerlySerializedAs("disableWallhackDetectorValidation")]
+        [SerializeField]
+        private bool disableWallhackDetectorShaderValidation;
 
-		[FormerlySerializedAs("disableWallhackDetectorValidation")]
-		[SerializeField]
-		private bool disableWallhackDetectorShaderValidation;
-		
-		[SerializeField]
-		private bool disableWallhackDetectorPhysicsValidation;
-		
-		[SerializeField]
-		private bool disableWallhackDetectorLinkXmlValidation;
+        [SerializeField]
+        private bool disableWallhackDetectorPhysicsValidation;
 
-		[SerializeField]
-		private List<AllowedAssembly> injectionDetectorWhiteList = new List<AllowedAssembly>();
+        [SerializeField]
+        private bool disableWallhackDetectorLinkXmlValidation;
 
-		[SerializeField]
-		private string version = ACTk.Version;
+        [SerializeField]
+        private List<AllowedAssembly> injectionDetectorWhiteList = new List<AllowedAssembly>();
 
-		private static ACTkSettings instance;
-		public static ACTkSettings Instance
-		{
-			get
-			{
-				if (instance != null) return instance;
-				instance = LoadOrCreate();
-				return instance;
-			}
-		}
+        [SerializeField]
+        private string version = ACTk.Version;
 
-		public static void Show()
-		{
-			SettingsService.OpenProjectSettings(ACTkEditorConstants.SettingsProviderPath);
-		}
+        private static ACTkSettings instance;
+        public static ACTkSettings Instance
+        {
+            get
+            {
+                if (instance != null)
+                    return instance;
+                instance = LoadOrCreate();
+                return instance;
+            }
+        }
 
-		public bool InjectionDetectorEnabled
-		{
-			get => injectionDetectorEnabled;
-			set
-			{
-				injectionDetectorEnabled = value;
-				Save();
-			}
-		}
+        public static void Show()
+        {
+            SettingsService.OpenProjectSettings(ACTkEditorConstants.SettingsProviderPath);
+        }
 
-		public bool PreGenerateBuildHash
-		{
-			get => preGenerateBuildHash;
-			set
-			{
-				preGenerateBuildHash = value;
-				Save();
-			}
-		}
+        public bool InjectionDetectorEnabled
+        {
+            get => injectionDetectorEnabled;
+            set
+            {
+                injectionDetectorEnabled = value;
+                Save();
+            }
+        }
 
-		public bool DisableInjectionDetectorValidation
-		{
-			get => disableInjectionDetectorValidation;
-			set
-			{
-				disableInjectionDetectorValidation = value;
-				Save();
-			}
-		}
+        public bool PreGenerateBuildHash
+        {
+            get => preGenerateBuildHash;
+            set
+            {
+                preGenerateBuildHash = value;
+                Save();
+            }
+        }
 
-		public bool DisableWallhackDetectorShaderValidation
-		{
-			get => disableWallhackDetectorShaderValidation;
-			set
-			{
-				disableWallhackDetectorShaderValidation = value;
-				Save();
-			}
-		}
-		
-		public bool DisableWallhackDetectorPhysicsValidation
-		{
-			get => disableWallhackDetectorPhysicsValidation;
-			set
-			{
-				disableWallhackDetectorPhysicsValidation = value;
-				Save();
-			}
-		}
-		
-		public bool DisableWallhackDetectorLinkXmlValidation
-		{
-			get => disableWallhackDetectorLinkXmlValidation;
-			set
-			{
-				disableWallhackDetectorLinkXmlValidation = value;
-				Save();
-			}
-		}
+        public bool DisableInjectionDetectorValidation
+        {
+            get => disableInjectionDetectorValidation;
+            set
+            {
+                disableInjectionDetectorValidation = value;
+                Save();
+            }
+        }
 
-		public List<AllowedAssembly> InjectionDetectorWhiteList
-		{
-			get => injectionDetectorWhiteList;
-			set
-			{
-				injectionDetectorWhiteList = value;
-				Save();
-			}
-		}
+        public bool DisableWallhackDetectorShaderValidation
+        {
+            get => disableWallhackDetectorShaderValidation;
+            set
+            {
+                disableWallhackDetectorShaderValidation = value;
+                Save();
+            }
+        }
 
-		public static void Delete()
-		{
-			instance = null;
-			EditorTools.DeleteFile(Path);
-		}
+        public bool DisableWallhackDetectorPhysicsValidation
+        {
+            get => disableWallhackDetectorPhysicsValidation;
+            set
+            {
+                disableWallhackDetectorPhysicsValidation = value;
+                Save();
+            }
+        }
 
-		public static void Save()
-		{
-			SaveInstance(Instance);
-		}
+        public bool DisableWallhackDetectorLinkXmlValidation
+        {
+            get => disableWallhackDetectorLinkXmlValidation;
+            set
+            {
+                disableWallhackDetectorLinkXmlValidation = value;
+                Save();
+            }
+        }
 
-		private static ACTkSettings LoadOrCreate()
-		{
-			ACTkSettings settings;
+        public List<AllowedAssembly> InjectionDetectorWhiteList
+        {
+            get => injectionDetectorWhiteList;
+            set
+            {
+                injectionDetectorWhiteList = value;
+                Save();
+            }
+        }
 
-			if (!File.Exists(Path))
-			{
-				settings = CreateNewSettingsFile();
-			}
-			else
-			{
-				settings = LoadInstance();
+        public static void Delete()
+        {
+            instance = null;
+            EditorTools.DeleteFile(Path);
+        }
 
-				if (settings == null)
-				{
-					EditorTools.DeleteFile(Path);
-					settings = CreateNewSettingsFile();
-				}
+        public static void Save()
+        {
+            SaveInstance(Instance);
+        }
 
-				if (settings.version != ACTk.Version)
-				{
-					// for future migration reference
-				}
-			}
+        private static ACTkSettings LoadOrCreate()
+        {
+            ACTkSettings settings;
 
-			settings.hideFlags = HideFlags.HideAndDontSave;
-			settings.version = ACTk.Version;
+            if (!File.Exists(Path))
+            {
+                settings = CreateNewSettingsFile();
+            }
+            else
+            {
+                settings = LoadInstance();
 
-			return settings;
-		}
+                if (settings == null)
+                {
+                    EditorTools.DeleteFile(Path);
+                    settings = CreateNewSettingsFile();
+                }
 
-		private static ACTkSettings CreateNewSettingsFile()
-		{
-			var settingsInstance = CreateInstance();
-			SaveInstance(settingsInstance);
-			return settingsInstance;
-		}
+                if (settings.version != ACTk.Version)
+                {
+                    // for future migration reference
+                }
+            }
 
-		private static void SaveInstance(ACTkSettings settingsInstance)
-		{
-			if (!System.IO.Directory.Exists(Directory)) 
-				System.IO.Directory.CreateDirectory(Directory);
+            settings.hideFlags = HideFlags.HideAndDontSave;
+            settings.version = ACTk.Version;
 
-			try
-			{
-				UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(new Object[] { settingsInstance }, Path, true);
-			}
-			catch (Exception e)
-			{
-				ACTk.PrintExceptionForSupport("Can't save settings!", e);
-			}
-		}
+            return settings;
+        }
 
-		private static ACTkSettings LoadInstance()
-		{
-			ACTkSettings settingsInstance;
+        private static ACTkSettings CreateNewSettingsFile()
+        {
+            var settingsInstance = CreateInstance();
+            SaveInstance(settingsInstance);
+            return settingsInstance;
+        }
 
-			try
-			{
-				settingsInstance = (ACTkSettings)UnityEditorInternal.InternalEditorUtility.LoadSerializedFileAndForget(Path)[0];
-			}
-			catch (Exception e)
-			{
-				Debug.Log($"{ACTk.LogPrefix}Can't read settings, resetting them to defaults.\n" +
-						  "This message is harmless in most cases and can be ignored if not repeating.\n" +
-						  $"Exception: {e}");
-				settingsInstance = null;
-			}
+        private static void SaveInstance(ACTkSettings settingsInstance)
+        {
+            if (!System.IO.Directory.Exists(Directory))
+                System.IO.Directory.CreateDirectory(Directory);
 
-			return settingsInstance;
-		}
+            try
+            {
+                UnityEditorInternal.InternalEditorUtility.SaveToSerializedFileAndForget(
+                    new Object[] { settingsInstance },
+                    Path,
+                    true
+                );
+            }
+            catch (Exception e)
+            {
+                ACTk.PrintExceptionForSupport("Can't save settings!", e);
+            }
+        }
 
-		private static ACTkSettings CreateInstance()
-		{
-			var newInstance = CreateInstance<ACTkSettings>();
-			return newInstance;
-		}
-	}
+        private static ACTkSettings LoadInstance()
+        {
+            ACTkSettings settingsInstance;
+
+            try
+            {
+                settingsInstance = (ACTkSettings)
+                    UnityEditorInternal.InternalEditorUtility.LoadSerializedFileAndForget(Path)[0];
+            }
+            catch (Exception e)
+            {
+                Debug.Log(
+                    $"{ACTk.LogPrefix}Can't read settings, resetting them to defaults.\n"
+                        + "This message is harmless in most cases and can be ignored if not repeating.\n"
+                        + $"Exception: {e}"
+                );
+                settingsInstance = null;
+            }
+
+            return settingsInstance;
+        }
+
+        private static ACTkSettings CreateInstance()
+        {
+            var newInstance = CreateInstance<ACTkSettings>();
+            return newInstance;
+        }
+    }
 }

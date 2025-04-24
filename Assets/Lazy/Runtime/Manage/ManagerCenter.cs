@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Singleton;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -52,11 +51,11 @@ namespace Lazy
         public static void Setup(MonoBehaviour behaviour)
         {
             if (behaviour == null)
-                Log.Log.MsgE("MonoBehaviour Is Null !");
+                Log.MsgE("MonoBehaviour Is Null !");
 
             if (_behaviour != null)
             {
-                Log.Log.MsgE($"{nameof(ManagerCenter)} is already setup.");
+                Log.MsgE($"{nameof(ManagerCenter)} is already setup.");
                 return;
             }
 
@@ -76,13 +75,13 @@ namespace Lazy
         {
             if (priority < 0)
             {
-                Log.Log.MsgW("Priority can not is negative. Auto switch to 0");
+                Log.MsgW("Priority can not is negative. Auto switch to 0");
                 priority = 0;
             }
 
             if (TryGet<T>(out var manager))
             {
-                Log.Log.MsgW($"{typeof(T)} is already registered.");
+                Log.MsgW($"{typeof(T)} is already registered.");
                 return manager;
             }
 
@@ -93,7 +92,7 @@ namespace Lazy
                 priority = ++maxPriority;
             }
 
-            Log.Log.MsgD($"Create Manager {typeof(T)} with priority {priority}");
+            Log.MsgD($"Create Manager {typeof(T)} with priority {priority}");
 
             var mgr = createMethod.Fire();
             var wrapper = new ManagerWrapper(mgr, priority);
@@ -165,13 +164,13 @@ namespace Lazy
         {
             if (priority < 0)
             {
-                Log.Log.MsgW("Priority can not is negative. Auto switch to 0");
+                Log.MsgW("Priority can not is negative. Auto switch to 0");
                 priority = 0;
             }
 
             if (TryGetMono<T>(out var manager))
             {
-                Log.Log.MsgW($"{typeof(T)} is already registered.");
+                Log.MsgW($"{typeof(T)} is already registered.");
                 return manager;
             }
 
@@ -182,7 +181,7 @@ namespace Lazy
                 priority = ++maxPriority;
             }
 
-            Log.Log.MsgD($"Create Manager {typeof(T)} with priority {priority}");
+            Log.MsgD($"Create Manager {typeof(T)} with priority {priority}");
 
             var mgr = createMethod.Fire();
             var wrapper = new ManagerWrapper(mgr, priority);
@@ -394,7 +393,7 @@ namespace Lazy
         public static MonoBehaviour GetBehaviour()
         {
             if (_behaviour == null)
-                Log.Log.MsgE($"{nameof(ManagerCenter)} 未初始化。");
+                Log.MsgE($"{nameof(ManagerCenter)} 未初始化。");
             return _behaviour;
         }
 

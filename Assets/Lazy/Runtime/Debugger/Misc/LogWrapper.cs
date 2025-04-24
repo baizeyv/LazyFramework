@@ -1,9 +1,8 @@
 ﻿using System;
-using Lazy.Ref;
-using Lazy.Timer;
+using Lazy;
 using UnityEngine;
 
-namespace Lazy.Debugger.Misc
+namespace Lazy
 {
     /// <summary>
     /// * Unity日志记录包装器

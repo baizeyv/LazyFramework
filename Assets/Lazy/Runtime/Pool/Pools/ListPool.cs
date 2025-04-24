@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Lazy.Pool
+namespace Lazy
 {
     public static class ListPool<T>
     {
@@ -17,11 +17,9 @@ namespace Lazy.Pool
         public static void Free(List<T> list)
         {
             if (_listStack.Contains(list))
-            {
                 throw new InvalidOperationException(
                     "重复回收 List, The List is released even though it is in the pool"
                 );
-            }
 
             list.Clear();
             _listStack.Push(list);

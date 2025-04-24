@@ -1,8 +1,9 @@
-﻿using Lazy.Editor.AssetEditor;
+﻿using Lazy;
+using LazyEditor;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lazy.Editor
+namespace LazyEditor
 {
     public static class Helper
     {
@@ -38,9 +39,9 @@ namespace Lazy.Editor
         private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)
         {
             if (
-                UnityEngine.Event.current.type == EventType.KeyDown
-                && UnityEngine.Event.current.keyCode == KeyCode.Space
-                && selectionRect.Contains(UnityEngine.Event.current.mousePosition)
+                Event.current.type == EventType.KeyDown
+                && Event.current.keyCode == KeyCode.Space
+                && selectionRect.Contains(Event.current.mousePosition)
             )
             {
                 EditorApplication.delayCall += () =>
@@ -53,7 +54,7 @@ namespace Lazy.Editor
                     if (obj != null)
                         EditorGUIUtility.PingObject(obj);
                 };
-                UnityEngine.Event.current.Use();
+                Event.current.Use();
             }
         }
     }

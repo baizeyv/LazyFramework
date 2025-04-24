@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lazy;
-using Lazy.Debugger.Misc;
-using Lazy.Debugger.Module;
-using Lazy.Runtime.Utility;
-using Lazy.Singleton;
 using UnityEngine;
 
-namespace Lazy.Debugger
+namespace Lazy
 {
     [ManagerUpdate]
     [ManagerGUI]
@@ -118,7 +114,7 @@ namespace Lazy.Debugger
             };
             AppLauncher.Instance.OnStartGame += () =>
             {
-                Log.Log.SepD(this);
+                Log.SepD(this);
             };
             consoleWindow.Initialize();
             _textEditor = new TextEditor();

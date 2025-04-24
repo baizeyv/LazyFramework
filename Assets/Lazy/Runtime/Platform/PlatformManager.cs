@@ -1,4 +1,4 @@
-﻿using Lazy.Singleton;
+﻿using Lazy;
 using UnityEngine;
 
 namespace Lazy
@@ -19,7 +19,7 @@ namespace Lazy
 
         public override void OnSingletonInitialize()
         {
-            Log.Log.I()
+            Log.I()
                 .Msg($"Platform Unity Initialized: <color=#00ff00>{Debug.isDebugBuild}</color>")
                 .Tag("PLATFORM")
                 .Do();

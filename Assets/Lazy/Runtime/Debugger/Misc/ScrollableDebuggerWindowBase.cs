@@ -1,10 +1,8 @@
 ﻿using System;
 using Lazy;
-using Lazy.Debugger.Module;
-using Lazy.Runtime.Utility;
 using UnityEngine;
 
-namespace Lazy.Debugger.Misc
+namespace Lazy
 {
     public abstract class ScrollableDebuggerWindowBase : IDebuggerWindow
     {
@@ -48,7 +46,7 @@ namespace Lazy.Debugger.Misc
             {
                 GUILayout.Label(tag, GUILayout.Width(TitleWidth));
                 if (GUILayout.Button(content, "label"))
-                    Debugger.CopyToClipboard(content);
+                    Lazy.Debugger.CopyToClipboard(content);
             }
             GUILayout.EndHorizontal();
         }

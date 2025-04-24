@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Singleton
+namespace Lazy
 {
-    public static class MonoSingletonProperty<T> where T : MonoBehaviour, ISingleton
+    public static class MonoSingletonProperty<T>
+        where T : MonoBehaviour, ISingleton
     {
         private static T _instance;
 

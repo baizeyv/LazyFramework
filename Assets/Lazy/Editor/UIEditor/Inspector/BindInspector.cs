@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Lazy;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Lazy.Editor.UIEditor
+namespace LazyEditor
 {
     [CustomEditor(typeof(ABSBind), true)]
     [CanEditMultipleObjects]
@@ -155,7 +156,9 @@ namespace Lazy.Editor.UIEditor
 
                 if (rootGameObj)
                     if (GUILayout.Button($"Generate ({rootGameObj.name})", GUILayout.Height(30)))
-                        GenViewPresenterCodeUtility.Generate(rootGameObj.GetComponent<IBindGroup>());
+                        GenViewPresenterCodeUtility.Generate(
+                            rootGameObj.GetComponent<IBindGroup>()
+                        );
             }
             GUILayout.EndVertical();
 

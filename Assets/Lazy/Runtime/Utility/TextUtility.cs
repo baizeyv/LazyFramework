@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Lazy.Runtime.Utility
+namespace Lazy
 {
     public static class TextUtility
     {

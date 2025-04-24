@@ -1,7 +1,7 @@
-﻿using Lazy.RedDot;
+﻿using Lazy;
 using UnityEditor.IMGUI.Controls;
 
-namespace Lazy.Editor.RedDotEditor
+namespace LazyEditor
 {
     public class RedDotTreeViewItem : TreeViewItem
     {

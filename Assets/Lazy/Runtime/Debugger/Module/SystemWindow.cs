@@ -1,9 +1,8 @@
 ﻿using System;
-using Lazy.Debugger.Misc;
-using Lazy.Runtime.Utility;
+using Lazy;
 using UnityEngine;
 
-namespace Lazy.Debugger.Module
+namespace Lazy
 {
     [Serializable]
     public class SystemWindow : ScrollableDebuggerWindowBase
