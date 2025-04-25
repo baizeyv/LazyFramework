@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Lazy.Melody;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,12 +7,11 @@ namespace Lazy.Example
 {
     public class GameManager : ABSGameManager
     {
-        public Image img;
-
         protected override void OnStart()
         {
-            StorageManager.Instance.Set("test", 5);
             Log.MsgD("START APP GAME !");
+            /*
+            StorageManager.Instance.Set("test", 5);
             App.Timer.SubscribeClock(
                 9,
                 _ =>
@@ -19,6 +19,8 @@ namespace Lazy.Example
                     Log.MsgI("A Time: 9");
                 }
             );
+            */
+
             // App.Asset.LoadAsync<DOTweenSettings>(
             //     "DOTweenSettings",
             //     x =>
@@ -65,7 +67,7 @@ namespace Lazy.Example
             // );
             // App.UI.OpenSync<MyPanel>(prefabName: "MyPanelUUU");
             // StartCoroutine(TestPanelClose());
-            App.UI.OpenSync<DialogA>();
+            // App.UI.OpenSync<DialogA>();
             // App.UI.OpenSync<DialogB>();
             // App.UI.OpenSync<DialogC>();
 
@@ -76,10 +78,8 @@ namespace Lazy.Example
                 Instantiate(prefab, UIRoot.Instance.transform);
             });
             */
-            StartCoroutine(TestPanelClose());
-
-            var t = App.Asset.LoadSync<TextAsset>("cc22");
-            Log.MsgI(t.text);
+            // StartCoroutine(TestPanelClose());
+            App.UI.OpenSync<UIOperationDialog>();
         }
 
         private IEnumerator TestPanelClose()
@@ -91,6 +91,7 @@ namespace Lazy.Example
             App.RedDot.SetValue("root/test", 0);
         }
 
+        /*
         private void Update()
         {
             // var ts = App.Timer.GetServerTime(out var utc, out var local);
@@ -104,5 +105,6 @@ namespace Lazy.Example
             // Log.VarD(this, nameof(utcLocal), utcLocal);
             // Log.VarD(this, nameof(localLocal), localLocal);
         }
+        */
     }
 }

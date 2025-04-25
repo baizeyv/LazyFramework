@@ -9,7 +9,7 @@
                 () =>
                 {
                     Debugger.Instance.SetShowType(DebuggerShowType.Icon);
-                    // TODO: Show GUIMASK
+                    UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = false;
                 },
                 "#c8161d"
             );

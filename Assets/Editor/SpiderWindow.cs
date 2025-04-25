@@ -269,19 +269,6 @@ namespace LazyEditor
             }
         }
 
-        private IEnumerator VitaColor()
-        {
-            var json = File.ReadAllText(_inputVitaJsonPath);
-            var bean = JsonConvert.DeserializeObject<VitaBean>(json, Constant.JsonSetting);
-            foreach (var x in bean.SelectMany(item => item.Value))
-            {
-                var solver = new SpiderSolver();
-                var poker = new Poker(x.question);
-                solver.SuitCount = poker.GetSuitCount();
-                yield return solver.DepthFirstSearch(poker, null, _outputVitaCsvPath, x.id);
-            }
-        }
-
         private void ThreadVitaColor()
         {
             var json = File.ReadAllText(_inputVitaJsonPath);
@@ -294,22 +281,16 @@ namespace LazyEditor
                     var solver = new SpiderSolver();
                     var poker = new Poker(x.question);
                     solver.SuitCount = poker.GetSuitCount();
-                    solver.ThreadDfs(poker, null, _outputVitaCsvPath, x.id, stepLimit: step);
+                    solver.ThreadDepthFirstSearch(
+                        poker,
+                        null,
+                        _outputVitaCsvPath,
+                        x.id,
+                        stepLimit: step
+                    );
                 }
             });
             _vitaThread.Start();
-        }
-
-        private IEnumerator PlayValveSeed()
-        {
-            var array = _inputPlayValveSeeds.Split(',');
-            var seeds = array.Select(int.Parse).ToArray();
-            for (var i = 0; i < seeds.Length; i++)
-            {
-                var solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1 };
-                var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
-                yield return solver.DepthFirstSearch(poker, null, _outputPlayValveCsvPath, i + 1);
-            }
         }
 
         private void ThreadPlayValveSeed()
@@ -323,7 +304,13 @@ namespace LazyEditor
                 {
                     var solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1 };
                     var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
-                    solver.ThreadDfs(poker, null, _outputPlayValveCsvPath, i + 1, stepLimit: step);
+                    solver.ThreadDepthFirstSearch(
+                        poker,
+                        null,
+                        _outputPlayValveCsvPath,
+                        i + 1,
+                        stepLimit: step
+                    );
                 }
             });
             _playValveThread.Start();
@@ -372,7 +359,7 @@ namespace LazyEditor
                             var poker = new Poker(v, _selectedOption + 1);
                             ss.SuitCount = _selectedOption + 1;
                             _solver = ss;
-                            ss.ThreadDfs(
+                            ss.ThreadDepthFirstSearch(
                                 poker,
                                 () =>
                                 {
@@ -419,7 +406,7 @@ namespace LazyEditor
                             var poker = new Poker(_inputVita);
                             ss.SuitCount = poker.GetSuitCount();
                             _solver = ss;
-                            ss.ThreadDfs(
+                            ss.ThreadDepthFirstSearch(
                                 poker,
                                 () =>
                                 {

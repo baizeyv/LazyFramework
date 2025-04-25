@@ -17,7 +17,13 @@ namespace Solver
         /// <param name="suitCount"></param>
         /// <param name="file"></param>
         /// <param name="stepLimit"></param>
-        public void GenerateLevel(int minSeed, int maxSeed, int suitCount, string file, int stepLimit)
+        public void GenerateLevel(
+            int minSeed,
+            int maxSeed,
+            int suitCount,
+            string file,
+            int stepLimit
+        )
         {
             if (_thread != null)
                 return;
@@ -29,8 +35,17 @@ namespace Solver
                 {
                     var solver = new SpiderSolver { SuitCount = suitCount };
                     var poker = new Poker(i, suitCount);
-                    solver.ThreadDfs(poker,
-                        () => { _thread = null; }, file, 0, false, stepLimit);
+                    solver.ThreadDepthFirstSearch(
+                        poker,
+                        () =>
+                        {
+                            _thread = null;
+                        },
+                        file,
+                        0,
+                        false,
+                        stepLimit
+                    );
                 }
             });
             _thread.Start();

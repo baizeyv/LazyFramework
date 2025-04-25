@@ -66,7 +66,7 @@
         private static TimerManager _timerManager;
 
         /// <summary>
-        /// * 事件管理器
+        /// * 时间管理器
         /// </summary>
         public static TimerManager Timer
         {

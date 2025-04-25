@@ -451,7 +451,7 @@ namespace LazyEditor
                 Regex
                     .Split(str, @"^a-zA-Z0-9")
                     .Where(w => w.Length > 0)
-                    .Select(w => char.ToUpper(w[0]) + w.Substring(1).ToLower())
+                    .Select(w => char.ToUpper(w[0]) + w.Substring(1))
             );
             return Regex.Replace(newStr, @"[^a-zA-Z0-9]", "");
         }

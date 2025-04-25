@@ -63,6 +63,51 @@ namespace Lazy
         }
 
         /// <summary>
+        /// * Unity TMP_InputField 绑定 RxVariable
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeToTMPInputField(
+            this Observable<string> source,
+            TMP_InputField text
+        )
+        {
+            return source.Subscribe<string, TMP_InputField>(text, (x, t) => t.text = x);
+        }
+
+        /// <summary>
+        /// * Unity TMP_InputField 绑定 RxVariable
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static IDisposable SubscribeToTMPInputField(
+            this Observable<int> source,
+            TMP_InputField text
+        )
+        {
+            return source.Subscribe<int, TMP_InputField>(text, (x, t) => t.text = x.ToString());
+        }
+
+        /// <summary>
+        /// * Unity TMP_InputField 绑定 RxVariable 带有选择器
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="text"></param>
+        /// <param name="selector"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IDisposable SubscribeToTMPInputField<T>(
+            this Observable<T> source,
+            TMP_InputField text,
+            Func<T, string> selector
+        )
+        {
+            return source.Subscribe<T, TMP_InputField>(text, (x, t) => t.text = selector.Fire(x));
+        }
+
+        /// <summary>
         /// * Unity Text 绑定 RxVariable
         /// </summary>
         /// <param name="source"></param>

@@ -18,10 +18,12 @@ namespace Lazy
         }
 
 #if UNITY_EDITOR
-        #pragma warning disable CS0108
+#pragma warning disable CS0108
         protected void OnValidate()
         {
             var canvas = GetComponent<Canvas>();
+            if (canvas == null)
+                return;
             base.OnValidate();
             if (!canvas.overrideSorting)
             {
@@ -40,7 +42,7 @@ namespace Lazy
                     };
             }
         }
-        #pragma warning restore CS0108
+#pragma warning restore CS0108
 #endif
         public Action Callback { get; set; }
     }

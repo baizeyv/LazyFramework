@@ -144,12 +144,8 @@ namespace Lazy
 
             var curHotControl = GUIUtility.hotControl;
             if (curHotControl != _lastHotControl)
-            {
                 if (curHotControl != 0)
                     UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = true;
-                else
-                    UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = false;
-            }
         }
 
         public void OnFixedUpdate() { }
@@ -279,6 +275,7 @@ namespace Lazy
                 _selectedWindow = null;
                 _selectIndex = 0;
                 _toolbarIndex = 0;
+                UIRoot.Instance.debuggerRaycastBlocker.raycastTarget = false;
                 return;
             }
 
