@@ -1,4 +1,6 @@
-﻿using System;
+﻿// #undef LAZY_DEBUG
+
+using System;
 using System.Collections;
 
 namespace Lazy
@@ -31,7 +33,7 @@ namespace Lazy
             ManagerCenter.Setup(this);
 
             // ! 这里的顺序不能改变
-#if DEBUG
+#if LAZY_DEBUG
             App.Debugger = ManagerCenter.CreateMono(() => Lazy.Debugger.Instance);
 #endif
             App.Storage = ManagerCenter.Create(() => StorageManager.Instance);
@@ -74,10 +76,12 @@ namespace Lazy
             ManagerCenter.FixedUpdate();
         }
 
+#if LAZY_DEBUG
         private void OnGUI()
         {
             ManagerCenter.GUI();
         }
+#endif
 
         private void OnDestroy()
         {
