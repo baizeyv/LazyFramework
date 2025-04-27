@@ -1,4 +1,4 @@
-﻿#undef LAZY_DEBUG
+﻿//#undef LAZY_DEBUG
 
 using System;
 using System.Collections;
@@ -36,8 +36,9 @@ namespace Lazy
 #if LAZY_DEBUG
             App.Debugger = ManagerCenter.CreateMono(() => Lazy.Debugger.Instance);
             Log.Enable();
-#endif
+#else
             Log.Disable();
+#endif
             App.Storage = ManagerCenter.Create(() => StorageManager.Instance);
             App.Platform = ManagerCenter.Create(() => PlatformManager.Instance);
             App.HotUpdate = ManagerCenter.Create(() => HotUpdateManager.Instance);
