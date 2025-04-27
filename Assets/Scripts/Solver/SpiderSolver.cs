@@ -110,17 +110,61 @@ namespace Solver
             int stepLimit = 1000000
         )
         {
-            if (_taskEndFlag)
-                return;
-            _calc++;
-            AllStep.Add(root);
-            root.Calc = _calc;
-            // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
-            var states = TakeAStep(root, this)
-                .FindAll(x => !StateExists(_allStates, x))
-                .FindAll(x => x.SecondaryValuation());
+            try
+            {
+                if (_taskEndFlag)
+                    return;
+                _calc++;
+                AllStep.Add(root);
+                root.Calc = _calc;
+                // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
+                var states = TakeAStep(root, this)
+                    .FindAll(x => !StateExists(_allStates, x))
+                    .FindAll(x => x.SecondaryValuation());
 
-            if (_calc >= stepLimit && stepLimit > 0) // # 百万步
+                if (_calc >= stepLimit && stepLimit > 0) // # 百万步
+                {
+                    if (!string.IsNullOrEmpty(file) && exportNull)
+                    {
+                        var se = new SpiderExporter(file);
+                        await se.ExportNullAsync(id, root, SuitCount, _calc);
+                    }
+
+                    _taskEndFlag = true;
+                    return;
+                }
+
+                // # 遍历所有没有试过的游戏状态
+                foreach (var state in states)
+                {
+                    if (state.GameCompleted)
+                    {
+                        // # 完成游戏
+#if UNITY_EDITOR
+                        EditorApplication.delayCall += () => Log.MsgD("Game Completed !!!");
+#endif
+                        onCompleted.Fire();
+                        // var se = new SpiderExporter(
+                        //     @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv"
+                        // );
+                        if (!string.IsNullOrEmpty(file))
+                        {
+                            var se = new SpiderExporter(file);
+                            await se.ExportAsync(id, state, SuitCount, _calc);
+                        }
+
+                        _taskEndFlag = true;
+                        return;
+                    }
+
+                    foreach (var item in states)
+                        _allStates.Add(item);
+                    await TaskDepthFirstSearch(state, onCompleted, file, id, exportNull, stepLimit);
+                    if (_taskEndFlag)
+                        return;
+                }
+            }
+            catch (Exception e)
             {
                 if (!string.IsNullOrEmpty(file) && exportNull)
                 {
@@ -129,37 +173,7 @@ namespace Solver
                 }
 
                 _taskEndFlag = true;
-                return;
-            }
-
-            // # 遍历所有没有试过的游戏状态
-            foreach (var state in states)
-            {
-                if (state.GameCompleted)
-                {
-                    // # 完成游戏
-#if UNITY_EDITOR
-                    EditorApplication.delayCall += () => Log.MsgD("Game Completed !!!");
-#endif
-                    onCompleted.Fire();
-                    // var se = new SpiderExporter(
-                    //     @"C:\Users\baizeyv\Documents\a\TestSpiderSolver.csv"
-                    // );
-                    if (!string.IsNullOrEmpty(file))
-                    {
-                        var se = new SpiderExporter(file);
-                        await se.ExportAsync(id, state, SuitCount, _calc);
-                    }
-
-                    _taskEndFlag = true;
-                    return;
-                }
-
-                foreach (var item in states)
-                    _allStates.Add(item);
-                await TaskDepthFirstSearch(state, onCompleted, file, id, exportNull, stepLimit);
-                if (_taskEndFlag)
-                    return;
+                // Log.MsgD(e.Message + " !!!");
             }
         }
 
