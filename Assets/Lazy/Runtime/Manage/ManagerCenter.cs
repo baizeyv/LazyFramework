@@ -58,7 +58,8 @@ namespace Lazy
                 return;
             }
 
-            Object.DontDestroyOnLoad(behaviour.gameObject);
+            if (behaviour.gameObject.transform.parent == null)
+                Object.DontDestroyOnLoad(behaviour.gameObject);
             _behaviour = behaviour;
         }
 
