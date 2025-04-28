@@ -9,6 +9,7 @@ namespace Lazy.Example
     {
         protected override void OnStart()
         {
+            Application.targetFrameRate = 30;
             Log.MsgD("START APP GAME !");
             /*
             StorageManager.Instance.Set("test", 5);

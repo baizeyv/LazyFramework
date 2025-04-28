@@ -3,13 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SFB;
+using SimpleFileBrowser;
 using Solver;
 using Solver.Exporter;
 
 namespace Lazy.Melody
 {
-    public class UIOperationDialogData : IPanelData { }
+    public class UIOperationDialogData : IPanelData
+    {
+    }
 
     public partial class UIOperationDialog
     {
@@ -215,7 +217,9 @@ namespace Lazy.Melody
             #endregion
         }
 
-        protected override void OnOpen() { }
+        protected override void OnOpen()
+        {
+        }
 
         protected override void OnShow()
         {
@@ -300,15 +304,25 @@ namespace Lazy.Melody
             #endregion
         }
 
-        protected override void OnShowTweenEnd() { }
+        protected override void OnShowTweenEnd()
+        {
+        }
 
-        protected override void OnEndTweenBegin() { }
+        protected override void OnEndTweenBegin()
+        {
+        }
 
-        protected override void OnClose() { }
+        protected override void OnClose()
+        {
+        }
 
-        protected override void OnBack() { }
+        protected override void OnBack()
+        {
+        }
 
-        protected override void OnUIDestroy() { }
+        protected override void OnUIDestroy()
+        {
+        }
 
         #endregion
 
@@ -319,17 +333,15 @@ namespace Lazy.Melody
         /// </summary>
         private void OnClickSelectVitaInput()
         {
-            var paths = StandaloneFileBrowser.OpenFilePanel(
-                "Select Vita Input Json",
-                "",
-                "json",
-                false
-            );
-            if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+            FileBrowser.SetFilters(false, new FileBrowser.Filter("JsonFile", ".json"));
+            FileBrowser.ShowLoadDialog((paths) =>
             {
-                _vitaInputJson.Value = paths[0];
-                App.Storage.SetString(VitaInputJsonKey, _vitaInputJson.Value);
-            }
+                if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+                {
+                    _vitaInputJson.Value = paths[0];
+                    App.Storage.SetString(VitaInputJsonKey, _vitaInputJson.Value);
+                }
+            }, () => { }, FileBrowser.PickMode.Files, false, null, null, "Select File");
         }
 
         /// <summary>
@@ -337,16 +349,14 @@ namespace Lazy.Melody
         /// </summary>
         private void OnClickSelectVitaOutput()
         {
-            var folderPath = StandaloneFileBrowser.OpenFolderPanel(
-                "Select Vita Output Folder",
-                "",
-                false
-            );
-            if (folderPath.Length > 0 && !string.IsNullOrEmpty(folderPath[0]))
+            FileBrowser.ShowLoadDialog((paths) =>
             {
-                _vitaOutputCsv.Value = folderPath[0];
-                App.Storage.SetString(VitaOutputCsvKey, _vitaOutputCsv.Value);
-            }
+                if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+                {
+                    _vitaOutputCsv.Value = paths[0];
+                    App.Storage.SetString(VitaOutputCsvKey, _vitaOutputCsv.Value);
+                }
+            }, () => { }, FileBrowser.PickMode.Folders, false, null, null, "Select Folder");
         }
 
         private void OnVitaStepLimitEndEdit(string text)
@@ -425,6 +435,8 @@ namespace Lazy.Melody
                         x.id,
                         stepLimit: _vitaStepLimit.Value
                     );
+                    _currentVitaExportSolver.Dispose();
+                    GC.Collect();
                     if (_stopExportVitaFlag)
                         break;
                 }
@@ -527,7 +539,7 @@ namespace Lazy.Melody
                         case 1:
                             _currentPlayValveSuit1ExportSolver = new SpiderSolver
                             {
-                                SuitCount = suit,
+                                SuitCount = suit
                             };
                             _currentPlayValveSuit1ExportPoker = poker;
                             await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(
@@ -537,11 +549,13 @@ namespace Lazy.Melody
                                 seed,
                                 stepLimit: step
                             );
+                            _currentPlayValveSuit1ExportSolver.Dispose();
+                            GC.Collect();
                             break;
                         case 2:
                             _currentPlayValveSuit2ExportSolver = new SpiderSolver
                             {
-                                SuitCount = suit,
+                                SuitCount = suit
                             };
                             _currentPlayValveSuit2ExportPoker = poker;
                             await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(
@@ -551,11 +565,13 @@ namespace Lazy.Melody
                                 seed,
                                 stepLimit: step
                             );
+                            _currentPlayValveSuit2ExportSolver.Dispose();
+                            GC.Collect();
                             break;
                         case 3:
                             _currentPlayValveSuit3ExportSolver = new SpiderSolver
                             {
-                                SuitCount = suit,
+                                SuitCount = suit
                             };
                             _currentPlayValveSuit3ExportPoker = poker;
                             await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(
@@ -565,11 +581,13 @@ namespace Lazy.Melody
                                 seed,
                                 stepLimit: step
                             );
+                            _currentPlayValveSuit3ExportSolver.Dispose();
+                            GC.Collect();
                             break;
                         case 4:
                             _currentPlayValveSuit4ExportSolver = new SpiderSolver
                             {
-                                SuitCount = suit,
+                                SuitCount = suit
                             };
                             _currentPlayValveSuit4ExportPoker = poker;
                             await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(
@@ -579,6 +597,8 @@ namespace Lazy.Melody
                                 seed,
                                 stepLimit: step
                             );
+                            _currentPlayValveSuit4ExportSolver.Dispose();
+                            GC.Collect();
                             break;
                     }
 
@@ -661,31 +681,27 @@ namespace Lazy.Melody
 
         private void OnClickSelectPlayValveInput()
         {
-            var paths = StandaloneFileBrowser.OpenFilePanel(
-                "Select PlayValve Input Txt",
-                "",
-                "txt",
-                false
-            );
-            if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+            FileBrowser.SetFilters(false, new FileBrowser.Filter("TxtFile", ".txt"));
+            FileBrowser.ShowLoadDialog((paths) =>
             {
-                _playValveInputTxt.Value = paths[0];
-                App.Storage.SetString(PlayValveInputTxtKey, _playValveInputTxt.Value);
-            }
+                if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+                {
+                    _playValveInputTxt.Value = paths[0];
+                    App.Storage.SetString(PlayValveInputTxtKey, _playValveInputTxt.Value);
+                }
+            }, () => { }, FileBrowser.PickMode.Files, false, null, null, "Select File");
         }
 
         private void OnClickSelectPlayValveOutput()
         {
-            var folderPath = StandaloneFileBrowser.OpenFolderPanel(
-                "Select PlayValve Output Folder",
-                "",
-                false
-            );
-            if (folderPath.Length > 0 && !string.IsNullOrEmpty(folderPath[0]))
+            FileBrowser.ShowLoadDialog(folderPath =>
             {
-                _playValveOutputCsv.Value = folderPath[0];
-                App.Storage.SetString(PlayValveOutputCsvKey, _playValveOutputCsv.Value);
-            }
+                if (folderPath.Length > 0 && !string.IsNullOrEmpty(folderPath[0]))
+                {
+                    _playValveOutputCsv.Value = folderPath[0];
+                    App.Storage.SetString(PlayValveOutputCsvKey, _playValveOutputCsv.Value);
+                }
+            }, () => { }, FileBrowser.PickMode.Folders, false, null, null, "Select Folder");
         }
 
         private void OnPlayValveStepLimitEndEdit(string text)
@@ -777,20 +793,38 @@ namespace Lazy.Melody
             #region Vita Export
 
             if (_stopExportVitaFlag)
+            {
                 _currentVitaExportSolver?.StopTask();
+                _currentVitaExportSolver?.Dispose();
+            }
 
             #endregion
 
             #region PlayValve Export
 
             if (_stopExportPlayValveSuit1Flag)
+            {
                 _currentPlayValveSuit1ExportSolver?.StopTask();
+                _currentPlayValveSuit1ExportSolver?.Dispose();
+            }
+
             if (_stopExportPlayValveSuit2Flag)
+            {
                 _currentPlayValveSuit2ExportSolver?.StopTask();
+                _currentPlayValveSuit2ExportSolver?.Dispose();
+            }
+
             if (_stopExportPlayValveSuit3Flag)
+            {
                 _currentPlayValveSuit3ExportSolver?.StopTask();
+                _currentPlayValveSuit3ExportSolver?.Dispose();
+            }
+
             if (_stopExportPlayValveSuit4Flag)
+            {
                 _currentPlayValveSuit4ExportSolver?.StopTask();
+                _currentPlayValveSuit4ExportSolver?.Dispose();
+            }
 
             #endregion
         }

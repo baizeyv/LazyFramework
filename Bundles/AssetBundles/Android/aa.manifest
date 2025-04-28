@@ -1,0 +1,40 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.28f1
+CRC: 4078779248
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 22b51741b4958cc70d0396d45ede49f1
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 19a07376d2a275fe0c687466fc88681f
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: cace109e37170840b6b6b2ab2e3a6f0a
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+Assets:
+- Assets/AssetBundles/aa/loadingBarBg.png
+- Assets/AssetBundles/aa/CC/2.png
+- Assets/AssetBundles/aa/CC/Image.prefab
+- Assets/AssetBundles/aa/jigsaw_0.jpg
+Dependencies: []

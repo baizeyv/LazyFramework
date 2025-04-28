@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lazy;
-using NPOI.OpenXmlFormats.Dml.Diagram;
 using Solver.Exporter;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,7 +10,7 @@ using UnityEditor;
 
 namespace Solver
 {
-    public class SpiderSolver
+    public class SpiderSolver : IDisposable
     {
         // ! 使用HashSet而不用List的原因是在于Contains的查询速度,HashSet为O(1),List为O(n),随着数组越来越大会导致执行效率大幅度下降
         private readonly HashSet<Poker> _allStates = new();
@@ -20,6 +19,11 @@ namespace Solver
         /// * 所有Calc步骤
         /// </summary>
         public readonly List<Poker> AllStep = new();
+
+        /// <summary>
+        /// * dfs深度
+        /// </summary>
+        private int _depth;
 
         private int _calc;
 
@@ -114,6 +118,9 @@ namespace Solver
             {
                 if (_taskEndFlag)
                     return;
+                _depth++;
+                if (_depth >= 480) // # 最大栈深度
+                    return;
                 _calc++;
                 AllStep.Add(root);
                 root.Calc = _calc;
@@ -160,11 +167,12 @@ namespace Solver
                     foreach (var item in states)
                         _allStates.Add(item);
                     await TaskDepthFirstSearch(state, onCompleted, file, id, exportNull, stepLimit);
+                    _depth--;
                     if (_taskEndFlag)
                         return;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (!string.IsNullOrEmpty(file) && exportNull)
                 {
@@ -235,7 +243,7 @@ namespace Solver
                 PreviousPoker = poker,
                 CardCount = poker.CardCount,
                 CollectionStep = new List<int>(poker.CollectionStep),
-                Mark = poker.Mark,
+                Mark = poker.Mark
             };
             if (fromIndex < 0 || toIndex < 0)
                 return newPoker;
@@ -413,13 +421,19 @@ namespace Solver
                     if (
                         x.PreviousPoker.VisibleGroup[to].Count > 0
                         && x.PreviousPoker.VisibleGroup[from][0].GetType()
-                            == x.PreviousPoker.VisibleGroup[to][0].GetType()
+                        == x.PreviousPoker.VisibleGroup[to][0].GetType()
                     )
                         return int.MaxValue;
                     return int.MinValue;
                 })
                 .ToList();
             return result;
+        }
+
+        public void Dispose()
+        {
+            _allStates.Clear();
+            AllStep.Clear();
         }
     }
 }
