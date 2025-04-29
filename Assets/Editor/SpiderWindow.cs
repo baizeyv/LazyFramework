@@ -166,21 +166,9 @@ namespace LazyEditor
             GUILayout.BeginHorizontal("helpbox");
             {
                 _showSolver = GUILayout.Toggle(_showSolver, "Show Solver", GUILayout.Width(100));
-                _showExporter = GUILayout.Toggle(
-                    _showExporter,
-                    "Show Exporter",
-                    GUILayout.Width(110)
-                );
-                _showGenerator = GUILayout.Toggle(
-                    _showGenerator,
-                    "Show Generator",
-                    GUILayout.Width(120)
-                );
-                _showCalculation = GUILayout.Toggle(
-                    _showCalculation,
-                    "Show Calculation",
-                    GUILayout.Width(120)
-                );
+                _showExporter = GUILayout.Toggle(_showExporter, "Show Exporter", GUILayout.Width(110));
+                _showGenerator = GUILayout.Toggle(_showGenerator, "Show Generator", GUILayout.Width(120));
+                _showCalculation = GUILayout.Toggle(_showCalculation, "Show Calculation", GUILayout.Width(120));
                 _showOutput = GUILayout.Toggle(_showOutput, "Show Output", GUILayout.Width(120));
             }
             GUILayout.EndHorizontal();
@@ -260,7 +248,8 @@ namespace LazyEditor
         {
             if (HasOpenInstances<SpiderWindow>())
             {
-                GetWindow<SpiderWindow>("Spider").Close();
+                GetWindow<SpiderWindow>("Spider")
+                    .Close();
             }
             else
             {
@@ -281,13 +270,20 @@ namespace LazyEditor
                     var solver = new SpiderSolver();
                     var poker = new Poker(x.question);
                     solver.SuitCount = poker.GetSuitCount();
-                    solver.ThreadDepthFirstSearch(
-                        poker,
-                        null,
-                        _outputVitaCsvPath,
-                        x.id,
-                        stepLimit: step
-                    );
+                    solver.ThreadDepthFirstSearch(poker, null, _outputVitaCsvPath, x.id, stepLimit: step);
+                    if (!solver.Solved)
+                    {
+                        solver.Dispose();
+                        GC.Collect();
+                        solver = new SpiderSolver();
+                        poker = new Poker(x.question);
+                        solver.SuitCount = poker.GetSuitCount();
+                        solver.CancelSpecialFilter = true;
+                        solver.ThreadDepthFirstSearch(poker, null, _outputVitaCsvPath, x.id, stepLimit: step);
+                    }
+
+                    solver.Dispose();
+                    GC.Collect();
                 }
             });
             _vitaThread.Start();
@@ -296,7 +292,8 @@ namespace LazyEditor
         private void ThreadPlayValveSeed()
         {
             var array = _inputPlayValveSeeds.Split(',');
-            var seeds = array.Select(int.Parse).ToArray();
+            var seeds = array.Select(int.Parse)
+                .ToArray();
             var step = int.Parse(_exportStepLimitText);
             _playValveThread = new Thread(() =>
             {
@@ -304,13 +301,16 @@ namespace LazyEditor
                 {
                     var solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1 };
                     var poker = new Poker(seeds[i], _playValveSelectedOption + 1);
-                    solver.ThreadDepthFirstSearch(
-                        poker,
-                        null,
-                        _outputPlayValveCsvPath,
-                        i + 1,
-                        stepLimit: step
-                    );
+                    solver.ThreadDepthFirstSearch(poker, null, _outputPlayValveCsvPath, i + 1, stepLimit: step);
+                    if (!solver.Solved)
+                    {
+                        solver = new SpiderSolver { SuitCount = _playValveSelectedOption + 1, CancelSpecialFilter = true };
+                        poker = new Poker(seeds[i], _playValveSelectedOption + 1);
+                        solver.ThreadDepthFirstSearch(poker, null, _outputPlayValveCsvPath, i + 1, stepLimit: step);
+                    }
+
+                    solver.Dispose();
+                    GC.Collect();
                 }
             });
             _playValveThread.Start();
@@ -318,10 +318,7 @@ namespace LazyEditor
 
         private void DrawSolvePlayValve()
         {
-            GUILayout.BeginVertical(
-                "helpbox",
-                GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10)
-            );
+            GUILayout.BeginVertical("helpbox", GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10));
             {
                 GUILayout.BeginHorizontal();
                 {
@@ -359,13 +356,18 @@ namespace LazyEditor
                             var poker = new Poker(v, _selectedOption + 1);
                             ss.SuitCount = _selectedOption + 1;
                             _solver = ss;
-                            ss.ThreadDepthFirstSearch(
-                                poker,
-                                () =>
-                                {
-                                    _thread = null;
-                                }
-                            );
+                            ss.ThreadDepthFirstSearch(poker, () => { _thread = null; });
+                            if (!ss.Solved)
+                            {
+                                ss.Dispose();
+                                GC.Collect();
+                                ss = new SpiderSolver();
+                                poker = new Poker(v, _selectedOption + 1);
+                                ss.SuitCount = _selectedOption + 1;
+                                ss.CancelSpecialFilter = true;
+                                _solver = ss;
+                                ss.ThreadDepthFirstSearch(poker, () => { _thread = null; });
+                            }
                         });
                         _thread.Start();
                     }
@@ -382,10 +384,7 @@ namespace LazyEditor
 
         private void DrawSolveVita()
         {
-            GUILayout.BeginVertical(
-                "helpbox",
-                GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10)
-            );
+            GUILayout.BeginVertical("helpbox", GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10));
             {
                 GUILayout.BeginHorizontal();
                 {
@@ -394,7 +393,8 @@ namespace LazyEditor
                 }
                 GUILayout.EndHorizontal();
 
-                if (string.IsNullOrEmpty(_inputVita) || _inputVita.Length != 136)
+                if (string.IsNullOrEmpty(_inputVita) ||
+                    _inputVita.Length != 136)
                     GUI.enabled = false;
                 if (GUILayout.Button("Solve Vita", GUILayout.Height(35)))
                 {
@@ -406,13 +406,18 @@ namespace LazyEditor
                             var poker = new Poker(_inputVita);
                             ss.SuitCount = poker.GetSuitCount();
                             _solver = ss;
-                            ss.ThreadDepthFirstSearch(
-                                poker,
-                                () =>
-                                {
-                                    _thread = null;
-                                }
-                            );
+                            ss.ThreadDepthFirstSearch(poker, () => { _thread = null; });
+                            if (!ss.Solved)
+                            {
+                                ss.Dispose();
+                                GC.Collect();
+                                ss = new SpiderSolver();
+                                poker = new Poker(_inputVita);
+                                ss.SuitCount = poker.GetSuitCount();
+                                ss.CancelSpecialFilter = true;
+                                _solver = ss;
+                                ss.ThreadDepthFirstSearch(poker, () => { _thread = null; });
+                            }
                         });
                         _thread.Start();
                     }
@@ -429,10 +434,7 @@ namespace LazyEditor
 
         private void DrawExportPlayValve()
         {
-            GUILayout.BeginVertical(
-                "helpbox",
-                GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10)
-            );
+            GUILayout.BeginVertical("helpbox", GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10));
             {
                 GUILayout.BeginHorizontal();
                 {
@@ -464,9 +466,7 @@ namespace LazyEditor
                 }
                 GUILayout.EndHorizontal();
 
-                GUI.enabled =
-                    !string.IsNullOrEmpty(_outputPlayValveCsvPath)
-                    && !string.IsNullOrEmpty(_inputPlayValveSeeds);
+                GUI.enabled = !string.IsNullOrEmpty(_outputPlayValveCsvPath) && !string.IsNullOrEmpty(_inputPlayValveSeeds);
                 if (GUILayout.Button("Export PlayValve", GUILayout.Height(35)))
                     if (_playValveThread == null)
                         ThreadPlayValveSeed();
@@ -495,10 +495,7 @@ namespace LazyEditor
 
         private void DrawExportVita()
         {
-            GUILayout.BeginVertical(
-                "helpbox",
-                GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10)
-            );
+            GUILayout.BeginVertical("helpbox", GUILayout.Width(EditorGUIUtility.currentViewWidth / 2 - 10));
             {
                 GUILayout.BeginHorizontal();
                 {
@@ -514,11 +511,8 @@ namespace LazyEditor
                 }
                 GUILayout.EndHorizontal();
 
-                GUI.enabled =
-                    !string.IsNullOrEmpty(_outputVitaCsvPath)
-                    && !string.IsNullOrEmpty(_inputVitaJsonPath)
-                    && _inputVitaJsonPath.EndsWith(".json")
-                    && File.Exists(_inputVitaJsonPath);
+                GUI.enabled = !string.IsNullOrEmpty(_outputVitaCsvPath) && !string.IsNullOrEmpty(_inputVitaJsonPath) &&
+                              _inputVitaJsonPath.EndsWith(".json") && File.Exists(_inputVitaJsonPath);
                 if (GUILayout.Button("Export Vita", GUILayout.Height(35)))
                     if (_vitaThread == null)
                         ThreadVitaColor();
@@ -594,36 +588,20 @@ namespace LazyEditor
                 var maxSeedFlag = int.TryParse(_generationMaxSeedText, out var maxSeed);
                 GUILayout.BeginHorizontal();
                 {
-                    GUI.enabled =
-                        !string.IsNullOrEmpty(_generationFileCsvPath)
-                        && stepLimitFlag
-                        && minSeedFlag
-                        && maxSeedFlag
-                        && (maxSeed > minSeed || maxSeed == -1);
+                    GUI.enabled = !string.IsNullOrEmpty(_generationFileCsvPath) && stepLimitFlag && minSeedFlag && maxSeedFlag &&
+                                  (maxSeed > minSeed || maxSeed == -1);
                     if (GUILayout.Button("Generate", GUILayout.Height(35)))
                     {
                         var generator = new SpiderGenerator();
                         if (maxSeed == -1)
                             maxSeed = int.MaxValue;
                         // # 生成关卡
-                        generator.GenerateLevel(
-                            minSeed,
-                            maxSeed,
-                            _generationSuitCountIndex + 1,
-                            _generationFileCsvPath,
-                            stepLimit
-                        );
+                        generator.GenerateLevel(minSeed, maxSeed, _generationSuitCountIndex + 1, _generationFileCsvPath, stepLimit);
                         _generators.Add(generator);
                     }
 
                     GUI.enabled = true;
-                    if (
-                        GUILayout.Button(
-                            "Stop All Generation",
-                            GUILayout.Height(35),
-                            GUILayout.Width(150)
-                        )
-                    )
+                    if (GUILayout.Button("Stop All Generation", GUILayout.Height(35), GUILayout.Width(150)))
                     {
                         foreach (var generator in _generators)
                             generator.StopGeneration();
@@ -650,7 +628,8 @@ namespace LazyEditor
                             GUILayout.BeginVertical();
                             {
                                 GUILayout.Label("Hidden " + i);
-                                _hiddenReorderableList[i]?.DoLayoutList();
+                                _hiddenReorderableList[i]
+                                    ?.DoLayoutList();
                             }
                             GUILayout.EndVertical();
                         }
@@ -670,7 +649,8 @@ namespace LazyEditor
                             GUILayout.BeginVertical();
                             {
                                 GUILayout.Label("Visible " + i);
-                                _visibleReorderableList[i]?.DoLayoutList();
+                                _visibleReorderableList[i]
+                                    ?.DoLayoutList();
                             }
                             GUILayout.EndVertical();
                         }
@@ -701,7 +681,8 @@ namespace LazyEditor
                             var n = new List<EditorCard>(_hiddenList[i]);
                             n.Reverse();
                             foreach (var x in n)
-                                hiddenGroup[i].Add(x.ToCard());
+                                hiddenGroup[i]
+                                    .Add(x.ToCard());
                         }
 
                         for (var i = 0; i < _visibleList.Count; i++)
@@ -709,7 +690,8 @@ namespace LazyEditor
                             var n = new List<EditorCard>(_visibleList[i]);
                             n.Reverse();
                             foreach (var x in n)
-                                visibleGroup[i].Add(x.ToCard());
+                                visibleGroup[i]
+                                    .Add(x.ToCard());
                         }
 
                         var poker = new Poker(visibleGroup, hiddenGroup, new List<Card>());
@@ -741,21 +723,22 @@ namespace LazyEditor
                 GUILayout.BeginHorizontal();
                 {
                     var e = Event.current;
-                    if (e.type == EventType.KeyDown && e.keyCode == KeyCode.DownArrow)
+                    if (e.type == EventType.KeyDown &&
+                        e.keyCode == KeyCode.DownArrow)
                         NextCalc();
-                    if (e.type == EventType.KeyDown && e.keyCode == KeyCode.UpArrow)
+                    if (e.type == EventType.KeyDown &&
+                        e.keyCode == KeyCode.UpArrow)
                         PrevCalc();
-                    if (e.type == EventType.KeyDown && e.keyCode == KeyCode.DownArrow && e.shift)
+                    if (e.type == EventType.KeyDown &&
+                        e.keyCode == KeyCode.DownArrow &&
+                        e.shift)
                         LastCalc();
-                    if (e.type == EventType.KeyDown && e.keyCode == KeyCode.UpArrow && e.shift)
+                    if (e.type == EventType.KeyDown &&
+                        e.keyCode == KeyCode.UpArrow &&
+                        e.shift)
                         FirstCalc();
                     GUILayout.Label("Calc:", GUILayout.Width(35));
-                    if (
-                        !int.TryParse(
-                            GUILayout.TextField(_searchCalc.ToString(), GUILayout.Width(50)),
-                            out _searchCalc
-                        )
-                    )
+                    if (!int.TryParse(GUILayout.TextField(_searchCalc.ToString(), GUILayout.Width(50)), out _searchCalc))
                     {
                         _searchCalc = 0;
                     }
@@ -766,12 +749,7 @@ namespace LazyEditor
                     }
 
                     GUILayout.Label("Step:", GUILayout.Width(35));
-                    if (
-                        !int.TryParse(
-                            GUILayout.TextField(_searchStep.ToString(), GUILayout.Width(50)),
-                            out _searchStep
-                        )
-                    )
+                    if (!int.TryParse(GUILayout.TextField(_searchStep.ToString(), GUILayout.Width(50)), out _searchStep))
                     {
                         _searchStep = -1;
                     }
@@ -800,10 +778,7 @@ namespace LazyEditor
                         var poker = _solver.AllStep[_searchCalc];
                         GUILayout.BeginVertical("helpbox");
                         {
-                            GUILayout.Label(
-                                poker.ToString(),
-                                new GUIStyle(GUI.skin.label) { fontSize = 14, richText = true }
-                            );
+                            GUILayout.Label(poker.ToString(), new GUIStyle(GUI.skin.label) { fontSize = 14, richText = true });
                         }
                         GUILayout.EndVertical();
                     }
@@ -818,10 +793,7 @@ namespace LazyEditor
                         {
                             GUILayout.BeginVertical("helpbox");
                             {
-                                GUILayout.Label(
-                                    x.ToString(),
-                                    new GUIStyle(GUI.skin.label) { fontSize = 14, richText = true }
-                                );
+                                GUILayout.Label(x.ToString(), new GUIStyle(GUI.skin.label) { fontSize = 14, richText = true });
                             }
                             GUILayout.EndVertical();
                         }
@@ -875,62 +847,31 @@ namespace LazyEditor
 
             for (var i = 0; i < 10; i++)
             {
-                _hiddenReorderableList.Add(
-                    new ReorderableList(_hiddenList[i], typeof(EditorCard), true, false, true, true)
-                );
-                _visibleReorderableList.Add(
-                    new ReorderableList(
-                        _visibleList[i],
-                        typeof(EditorCard),
-                        true,
-                        false,
-                        true,
-                        true
-                    )
-                );
+                _hiddenReorderableList.Add(new ReorderableList(_hiddenList[i], typeof(EditorCard), true, false, true, true));
+                _visibleReorderableList.Add(new ReorderableList(_visibleList[i], typeof(EditorCard), true, false, true, true));
             }
 
             for (var i = 0; i < _hiddenReorderableList.Count; i++)
             {
                 var finalI = i;
-                _hiddenReorderableList[i].drawElementCallback = (
-                    rect,
-                    index,
-                    isActive,
-                    isFocused
-                ) =>
+                _hiddenReorderableList[i].drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     rect.y += 2;
                     var w = rect.width / 2f;
                     const float gap = 2f;
-                    _hiddenList[finalI][index].suitType = (SuitType)
-                        EditorGUI.EnumPopup(
-                            new Rect(rect.x, rect.y, w - gap, EditorGUIUtility.singleLineHeight),
-                            _hiddenList[finalI][index].suitType
-                        );
-                    if (
-                        !int.TryParse(
-                            EditorGUI.TextField(
-                                new Rect(
-                                    rect.x + w + gap,
-                                    rect.y,
-                                    rect.width - w - gap,
-                                    EditorGUIUtility.singleLineHeight
-                                ),
-                                _hiddenList[finalI][index].value.ToString()
-                            ),
-                            out _hiddenList[finalI][index].value
-                        )
-                    )
+                    _hiddenList[finalI][index].suitType =
+                        (SuitType)EditorGUI.EnumPopup(new Rect(rect.x, rect.y, w - gap, EditorGUIUtility.singleLineHeight),
+                            _hiddenList[finalI][index].suitType);
+                    if (!int.TryParse(EditorGUI.TextField(new Rect(rect.x + w + gap, rect.y, rect.width - w - gap, EditorGUIUtility.singleLineHeight),
+                            _hiddenList[finalI][index]
+                                .value.ToString()), out _hiddenList[finalI][index].value))
                     {
                         _hiddenList[finalI][index].value = 1;
                     }
                     else
                     {
-                        if (
-                            _hiddenList[finalI][index].value > 13
-                            || _hiddenList[finalI][index].value < 1
-                        )
+                        if (_hiddenList[finalI][index].value > 13 ||
+                            _hiddenList[finalI][index].value < 1)
                             _hiddenList[finalI][index].value = 1;
                     }
                 };
@@ -942,52 +883,34 @@ namespace LazyEditor
                 };
                 _hiddenReorderableList[i].onRemoveCallback = l =>
                 {
-                    if (l.index >= 0 && l.index <= _hiddenList[finalI].Count)
-                        _hiddenList[finalI].RemoveAt(l.index);
+                    if (l.index >= 0 &&
+                        l.index <= _hiddenList[finalI].Count)
+                        _hiddenList[finalI]
+                            .RemoveAt(l.index);
                 };
             }
 
             for (var i = 0; i < _visibleReorderableList.Count; i++)
             {
                 var finalI = i;
-                _visibleReorderableList[i].drawElementCallback = (
-                    rect,
-                    index,
-                    isActive,
-                    isFocused
-                ) =>
+                _visibleReorderableList[i].drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
                     rect.y += 2;
                     var w = rect.width / 2f;
                     const float gap = 2f;
-                    _visibleList[finalI][index].suitType = (SuitType)
-                        EditorGUI.EnumPopup(
-                            new Rect(rect.x, rect.y, w - gap, EditorGUIUtility.singleLineHeight),
-                            _visibleList[finalI][index].suitType
-                        );
-                    if (
-                        !int.TryParse(
-                            EditorGUI.TextField(
-                                new Rect(
-                                    rect.x + w + gap,
-                                    rect.y,
-                                    rect.width - w - gap,
-                                    EditorGUIUtility.singleLineHeight
-                                ),
-                                _visibleList[finalI][index].value.ToString()
-                            ),
-                            out _visibleList[finalI][index].value
-                        )
-                    )
+                    _visibleList[finalI][index].suitType =
+                        (SuitType)EditorGUI.EnumPopup(new Rect(rect.x, rect.y, w - gap, EditorGUIUtility.singleLineHeight),
+                            _visibleList[finalI][index].suitType);
+                    if (!int.TryParse(EditorGUI.TextField(new Rect(rect.x + w + gap, rect.y, rect.width - w - gap, EditorGUIUtility.singleLineHeight),
+                            _visibleList[finalI][index]
+                                .value.ToString()), out _visibleList[finalI][index].value))
                     {
                         _visibleList[finalI][index].value = 1;
                     }
                     else
                     {
-                        if (
-                            _visibleList[finalI][index].value > 13
-                            || _visibleList[finalI][index].value < 1
-                        )
+                        if (_visibleList[finalI][index].value > 13 ||
+                            _visibleList[finalI][index].value < 1)
                             _visibleList[finalI][index].value = 1;
                     }
                 };
@@ -999,8 +922,10 @@ namespace LazyEditor
                 };
                 _visibleReorderableList[i].onRemoveCallback = l =>
                 {
-                    if (l.index >= 0 && l.index <= _visibleList[finalI].Count)
-                        _visibleList[finalI].RemoveAt(l.index);
+                    if (l.index >= 0 &&
+                        l.index <= _visibleList[finalI].Count)
+                        _visibleList[finalI]
+                            .RemoveAt(l.index);
                 };
             }
         }
@@ -1032,17 +957,13 @@ namespace LazyEditor
 
         private enum SuitType
         {
-            [InspectorName("♥️")]
-            Heart,
+            [InspectorName("♥️")] Heart,
 
-            [InspectorName("♦️")]
-            Diamond,
+            [InspectorName("♦️")] Diamond,
 
-            [InspectorName("♠️")]
-            Spades,
+            [InspectorName("♠️")] Spades,
 
-            [InspectorName("♣️")]
-            Clubs,
+            [InspectorName("♣️")] Clubs
         }
     }
 }

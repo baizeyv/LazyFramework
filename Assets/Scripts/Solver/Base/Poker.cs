@@ -17,9 +17,28 @@ namespace Solver
 
         public const int PadWidth = 30;
 
-        public string Mark = "";
+        private static Dictionary<char, int> VitaCharDic;
+
+        private readonly List<int> _columnValuation = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        private int _suitCount;
+
+        /// <summary>
+        /// * 私有估值
+        /// </summary>
+        private int _valuation = -9999;
 
         public int Calc = 0;
+
+        /// <summary>
+        /// * 当前的牌数
+        /// </summary>
+        public int CardCount = 104;
+
+        /// <summary>
+        /// * 收牌的步骤
+        /// </summary>
+        public List<int> CollectionStep = new();
 
         /// <summary>
         /// * 牌堆
@@ -32,19 +51,11 @@ namespace Solver
         public List<List<Card>> HiddenGroup;
 
         /// <summary>
-        /// * 可见牌
-        /// </summary>
-        public List<List<Card>> VisibleGroup;
-
-        /// <summary>
         /// * 历史记录 (fromColumnIndex, Count, toColumnIndex, 是否收一套牌)
         /// </summary>
         public List<(int, int, int, bool)> History = new();
 
-        /// <summary>
-        /// * 收牌的步骤
-        /// </summary>
-        public List<int> CollectionStep = new();
+        public string Mark = "";
 
         /// <summary>
         /// * 上一步状态
@@ -52,18 +63,45 @@ namespace Solver
         public Poker PreviousPoker;
 
         /// <summary>
-        /// * 当前的牌数
+        /// * 可见牌
         /// </summary>
-        public int CardCount = 104;
-
-        private int _suitCount;
-
-        private readonly List<int> _columnValuation = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public List<List<Card>> VisibleGroup;
 
         /// <summary>
-        /// * 私有估值
+        /// * Constructor
         /// </summary>
-        private int _valuation = -9999;
+        /// <param name="seed"></param>
+        /// <param name="suitCount"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public Poker(int seed, int suitCount)
+        {
+            Mark = seed.ToString();
+            _suitCount = suitCount;
+            var deck = GenerateDeck(seed, suitCount);
+            Build(deck);
+        }
+
+        public Poker(string vitaLevel)
+        {
+            Mark = vitaLevel;
+            var deck = VitaLevelConvertToPoker(vitaLevel);
+            Build(deck);
+        }
+
+        public Poker(List<List<Card>> visibleGroup, List<List<Card>> hiddenGroup, List<Card> deck)
+        {
+            VisibleGroup = visibleGroup;
+            HiddenGroup = hiddenGroup;
+            Deck = deck;
+            if (deck.Count > 50)
+                throw new ArgumentException("deck.Count must be <= 50");
+
+            if (hiddenGroup.Count > 12)
+                throw new ArgumentException("hiddenGroup.Count must be <= 12");
+
+            if (visibleGroup.Count > 12)
+                throw new ArgumentException("visibleGroup.Count must be <= 12");
+        }
 
         /// <summary>
         /// * 估值
@@ -151,6 +189,50 @@ namespace Solver
         }
 
         /// <summary>
+        /// * 完成了几套牌了
+        /// </summary>
+        public int FinishedCount
+        {
+            get
+            {
+                var currentCount = CardCount / 13;
+                return 8 - currentCount;
+            }
+        }
+
+        /// <summary>
+        /// * 剩余几套牌
+        /// </summary>
+        public int RemainingCount => CardCount / 13;
+
+        /// <summary>
+        /// * 游戏是否完成
+        /// </summary>
+        public bool GameCompleted
+        {
+            get
+            {
+                return Deck.Count == 0 && !VisibleGroup.SelectMany(x => x)
+                    .Any() && !HiddenGroup.SelectMany(x => x)
+                    .Any();
+            }
+        }
+
+        /// <summary>
+        /// * 空白列的数量
+        /// </summary>
+        public int BlankColumnCount
+        {
+            get
+            {
+                return VisibleGroup.Where((t, i) => t.Count + HiddenGroup[i].Count == 0)
+                    .Count();
+            }
+        }
+
+        public bool HasHidden => HiddenGroup.Sum(x => x.Count) != 0;
+
+        /// <summary>
         /// * 多花色的向其他地方移动牌的预测估值
         /// ! 加上这个之后之前很多可以解出来的变得解不出来了,所以舍去
         /// </summary>
@@ -165,7 +247,9 @@ namespace Solver
             var from = History[0].Item1;
             var count = History[0].Item2;
             var to = History[0].Item3;
-            if (from < 0 || count < 0 || to < 0)
+            if (from < 0 ||
+                count < 0 ||
+                to < 0)
                 // # 忽略发牌
                 return 0;
             if (PreviousPoker.VisibleGroup[from].Count != count)
@@ -191,10 +275,10 @@ namespace Solver
             var low = poker.VisibleGroup[column][0];
             canMove.Add(low);
             for (var i = 1; i < poker.VisibleGroup[column].Count; i++)
-                if (
-                    poker.VisibleGroup[column][i].GetType() == canMove[^1].GetType()
-                    && poker.VisibleGroup[column][i].Value - 1 == canMove[^1].Value
-                )
+                if (poker.VisibleGroup[column][i]
+                        .GetType() == canMove[^1]
+                        .GetType() &&
+                    poker.VisibleGroup[column][i].Value - 1 == canMove[^1].Value)
                     canMove.Add(poker.VisibleGroup[column][i]);
                 else
                     break;
@@ -212,7 +296,9 @@ namespace Solver
                     if (!newPoker.InValidMove())
                     {
                         // # 可以向其他列完整移动
-                        if (poker.VisibleGroup[i][0].GetType() == canMove[^1].GetType())
+                        if (poker.VisibleGroup[i][0]
+                                .GetType() == canMove[^1]
+                                .GetType())
                             // # 相同花色
                             result += 40;
                         else
@@ -231,10 +317,9 @@ namespace Solver
                     }
 
                     var cur = poker.VisibleGroup[i][x];
-                    if (
-                        cur.GetType() == moveList[^1].GetType()
-                        && cur.Value == moveList[^1].Value + 1
-                    )
+                    if (cur.GetType() == moveList[^1]
+                            .GetType() &&
+                        cur.Value == moveList[^1].Value + 1)
                         moveList.Add(cur);
                     else
                         break;
@@ -246,7 +331,8 @@ namespace Solver
                     var newPoker = SpiderSolver.CreateNewPoker(poker, moveList, i, column);
                     if (!newPoker.InValidMove())
                     {
-                        if (moveList[^1].GetType() == low.GetType())
+                        if (moveList[^1]
+                                .GetType() == low.GetType())
                             // # 相同花色
                             result += 30;
                         else
@@ -267,13 +353,13 @@ namespace Solver
         {
             if (History.Count < 2)
                 return false;
-            if (History[0].Item1 < 0 || History[0].Item2 < 0 || History[0].Item3 < 0)
+            if (History[0].Item1 < 0 ||
+                History[0].Item2 < 0 ||
+                History[0].Item3 < 0)
                 return false;
-            if (
-                History[0].Item2 == History[1].Item2
-                && History[0].Item1 == History[1].Item3
-                && History[0].Item3 == History[1].Item1
-            )
+            if (History[0].Item2 == History[1].Item2 &&
+                History[0].Item1 == History[1].Item3 &&
+                History[0].Item3 == History[1].Item1)
                 return true;
             return false;
         }
@@ -294,7 +380,9 @@ namespace Solver
             var from = History[0].Item1;
             var count = History[0].Item2;
             var to = History[0].Item3;
-            if (from < 0 || count < 0 || to < 0)
+            if (from < 0 ||
+                count < 0 ||
+                to < 0)
                 return result;
             if (IsBlank(from))
                 return result;
@@ -314,16 +402,18 @@ namespace Solver
                         }
                         else
                         {
-                            if (
-                                PreviousPoker.VisibleGroup[i][x].GetType() == list[^1].GetType()
-                                && PreviousPoker.VisibleGroup[i][x].Value - 1 == list[^1].Value
-                            )
+                            if (PreviousPoker.VisibleGroup[i][x]
+                                    .GetType() == list[^1]
+                                    .GetType() &&
+                                PreviousPoker.VisibleGroup[i][x].Value - 1 == list[^1].Value)
                                 list.Add(PreviousPoker.VisibleGroup[i][x]);
                             else
                                 break;
                         }
 
-                    if (VisibleGroup[from][0].GetType() == list[^1].GetType())
+                    if (VisibleGroup[from][0]
+                            .GetType() == list[^1]
+                            .GetType())
                     {
                         // # 同花色
                         if (list[^1].Value + 1 == VisibleGroup[from][0].Value)
@@ -340,10 +430,10 @@ namespace Solver
                                 }
                                 else
                                 {
-                                    if (
-                                        VisibleGroup[from][c].GetType() == st[^1].GetType()
-                                        && VisibleGroup[from][c].Value - 1 == st[^1].Value
-                                    )
+                                    if (VisibleGroup[from][c]
+                                            .GetType() == st[^1]
+                                            .GetType() &&
+                                        VisibleGroup[from][c].Value - 1 == st[^1].Value)
                                         st.Add(VisibleGroup[from][c]);
                                     else
                                         break;
@@ -371,13 +461,13 @@ namespace Solver
             var from = History[0].Item1;
             var count = History[0].Item2;
             var to = History[0].Item3;
-            if (from < 0 || count < 0 || to < 0)
+            if (from < 0 ||
+                count < 0 ||
+                to < 0)
                 // # 忽略发牌
                 return 0;
-            if (
-                PreviousPoker.VisibleGroup[from].Count == count
-                && PreviousPoker.HiddenGroup[from].Count != 0
-            )
+            if (PreviousPoker.VisibleGroup[from].Count == count &&
+                PreviousPoker.HiddenGroup[from].Count != 0)
             {
                 // # 可以翻出新牌 flop new card
                 var depth = 0;
@@ -385,70 +475,6 @@ namespace Solver
             }
 
             return 0;
-        }
-
-        /// <summary>
-        /// * 完成了几套牌了
-        /// </summary>
-        public int FinishedCount
-        {
-            get
-            {
-                var currentCount = CardCount / 13;
-                return 8 - currentCount;
-            }
-        }
-
-        /// <summary>
-        /// * 剩余几套牌
-        /// </summary>
-        public int RemainingCount => CardCount / 13;
-
-        /// <summary>
-        /// * 游戏是否完成
-        /// </summary>
-        public bool GameCompleted
-        {
-            get
-            {
-                return Deck.Count == 0
-                    && !VisibleGroup.SelectMany(x => x).Any()
-                    && !HiddenGroup.SelectMany(x => x).Any();
-            }
-        }
-
-        /// <summary>
-        /// * 空白列的数量
-        /// </summary>
-        public int BlankColumnCount
-        {
-            get
-            {
-                return VisibleGroup.Where((t, i) => t.Count + HiddenGroup[i].Count == 0).Count();
-            }
-        }
-
-        public bool HasHidden => HiddenGroup.Sum(x => x.Count) != 0;
-
-        /// <summary>
-        /// * Constructor
-        /// </summary>
-        /// <param name="seed"></param>
-        /// <param name="suitCount"></param>
-        /// <exception cref="ArgumentException"></exception>
-        public Poker(int seed, int suitCount)
-        {
-            Mark = seed.ToString();
-            _suitCount = suitCount;
-            var deck = GenerateDeck(seed, suitCount);
-            Build(deck);
-        }
-
-        public Poker(string vitaLevel)
-        {
-            Mark = vitaLevel;
-            var deck = VitaLevelConvertToPoker(vitaLevel);
-            Build(deck);
         }
 
         public int GetSuitCount()
@@ -512,7 +538,8 @@ namespace Solver
             {
                 if (idx > 9)
                     idx = 0;
-                hiddenTable[idx++].Add(item);
+                hiddenTable[idx++]
+                    .Add(item);
             }
 
             idx = 0;
@@ -520,7 +547,8 @@ namespace Solver
             {
                 if (idx > 9)
                     idx = 0;
-                visibleTable[idx++].Add(item);
+                visibleTable[idx++]
+                    .Add(item);
             }
 
             foreach (var item in hiddenTable)
@@ -537,26 +565,11 @@ namespace Solver
                 throw new ArgumentException("visibleGroup.Count must be <= 12");
         }
 
-        public Poker(List<List<Card>> visibleGroup, List<List<Card>> hiddenGroup, List<Card> deck)
-        {
-            VisibleGroup = visibleGroup;
-            HiddenGroup = hiddenGroup;
-            Deck = deck;
-            if (deck.Count > 50)
-                throw new ArgumentException("deck.Count must be <= 50");
-
-            if (hiddenGroup.Count > 12)
-                throw new ArgumentException("hiddenGroup.Count must be <= 12");
-
-            if (visibleGroup.Count > 12)
-                throw new ArgumentException("visibleGroup.Count must be <= 12");
-        }
-
         /// <summary>
         /// * 二次估值,用于解决在发牌前的很多无效移动 (各种顺子的移动)
         /// </summary>
         /// <returns></returns>
-        public bool SecondaryValuation()
+        public bool SecondaryValuation(SpiderSolver solver)
         {
             if (PreviousPoker == null)
                 return true;
@@ -564,7 +577,9 @@ namespace Solver
             var count = History[0].Item2;
             var to = History[0].Item3;
             var collection = History[0].Item4;
-            if (from < 0 || count < 0 || to < 0)
+            if (from < 0 ||
+                count < 0 ||
+                to < 0)
                 // # 发牌
                 return true;
             if (PreviousPoker.IsBlank(to))
@@ -572,6 +587,9 @@ namespace Solver
                 return true;
             if (PreviousPoker.VisibleGroup[from].Count == count || collection)
                 // # 一列全部都移动或收牌了
+                return true;
+            if (solver.CancelSpecialFilter)
+                // # 多花色不进行二次估值
                 return true;
             // # 上一步的列的二次估值
             var previousValue = Calculate(PreviousPoker.VisibleGroup[from]);
@@ -598,7 +616,7 @@ namespace Solver
                     if (top.Value == down.Value + 1)
                     {
                         if (top.GetType() == down.GetType())
-                        // # 花色相同
+                            // # 花色相同
                         {
                             val++;
                             if (i + 1 == cards.Count)
@@ -646,12 +664,7 @@ namespace Solver
                 if (poker.VisibleGroup[i][0].Value == value + 1)
                 {
                     // # 可以向其他列移动
-                    var newPoker = SpiderSolver.CreateNewPoker(
-                        poker,
-                        new List<Card> { poker.VisibleGroup[column][0] },
-                        column,
-                        i
-                    );
+                    var newPoker = SpiderSolver.CreateNewPoker(poker, new List<Card> { poker.VisibleGroup[column][0] }, column, i);
                     setTo.Add(newPoker);
                     result += 2;
                 }
@@ -666,10 +679,9 @@ namespace Solver
                     }
 
                     var cur = poker.VisibleGroup[i][x];
-                    if (
-                        cur.GetType() == moveList[^1].GetType()
-                        && cur.Value == moveList[^1].Value + 1
-                    )
+                    if (cur.GetType() == moveList[^1]
+                            .GetType() &&
+                        cur.Value == moveList[^1].Value + 1)
                         moveList.Add(cur);
                     else
                         break;
@@ -709,9 +721,12 @@ namespace Solver
             var set = 1;
             if (VisibleGroup[index].Count > 0)
             {
-                var suit = VisibleGroup[index][0].GetType();
-                foreach (var card in VisibleGroup[index].Take(13))
-                    if (card.Value == set && suit == card.GetType()) // # 同色才能收牌
+                var suit = VisibleGroup[index][0]
+                    .GetType();
+                foreach (var card in VisibleGroup[index]
+                             .Take(13))
+                    if (card.Value == set &&
+                        suit == card.GetType()) // # 同色才能收牌
                     {
                         set++;
                     }
@@ -727,14 +742,23 @@ namespace Solver
             {
                 collection = true;
                 // # 1-13全了 (收一套牌)
-                VisibleGroup[index] = VisibleGroup[index].Skip(13).ToList();
+                VisibleGroup[index] = VisibleGroup[index]
+                    .Skip(13)
+                    .ToList();
                 CardCount -= 13;
                 CollectionStep.Add(History.Count + 1);
-                if (VisibleGroup[index].Count == 0 && HiddenGroup[index].Count > 0)
+                if (VisibleGroup[index].Count == 0 &&
+                    HiddenGroup[index].Count > 0)
                 {
                     // # 移动后新的列收牌了,如若没有可见的了则展示新的牌
-                    VisibleGroup[index] = new List<Card> { HiddenGroup[index].First() };
-                    HiddenGroup[index] = HiddenGroup[index].Skip(1).ToList();
+                    VisibleGroup[index] = new List<Card>
+                    {
+                        HiddenGroup[index]
+                            .First()
+                    };
+                    HiddenGroup[index] = HiddenGroup[index]
+                        .Skip(1)
+                        .ToList();
                 }
             }
 
@@ -755,18 +779,28 @@ namespace Solver
 
             var fromList = VisibleGroup[from];
             var toList = VisibleGroup[to];
-            var movingCards = fromList.Take(count).ToList();
-            var newToList = movingCards.Concat(toList).ToList();
+            var movingCards = fromList.Take(count)
+                .ToList();
+            var newToList = movingCards.Concat(toList)
+                .ToList();
             VisibleGroup[to] = newToList;
-            VisibleGroup[from] = fromList.Skip(count).ToList();
+            VisibleGroup[from] = fromList.Skip(count)
+                .ToList();
             // # 检测收牌
             var collection = DetectCollection(to);
 
             // # 来源列在没有可见牌的时候要翻开隐藏牌
-            if (VisibleGroup[from].Count == 0 && HiddenGroup[from].Count > 0)
+            if (VisibleGroup[from].Count == 0 &&
+                HiddenGroup[from].Count > 0)
             {
-                VisibleGroup[from] = new List<Card> { HiddenGroup[from].First() };
-                HiddenGroup[from] = HiddenGroup[from].Skip(1).ToList();
+                VisibleGroup[from] = new List<Card>
+                {
+                    HiddenGroup[from]
+                        .First()
+                };
+                HiddenGroup[from] = HiddenGroup[from]
+                    .Skip(1)
+                    .ToList();
             }
 
             // # 添加历史记录
@@ -784,7 +818,8 @@ namespace Solver
             var collection = false;
             for (var i = 0; i < VisibleGroup.Count; i++)
             {
-                VisibleGroup[i].Insert(0, Deck.First());
+                VisibleGroup[i]
+                    .Insert(0, Deck.First());
                 Deck.RemoveAt(0);
                 collection |= DetectCollection(i);
             }
@@ -800,9 +835,7 @@ namespace Solver
             {
                 var step = 0;
                 foreach (var item in History)
-                    writer.WriteLine(
-                        $"Step:{++step}  From:{item.Item1}  To:{item.Item3}  Count:{item.Item2}"
-                    );
+                    writer.WriteLine($"Step:{++step}  From:{item.Item1}  To:{item.Item3}  Count:{item.Item2}");
             }
         }
 
@@ -851,92 +884,98 @@ namespace Solver
                     // # 发牌了
                     foreach (var item in VisibleGroup)
                         if (item.Count > 0)
-                            item[0]?.Highlight();
+                            item[0]
+                                ?.Highlight();
 
                     for (var i = 0; i < 10; i++)
-                        PreviousPoker.Deck[i]?.Highlight();
+                        PreviousPoker.Deck[i]
+                            ?.Highlight();
                 }
 
                 result += "      Previous ⏩⏩⏩ Current";
-                if (
-                    HiddenGroup.Any(x => x.Count > 0)
-                    || PreviousPoker.HiddenGroup.Any(x => x.Count > 0)
-                )
+                if (HiddenGroup.Any(x => x.Count > 0) ||
+                    PreviousPoker.HiddenGroup.Any(x => x.Count > 0))
                 {
-                    var currentMaxHidden = HiddenGroup
-                        .Select(x => x.Count)
+                    var currentMaxHidden = HiddenGroup.Select(x => x.Count)
                         .Aggregate(0, (currentMax, size) => size > currentMax ? size : currentMax);
-                    var previousMaxHidden = PreviousPoker
-                        .HiddenGroup.Select(x => x.Count)
+                    var previousMaxHidden = PreviousPoker.HiddenGroup.Select(x => x.Count)
                         .Aggregate(0, (currentMax, size) => size > currentMax ? size : currentMax);
                     var max = Math.Max(currentMaxHidden, previousMaxHidden);
                     result += "\n\n❎ Hidden Poker Cards: \n";
-                    var previousArray = PreviousPoker.GetHiddenString(0, max).Split('\n');
-                    var currentArray = GetHiddenString(0, max).Split('\n');
+                    var previousArray = PreviousPoker.GetHiddenString(0, max)
+                        .Split('\n');
+                    var currentArray = GetHiddenString(0, max)
+                        .Split('\n');
                     for (var i = 0; i < previousArray.Length; i++)
                     {
-                        result += previousArray[i].PadRight(305, ' ');
+                        result += previousArray[i]
+                            .PadRight(305, ' ');
                         result += "➡️".PadRight(10, ' ');
                         result += currentArray[i];
                         result += "\n";
                     }
                 }
 
-                if (
-                    VisibleGroup.Any(x => x.Count > 0)
-                    || PreviousPoker.VisibleGroup.Any(x => x.Count > 0)
-                )
+                if (VisibleGroup.Any(x => x.Count > 0) ||
+                    PreviousPoker.VisibleGroup.Any(x => x.Count > 0))
                 {
-                    var currentVisibleMax = VisibleGroup
-                        .Select(x => x.Count)
+                    var currentVisibleMax = VisibleGroup.Select(x => x.Count)
                         .Aggregate(0, (currentMax, size) => size > currentMax ? size : currentMax);
-                    var previousVisibleMax = PreviousPoker
-                        .VisibleGroup.Select(x => x.Count)
+                    var previousVisibleMax = PreviousPoker.VisibleGroup.Select(x => x.Count)
                         .Aggregate(0, (currentMax, size) => size > currentMax ? size : currentMax);
                     var max = Math.Max(currentVisibleMax, previousVisibleMax);
                     result += "\n✅ Visible Poker Cards: \n";
-                    var previousArray = PreviousPoker.GetVisibleString(0, max).Split('\n');
-                    var currentArray = GetVisibleString(0, max).Split('\n');
+                    var previousArray = PreviousPoker.GetVisibleString(0, max)
+                        .Split('\n');
+                    var currentArray = GetVisibleString(0, max)
+                        .Split('\n');
                     for (var i = 0; i < previousArray.Length; i++)
                     {
-                        result += previousArray[i].PadRight(305, ' ');
+                        result += previousArray[i]
+                            .PadRight(305, ' ');
                         result += "➡️".PadRight(10, ' ');
                         result += currentArray[i];
                         result += "\n";
                     }
                 }
 
-                if (Deck.Count > 0 || PreviousPoker.Deck.Count > 0)
+                if (Deck.Count > 0 ||
+                    PreviousPoker.Deck.Count > 0)
                 {
                     result += "\n❇️ Deck Poker Cards: \n";
                     var max = Math.Max(Deck.Count, PreviousPoker.Deck.Count);
                     var previousStr = string.Empty;
                     for (var i = 0; i < max; i++)
                     {
-                        if (i % 10 == 0 && i != 0)
+                        if (i % 10 == 0 &&
+                            i != 0)
                             previousStr += "\n";
-                        previousStr +=
-                            i < PreviousPoker.Deck.Count
-                                ? PreviousPoker.Deck[i].ToString().PadRight(PadWidth, ' ')
-                                : EmptyCard.PadRight(PadWidth, ' ');
+                        previousStr += i < PreviousPoker.Deck.Count
+                            ? PreviousPoker.Deck[i]
+                                .ToString()
+                                .PadRight(PadWidth, ' ')
+                            : EmptyCard.PadRight(PadWidth, ' ');
                     }
 
                     var currentStr = string.Empty;
                     for (var i = 0; i < max; i++)
                     {
-                        if (i % 10 == 0 && i != 0)
+                        if (i % 10 == 0 &&
+                            i != 0)
                             currentStr += "\n";
-                        currentStr +=
-                            i < Deck.Count
-                                ? Deck[i].ToString().PadRight(PadWidth, ' ')
-                                : EmptyCard.PadRight(PadWidth, ' ');
+                        currentStr += i < Deck.Count
+                            ? Deck[i]
+                                .ToString()
+                                .PadRight(PadWidth, ' ')
+                            : EmptyCard.PadRight(PadWidth, ' ');
                     }
 
                     var previousArray = previousStr.Split('\n');
                     var currentArray = currentStr.Split('\n');
                     for (var i = 0; i < previousArray.Length; i++)
                     {
-                        result += previousArray[i].PadRight(305, ' ');
+                        result += previousArray[i]
+                            .PadRight(305, ' ');
                         result += "➡️".PadRight(10, ' ');
                         result += currentArray[i];
                         result += "\n";
@@ -958,8 +997,7 @@ namespace Solver
                 // # 没有上一步
                 if (HiddenGroup.Any(x => x.Count > 0))
                 {
-                    var maxHidden = HiddenGroup
-                        .Select(x => x.Count)
+                    var maxHidden = HiddenGroup.Select(x => x.Count)
                         .Aggregate(0, (currentMax, size) => size > currentMax ? size : currentMax);
                     result += "\n\n❎ Hidden Poker Cards: \n";
                     result += GetHiddenString(0, maxHidden);
@@ -967,8 +1005,7 @@ namespace Solver
 
                 if (VisibleGroup.Any(x => x.Count > 0))
                 {
-                    var max = VisibleGroup
-                        .Select(x => x.Count)
+                    var max = VisibleGroup.Select(x => x.Count)
                         .Aggregate(0, (currentMax, size) => size > currentMax ? size : currentMax);
                     result += "\n\n✅ Visible Poker Cards: \n";
                     result += GetVisibleString(0, max);
@@ -988,7 +1025,9 @@ namespace Solver
             {
                 if (i % 10 == 0)
                     result += "\n";
-                result += Deck[i].ToString().PadRight(PadWidth, ' ');
+                result += Deck[i]
+                    .ToString()
+                    .PadRight(PadWidth, ' ');
             }
 
             return result;
@@ -1019,7 +1058,8 @@ namespace Solver
                 if (column.Count > row)
                 {
                     var card = column[column.Count - row - 1];
-                    result += card.ToString().PadRight(PadWidth, ' ');
+                    result += card.ToString()
+                        .PadRight(PadWidth, ' ');
                 }
                 else
                 {
@@ -1036,7 +1076,8 @@ namespace Solver
                 if (column.Count > row)
                 {
                     var card = column[column.Count - row - 1];
-                    result += card.ToString().PadRight(PadWidth, ' ');
+                    result += card.ToString()
+                        .PadRight(PadWidth, ' ');
                 }
                 else
                 {
@@ -1061,7 +1102,9 @@ namespace Solver
                         return false;
                     for (var x = 0; x < VisibleGroup[i].Count; x++)
                     {
-                        if (VisibleGroup[i][x].GetType() != that.VisibleGroup[i][x].GetType())
+                        if (VisibleGroup[i][x]
+                                .GetType() != that.VisibleGroup[i][x]
+                                .GetType())
                             return false;
                         if (VisibleGroup[i][x].Value != that.VisibleGroup[i][x].Value)
                             return false;
@@ -1069,7 +1112,9 @@ namespace Solver
 
                     for (var x = 0; x < HiddenGroup[i].Count; x++)
                     {
-                        if (HiddenGroup[i][x].GetType() != that.HiddenGroup[i][x].GetType())
+                        if (HiddenGroup[i][x]
+                                .GetType() != that.HiddenGroup[i][x]
+                                .GetType())
                             return false;
                         if (HiddenGroup[i][x].Value != that.HiddenGroup[i][x].Value)
                             return false;
@@ -1082,17 +1127,40 @@ namespace Solver
             return false;
         }
 
+        /*
         public override int GetHashCode()
         {
-            var hash = Deck.Aggregate(
-                17,
-                (current, item) => current * 31 + (item?.GetHashCode() ?? 0)
-            );
-            hash = HiddenGroup
-                .SelectMany(item => item)
+            var hash = 17;
+
+            // 计算 Deck 部分
+            foreach (var card in Deck) hash = hash * 31 + (card?.GetHashCode() ?? 0);
+
+            // 计算 HiddenGroup 部分
+            foreach (var group in HiddenGroup)
+            {
+                hash = hash * 31 + 1234567;
+                foreach (var card in group)
+                    hash = hash * 31 + (card?.GetHashCode() ?? 0);
+            }
+
+            // 计算 VisibleGroup 部分
+            foreach (var group in VisibleGroup)
+            {
+                hash = hash * 31 + 1234567;
+                foreach (var card in group)
+                    hash = hash * 31 + (card?.GetHashCode() ?? 0);
+            }
+
+            return hash;
+        }
+        */
+
+        public override int GetHashCode()
+        {
+            var hash = Deck.Aggregate(17, (current, item) => current * 31 + (item?.GetHashCode() ?? 0));
+            hash = HiddenGroup.SelectMany(item => item)
                 .Aggregate(hash, (current, card) => current * 31 + (card?.GetHashCode() ?? 0));
-            hash = VisibleGroup
-                .SelectMany(item => item)
+            hash = VisibleGroup.SelectMany(item => item)
                 .Aggregate(hash, (current, card) => current * 31 + (card?.GetHashCode() ?? 0));
             return hash;
         }
@@ -1111,23 +1179,21 @@ namespace Solver
                 cards.Add(i + 1 + tmp * 13);
             }
 
-            var cardValues = cards.OrderBy(_ => random.Next()).ToList();
-            var result = cardValues
-                .Select(x =>
+            var cardValues = cards.OrderBy(_ => random.Next())
+                .ToList();
+            // var str = string.Join(',', cardValues);
+            // Log.MsgD(str);
+            var result = cardValues.Select(x =>
                 {
                     switch (x)
                     {
-                        case >= 1
-                        and <= 13:
+                        case >= 1 and <= 13:
                             return BuildCard(2, x);
-                        case >= 14
-                        and <= 26:
+                        case >= 14 and <= 26:
                             return BuildCard(1, x);
-                        case >= 27
-                        and <= 39:
+                        case >= 27 and <= 39:
                             return BuildCard(4, x);
-                        case >= 40
-                        and <= 53:
+                        case >= 40 and <= 53:
                             return BuildCard(3, x);
                         default:
                             // Log.MsgE("Card Pile ERROR !");
@@ -1153,7 +1219,7 @@ namespace Solver
                 2 => new SpadeCard(num),
                 3 => new DiamondCard(num),
                 4 => new ClubsCard(num),
-                _ => new HeartCard(num),
+                _ => new HeartCard(num)
             };
         }
 
@@ -1162,7 +1228,8 @@ namespace Solver
             var array = vitaLevel.Split(",1;");
             var deck = string.Empty;
             // # 牌堆
-            var deckString = array[^1].Substring(0, array[^1].Length - 2); // # -2 是为了去掉最后的,0
+            var deckString = array[^1]
+                .Substring(0, array[^1].Length - 2); // # -2 是为了去掉最后的,0
             for (var i = deckString.Length - 1; i >= 0; i--)
                 deck += deckString[i];
 
@@ -1185,23 +1252,21 @@ namespace Solver
 
             var s = value + deck;
 
-            return s.Select(VitaCharToCardValue).Select(GetCard).ToList();
+            return s.Select(VitaCharToCardValue)
+                .Select(GetCard)
+                .ToList();
 
             Card GetCard(int x)
             {
                 switch (x)
                 {
-                    case >= 1
-                    and <= 13:
+                    case >= 1 and <= 13:
                         return BuildCard(2, x);
-                    case >= 14
-                    and <= 26:
+                    case >= 14 and <= 26:
                         return BuildCard(1, x);
-                    case >= 27
-                    and <= 39:
+                    case >= 27 and <= 39:
                         return BuildCard(4, x);
-                    case >= 40
-                    and <= 53:
+                    case >= 40 and <= 53:
                         return BuildCard(3, x);
                     default:
                         // Log.MsgE("Card Pile ERROR !");
@@ -1234,8 +1299,6 @@ namespace Solver
                 return (char)('a' + (x - 27));
             return (char)('A' + (x - 40));
         }
-
-        private static Dictionary<char, int> VitaCharDic;
 
         /// <summary>
         /// * Vita的关卡中的牌值转为自己的Poker的值

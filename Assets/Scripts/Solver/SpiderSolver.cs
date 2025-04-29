@@ -20,41 +20,55 @@ namespace Solver
         /// </summary>
         public readonly List<Poker> AllStep = new();
 
+        private int _calc;
+
         /// <summary>
         /// * dfs深度
         /// </summary>
         private int _depth;
 
-        private int _calc;
-
-        public int Calc => _calc;
-
-        public int SuitCount = 1;
+        private bool _taskEndFlag;
 
         private bool _threadEndFlag;
 
-        private bool _taskEndFlag;
+        /// <summary>
+        /// * 取消特殊的算法过滤
+        /// </summary>
+        public bool CancelSpecialFilter = false;
 
-        public void ThreadDepthFirstSearch(
-            Poker root,
-            Action onCompleted,
-            string file = "",
-            int id = 0,
-            bool exportNull = true,
-            int stepLimit = 1000000
-        )
+        public int SuitCount = 1;
+
+        public int Calc => _calc;
+
+        public bool Solved { get; private set; }
+
+        public void Dispose()
+        {
+            _allStates.Clear();
+            AllStep.Clear();
+        }
+
+        public void ThreadDepthFirstSearch(Poker root, Action onCompleted, string file = "", int id = 0, bool exportNull = true, int stepLimit = -1)
         {
             if (_threadEndFlag)
                 return;
+            _depth++;
+            /*
+            if (_depth >= 350)
+                // # 最大栈深度
+                return;
+            */
+
             _calc++;
             AllStep.Add(root);
             root.Calc = _calc;
             // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
             var states = TakeAStep(root, this)
                 .FindAll(x => !StateExists(_allStates, x))
-                .FindAll(x => x.SecondaryValuation());
+                .FindAll(x => x.SecondaryValuation(this));
 
-            if (_calc >= stepLimit && stepLimit > 0) // # 百万步
+            if (_calc >= stepLimit &&
+                stepLimit > 0) // # 百万步
             {
                 if (!string.IsNullOrEmpty(file) && exportNull)
                 {
@@ -71,6 +85,7 @@ namespace Solver
             {
                 if (state.GameCompleted)
                 {
+                    Solved = true;
                     // # 完成游戏
 #if UNITY_EDITOR
                     EditorApplication.delayCall += () => Log.MsgD("Game Completed !!!");
@@ -92,6 +107,7 @@ namespace Solver
                 foreach (var item in states)
                     _allStates.Add(item);
                 ThreadDepthFirstSearch(state, onCompleted, file, id, exportNull, stepLimit);
+                _depth--;
                 if (_threadEndFlag)
                     return;
             }
@@ -105,31 +121,30 @@ namespace Solver
             _taskEndFlag = true;
         }
 
-        public async Task TaskDepthFirstSearch(
-            Poker root,
-            Action onCompleted,
-            string file = "",
-            int id = 0,
-            bool exportNull = true,
-            int stepLimit = 1000000
-        )
+        public async Task TaskDepthFirstSearch
+            (Poker root, Action onCompleted, string file = "", int id = 0, bool exportNull = true, int stepLimit = 1000000)
         {
             try
             {
                 if (_taskEndFlag)
                     return;
                 _depth++;
-                if (_depth >= 480) // # 最大栈深度
+                /*
+                if (_depth >= 350)
+                    // # 最大栈深度
                     return;
+                */
+
                 _calc++;
                 AllStep.Add(root);
                 root.Calc = _calc;
                 // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
                 var states = TakeAStep(root, this)
                     .FindAll(x => !StateExists(_allStates, x))
-                    .FindAll(x => x.SecondaryValuation());
+                    .FindAll(x => x.SecondaryValuation(this));
 
-                if (_calc >= stepLimit && stepLimit > 0) // # 百万步
+                if (_calc >= stepLimit &&
+                    stepLimit > 0) // # 百万步
                 {
                     if (!string.IsNullOrEmpty(file) && exportNull)
                     {
@@ -147,6 +162,7 @@ namespace Solver
                     if (state.GameCompleted)
                     {
                         // # 完成游戏
+                        Solved = true;
 #if UNITY_EDITOR
                         EditorApplication.delayCall += () => Log.MsgD("Game Completed !!!");
 #endif
@@ -227,15 +243,12 @@ namespace Solver
         /// <param name="fromIndex"></param>
         /// <param name="toIndex"></param>
         /// <returns></returns>
-        public static Poker CreateNewPoker(
-            Poker poker,
-            List<Card> cards = null,
-            int fromIndex = -1,
-            int toIndex = -1
-        )
+        public static Poker CreateNewPoker(Poker poker, List<Card> cards = null, int fromIndex = -1, int toIndex = -1)
         {
-            var newVisibleGroup = poker.VisibleGroup.Select(x => new List<Card>(x)).ToList();
-            var newHiddenGroup = poker.HiddenGroup.Select(x => new List<Card>(x)).ToList();
+            var newVisibleGroup = poker.VisibleGroup.Select(x => new List<Card>(x))
+                .ToList();
+            var newHiddenGroup = poker.HiddenGroup.Select(x => new List<Card>(x))
+                .ToList();
             var newDeck = new List<Card>(poker.Deck);
             var newPoker = new Poker(newVisibleGroup, newHiddenGroup, newDeck)
             {
@@ -245,7 +258,8 @@ namespace Solver
                 CollectionStep = new List<int>(poker.CollectionStep),
                 Mark = poker.Mark
             };
-            if (fromIndex < 0 || toIndex < 0)
+            if (fromIndex < 0 ||
+                toIndex < 0)
                 return newPoker;
             newPoker.MoveCard(fromIndex, cards.Count, toIndex);
             return newPoker;
@@ -268,20 +282,21 @@ namespace Solver
                     return new List<Card> { column[0] };
                 // # 可见牌数>1
                 var result = new List<Card> { column[0] };
-                var tail = column.Skip(1).ToList();
+                var tail = column.Skip(1)
+                    .ToList();
                 result.AddRange(FindMovableCardInColumn(tail, column[0]));
                 return result;
             }
 
             // # 迭代调用
             // # 花色相同且值差1,此时可以移动
-            if (
-                column[0].GetType() == firstCard.GetType()
-                && column[0].Value == firstCard.Value + 1
-            )
+            if (column[0]
+                    .GetType() == firstCard.GetType() &&
+                column[0].Value == firstCard.Value + 1)
             {
                 var result = new List<Card> { column[0] };
-                var tail = column.Skip(1).ToList();
+                var tail = column.Skip(1)
+                    .ToList();
                 result.AddRange(FindMovableCardInColumn(tail, column[0]));
                 return result;
             }
@@ -297,12 +312,7 @@ namespace Solver
         /// <param name="poker"></param>
         /// <param name="solver"></param>
         /// <returns>所有移动后的状态</returns>
-        public static List<Poker> MoveMovableCards(
-            List<Card> movableCards,
-            int fromIndex,
-            Poker poker,
-            SpiderSolver solver
-        )
+        public static List<Poker> MoveMovableCards(List<Card> movableCards, int fromIndex, Poker poker, SpiderSolver solver)
         {
             var result = new HashSet<Poker>();
             for (var column = 0; column < poker.VisibleGroup.Count; column++)
@@ -314,27 +324,81 @@ namespace Solver
                 if (poker.IsBlank(column))
                 {
                     // # 目标列为空列
-                    if (
-                        movableCards.Count == poker.VisibleGroup[fromIndex].Count
-                        && poker.HiddenGroup[fromIndex].Count == 0
-                    )
+                    if (solver.CancelSpecialFilter)
+                    {
+                        for (var i = movableCards.Count - 1; i >= 1; i--)
+                        {
+                            var cards = movableCards.Take(i)
+                                .ToList();
+                            if (poker.VisibleGroup[column].Count > 0 &&
+                                cards.Count > 0 &&
+                                poker.VisibleGroup[column][0].Value == cards.Last()
+                                    .Value + 1)
+                            {
+                                // # 可以放到目标列 (符合差值为1的条件)
+                                var newPoker = CreateNewPoker(poker, cards, fromIndex, column);
+                                if (!StateExists(result, newPoker))
+                                    result.Add(newPoker);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (movableCards.Count == poker.VisibleGroup[fromIndex].Count &&
+                            poker.HiddenGroup[fromIndex].Count == 0)
+                        {
+                            // # 当前列没有Hidden的牌了，并且要全部移动到另一个空列的情况,不添加进数组
+                        }
+                        else
+                        {
+                            var newPoker = CreateNewPoker(poker, movableCards, fromIndex, column);
+                            if (!StateExists(result, newPoker))
+                                result.Add(newPoker);
+                        }
+                    }
+
+                    /*
+                    if (movableCards.Count == poker.VisibleGroup[fromIndex].Count &&
+                        poker.HiddenGroup[fromIndex].Count == 0)
                     {
                         // # 当前列没有Hidden的牌了，并且要全部移动到另一个空列的情况,不添加进数组
                     }
                     else
                     {
+                        if (solver.SuitCount > 1)
+                        {
+                            for (var i = movableCards.Count; i >= 1; i--)
+                            {
+                                var cards = movableCards.Take(i)
+                                    .ToList();
+                                if (poker.VisibleGroup[column][0].Value == cards.Last()
+                                        .Value + 1)
+                                {
+                                    // # 可以放到目标列 (符合差值为1的条件)
+                                    var newPoker = CreateNewPoker(poker, cards, fromIndex, column);
+                                    if (!StateExists(result, newPoker))
+                                        result.Add(newPoker);
+                                }
+                            }
+                        }
+                        else
+                        {
                         var newPoker = CreateNewPoker(poker, movableCards, fromIndex, column);
                         if (!StateExists(result, newPoker))
                             result.Add(newPoker);
+                        }
                     }
+                    */
                 }
                 else
                 {
                     // # 目标列不为空
                     for (var i = movableCards.Count; i >= 1; i--)
                     {
-                        var cards = movableCards.Take(i).ToList();
-                        if (poker.VisibleGroup[column][0].Value == cards.Last().Value + 1)
+                        var cards = movableCards.Take(i)
+                            .ToList();
+                        if (poker.VisibleGroup[column][0].Value == cards.Last()
+                                .Value + 1)
                         {
                             // # 可以放到目标列 (符合差值为1的条件)
                             var newPoker = CreateNewPoker(poker, cards, fromIndex, column);
@@ -406,34 +470,30 @@ namespace Solver
             */
 
             // # sorting games in descending order based on Valuation
-            var valuationSortList = pokers.OrderByDescending(x => x.Valuation).ToList();
-            var result = valuationSortList
-                .OrderByDescending(x =>
+            var valuationSortList = pokers.OrderByDescending(x => x.Valuation)
+                .ToList();
+            var result = valuationSortList.OrderByDescending(x =>
                 {
-                    if (x.PreviousPoker == null || x.GetSuitCount() <= 1)
+                    if (x.PreviousPoker == null ||
+                        x.GetSuitCount() <= 1)
                         return int.MinValue;
                     var history = x.History;
                     var from = history[0].Item1;
                     var count = history[0].Item2;
                     var to = history[0].Item3;
-                    if (from < 0 || count < 0 || to < 0)
+                    if (from < 0 ||
+                        count < 0 ||
+                        to < 0)
                         return int.MinValue;
-                    if (
-                        x.PreviousPoker.VisibleGroup[to].Count > 0
-                        && x.PreviousPoker.VisibleGroup[from][0].GetType()
-                        == x.PreviousPoker.VisibleGroup[to][0].GetType()
-                    )
+                    if (x.PreviousPoker.VisibleGroup[to].Count > 0 &&
+                        x.PreviousPoker.VisibleGroup[from][0]
+                            .GetType() == x.PreviousPoker.VisibleGroup[to][0]
+                            .GetType())
                         return int.MaxValue;
                     return int.MinValue;
                 })
                 .ToList();
             return result;
-        }
-
-        public void Dispose()
-        {
-            _allStates.Clear();
-            AllStep.Clear();
         }
     }
 }

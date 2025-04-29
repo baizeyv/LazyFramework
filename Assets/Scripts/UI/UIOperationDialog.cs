@@ -15,6 +15,47 @@ namespace Lazy.Melody
 
     public partial class UIOperationDialog
     {
+        private void Update()
+        {
+            #region Vita Export
+
+            if (_stopExportVitaFlag)
+            {
+                _currentVitaExportSolver?.StopTask();
+                _currentVitaExportSolver?.Dispose();
+            }
+
+            #endregion
+
+            #region PlayValve Export
+
+            if (_stopExportPlayValveSuit1Flag)
+            {
+                _currentPlayValveSuit1ExportSolver?.StopTask();
+                _currentPlayValveSuit1ExportSolver?.Dispose();
+            }
+
+            if (_stopExportPlayValveSuit2Flag)
+            {
+                _currentPlayValveSuit2ExportSolver?.StopTask();
+                _currentPlayValveSuit2ExportSolver?.Dispose();
+            }
+
+            if (_stopExportPlayValveSuit3Flag)
+            {
+                _currentPlayValveSuit3ExportSolver?.StopTask();
+                _currentPlayValveSuit3ExportSolver?.Dispose();
+            }
+
+            if (_stopExportPlayValveSuit4Flag)
+            {
+                _currentPlayValveSuit4ExportSolver?.StopTask();
+                _currentPlayValveSuit4ExportSolver?.Dispose();
+            }
+
+            #endregion
+        }
+
         #region Vita Export
 
         private const string VitaInputJsonKey = "VitaInputJson";
@@ -229,8 +270,10 @@ namespace Lazy.Melody
             _vitaOutputCsv.SubscribeToTMPText(mVitaOutputCsv, x => x?.Replace("\\", "/"));
             _vitaExportCalc.SubscribeToTMPText(mQueryCalcLbl);
             _vitaStepLimit.SubscribeToTMPInputField(mVitaStepLimit);
-            _vitaInputJson.Value = App.Storage.GetString(VitaInputJsonKey).Replace("\\", "/");
-            _vitaOutputCsv.Value = App.Storage.GetString(VitaOutputCsvKey).Replace("\\", "/");
+            _vitaInputJson.Value = App.Storage.GetString(VitaInputJsonKey)
+                .Replace("\\", "/");
+            _vitaOutputCsv.Value = App.Storage.GetString(VitaOutputCsvKey)
+                .Replace("\\", "/");
             _vitaStepLimit.Value = App.Storage.GetInt(VitaStepLimitKey);
 
             #endregion
@@ -244,11 +287,9 @@ namespace Lazy.Melody
             _playValveSuit3ExportCalc.SubscribeToTMPText(mQueryPVSuit3CalcLbl);
             _playValveSuit4ExportCalc.SubscribeToTMPText(mQueryPVSuit4CalcLbl);
             _playValveStepLimit.SubscribeToTMPInputField(mPVStepLimit);
-            _playValveInputTxt.Value = App
-                .Storage.GetString(PlayValveInputTxtKey)
+            _playValveInputTxt.Value = App.Storage.GetString(PlayValveInputTxtKey)
                 .Replace("\\", "/");
-            _playValveOutputCsv.Value = App
-                .Storage.GetString(PlayValveOutputCsvKey)
+            _playValveOutputCsv.Value = App.Storage.GetString(PlayValveOutputCsvKey)
                 .Replace("\\", "/");
             _playValveStepLimit.Value = App.Storage.GetInt(PlayValveStepLimitKey);
             _playValveExportSuitCount.Subscribe(x =>
@@ -336,7 +377,8 @@ namespace Lazy.Melody
             FileBrowser.SetFilters(false, new FileBrowser.Filter("JsonFile", ".json"));
             FileBrowser.ShowLoadDialog((paths) =>
             {
-                if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+                if (paths.Length > 0 &&
+                    !string.IsNullOrEmpty(paths[0]))
                 {
                     _vitaInputJson.Value = paths[0];
                     App.Storage.SetString(VitaInputJsonKey, _vitaInputJson.Value);
@@ -351,7 +393,8 @@ namespace Lazy.Melody
         {
             FileBrowser.ShowLoadDialog((paths) =>
             {
-                if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+                if (paths.Length > 0 &&
+                    !string.IsNullOrEmpty(paths[0]))
                 {
                     _vitaOutputCsv.Value = paths[0];
                     App.Storage.SetString(VitaOutputCsvKey, _vitaOutputCsv.Value);
@@ -380,14 +423,7 @@ namespace Lazy.Melody
         private void OnClickQueryVitaExportCalc()
         {
             var prefix = _currentVitaExportPoker != null ? _currentVitaExportPoker.Mark : "???";
-            _vitaExportCalc.Value =
-                prefix
-                + "\n"
-                + (
-                    _currentVitaExportSolver != null
-                        ? _currentVitaExportSolver.Calc.ToString()
-                        : "0"
-                );
+            _vitaExportCalc.Value = prefix + "\n" + (_currentVitaExportSolver != null ? _currentVitaExportSolver.Calc.ToString() : "0");
         }
 
         private void OnClickExportVita()
@@ -398,14 +434,16 @@ namespace Lazy.Melody
                 return;
             if (!File.Exists(_vitaInputJson.Value))
                 return;
-            if (_currentVitaExportSolver != null || _currentVitaExportPoker != null)
+            if (_currentVitaExportSolver != null ||
+                _currentVitaExportPoker != null)
                 return;
             Task.Run(ExportVita);
         }
 
         private void OnClickStopExportVita()
         {
-            if (_currentVitaExportSolver != null && !_stopExportVitaFlag)
+            if (_currentVitaExportSolver != null &&
+                !_stopExportVitaFlag)
                 _stopExportVitaFlag = true;
         }
 
@@ -428,13 +466,21 @@ namespace Lazy.Melody
                     var poker = new Poker(x.question);
                     _currentVitaExportPoker = poker;
                     _currentVitaExportSolver.SuitCount = poker.GetSuitCount();
-                    await _currentVitaExportSolver.TaskDepthFirstSearch(
-                        poker,
-                        null,
-                        filePrefix + _currentVitaExportSolver.SuitCount + fileSuffix,
-                        x.id,
-                        stepLimit: _vitaStepLimit.Value
-                    );
+                    await _currentVitaExportSolver.TaskDepthFirstSearch(poker, null, filePrefix + _currentVitaExportSolver.SuitCount + fileSuffix,
+                        x.id, stepLimit: _vitaStepLimit.Value);
+                    if (!_currentVitaExportSolver.Solved)
+                    {
+                        _currentVitaExportSolver.Dispose();
+                        GC.Collect();
+                        _currentVitaExportSolver = new SpiderSolver();
+                        poker = new Poker(x.question);
+                        _currentVitaExportPoker = poker;
+                        _currentVitaExportSolver.SuitCount = poker.GetSuitCount();
+                        _currentVitaExportSolver.CancelSpecialFilter = true;
+                        await _currentVitaExportSolver.TaskDepthFirstSearch(poker, null, filePrefix + _currentVitaExportSolver.SuitCount + fileSuffix,
+                            x.id, stepLimit: _vitaStepLimit.Value);
+                    }
+
                     _currentVitaExportSolver.Dispose();
                     GC.Collect();
                     if (_stopExportVitaFlag)
@@ -466,37 +512,17 @@ namespace Lazy.Melody
                 return;
             if (!File.Exists(_playValveInputTxt.Value))
                 return;
-            if (
-                suit == 1
-                && (
-                    _currentPlayValveSuit1ExportSolver != null
-                    || _currentPlayValveSuit1ExportPoker != null
-                )
-            )
+            if (suit == 1 &&
+                (_currentPlayValveSuit1ExportSolver != null || _currentPlayValveSuit1ExportPoker != null))
                 return;
-            if (
-                suit == 2
-                && (
-                    _currentPlayValveSuit2ExportSolver != null
-                    || _currentPlayValveSuit2ExportPoker != null
-                )
-            )
+            if (suit == 2 &&
+                (_currentPlayValveSuit2ExportSolver != null || _currentPlayValveSuit2ExportPoker != null))
                 return;
-            if (
-                suit == 3
-                && (
-                    _currentPlayValveSuit3ExportSolver != null
-                    || _currentPlayValveSuit3ExportPoker != null
-                )
-            )
+            if (suit == 3 &&
+                (_currentPlayValveSuit3ExportSolver != null || _currentPlayValveSuit3ExportPoker != null))
                 return;
-            if (
-                suit == 4
-                && (
-                    _currentPlayValveSuit4ExportSolver != null
-                    || _currentPlayValveSuit4ExportPoker != null
-                )
-            )
+            if (suit == 4 &&
+                (_currentPlayValveSuit4ExportSolver != null || _currentPlayValveSuit4ExportPoker != null))
                 return;
             Task.Run(ExportPlayValve);
         }
@@ -529,7 +555,8 @@ namespace Lazy.Melody
 
                 var txt = await File.ReadAllTextAsync(_playValveInputTxt.Value);
                 var array = txt.Split(',');
-                var seeds = array.Select(int.Parse).ToArray();
+                var seeds = array.Select(int.Parse)
+                    .ToArray();
                 var fullFile = filePrefix + suit + fileSuffix;
                 foreach (var seed in seeds)
                 {
@@ -542,13 +569,20 @@ namespace Lazy.Melody
                                 SuitCount = suit
                             };
                             _currentPlayValveSuit1ExportPoker = poker;
-                            await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(
-                                poker,
-                                null,
-                                fullFile,
-                                seed,
-                                stepLimit: step
-                            );
+                            await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            if (!_currentPlayValveSuit1ExportSolver.Solved)
+                            {
+                                _currentPlayValveSuit1ExportSolver.Dispose();
+                                GC.Collect();
+                                _currentPlayValveSuit1ExportSolver = new SpiderSolver
+                                {
+                                    SuitCount = suit,
+                                    CancelSpecialFilter = true
+                                };
+                                _currentPlayValveSuit1ExportPoker = poker;
+                                await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            }
+
                             _currentPlayValveSuit1ExportSolver.Dispose();
                             GC.Collect();
                             break;
@@ -558,13 +592,20 @@ namespace Lazy.Melody
                                 SuitCount = suit
                             };
                             _currentPlayValveSuit2ExportPoker = poker;
-                            await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(
-                                poker,
-                                null,
-                                fullFile,
-                                seed,
-                                stepLimit: step
-                            );
+                            await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            if (!_currentPlayValveSuit2ExportSolver.Solved)
+                            {
+                                _currentPlayValveSuit2ExportSolver.Dispose();
+                                GC.Collect();
+                                _currentPlayValveSuit2ExportSolver = new SpiderSolver
+                                {
+                                    SuitCount = suit,
+                                    CancelSpecialFilter = true
+                                };
+                                _currentPlayValveSuit2ExportPoker = poker;
+                                await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            }
+
                             _currentPlayValveSuit2ExportSolver.Dispose();
                             GC.Collect();
                             break;
@@ -574,13 +615,20 @@ namespace Lazy.Melody
                                 SuitCount = suit
                             };
                             _currentPlayValveSuit3ExportPoker = poker;
-                            await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(
-                                poker,
-                                null,
-                                fullFile,
-                                seed,
-                                stepLimit: step
-                            );
+                            await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            if (!_currentPlayValveSuit3ExportSolver.Solved)
+                            {
+                                _currentPlayValveSuit3ExportSolver.Dispose();
+                                GC.Collect();
+                                _currentPlayValveSuit3ExportSolver = new SpiderSolver
+                                {
+                                    SuitCount = suit,
+                                    CancelSpecialFilter = true
+                                };
+                                _currentPlayValveSuit3ExportPoker = poker;
+                                await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            }
+
                             _currentPlayValveSuit3ExportSolver.Dispose();
                             GC.Collect();
                             break;
@@ -590,13 +638,20 @@ namespace Lazy.Melody
                                 SuitCount = suit
                             };
                             _currentPlayValveSuit4ExportPoker = poker;
-                            await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(
-                                poker,
-                                null,
-                                fullFile,
-                                seed,
-                                stepLimit: step
-                            );
+                            await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            if (!_currentPlayValveSuit4ExportSolver.Solved)
+                            {
+                                _currentPlayValveSuit4ExportSolver.Dispose();
+                                GC.Collect();
+                                _currentPlayValveSuit4ExportSolver = new SpiderSolver
+                                {
+                                    SuitCount = suit,
+                                    CancelSpecialFilter = true
+                                };
+                                _currentPlayValveSuit4ExportPoker = poker;
+                                await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            }
+
                             _currentPlayValveSuit4ExportSolver.Dispose();
                             GC.Collect();
                             break;
@@ -649,31 +704,23 @@ namespace Lazy.Melody
             switch (_playValveExportSuitCount.Value)
             {
                 case 1:
-                    if (
-                        _currentPlayValveSuit1ExportSolver != null
-                        && !_stopExportPlayValveSuit1Flag
-                    )
+                    if (_currentPlayValveSuit1ExportSolver != null &&
+                        !_stopExportPlayValveSuit1Flag)
                         _stopExportPlayValveSuit1Flag = true;
                     break;
                 case 2:
-                    if (
-                        _currentPlayValveSuit2ExportSolver != null
-                        && !_stopExportPlayValveSuit2Flag
-                    )
+                    if (_currentPlayValveSuit2ExportSolver != null &&
+                        !_stopExportPlayValveSuit2Flag)
                         _stopExportPlayValveSuit2Flag = true;
                     break;
                 case 3:
-                    if (
-                        _currentPlayValveSuit3ExportSolver != null
-                        && !_stopExportPlayValveSuit3Flag
-                    )
+                    if (_currentPlayValveSuit3ExportSolver != null &&
+                        !_stopExportPlayValveSuit3Flag)
                         _stopExportPlayValveSuit3Flag = true;
                     break;
                 case 4:
-                    if (
-                        _currentPlayValveSuit4ExportSolver != null
-                        && !_stopExportPlayValveSuit4Flag
-                    )
+                    if (_currentPlayValveSuit4ExportSolver != null &&
+                        !_stopExportPlayValveSuit4Flag)
                         _stopExportPlayValveSuit4Flag = true;
                     break;
             }
@@ -684,7 +731,8 @@ namespace Lazy.Melody
             FileBrowser.SetFilters(false, new FileBrowser.Filter("TxtFile", ".txt"));
             FileBrowser.ShowLoadDialog((paths) =>
             {
-                if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+                if (paths.Length > 0 &&
+                    !string.IsNullOrEmpty(paths[0]))
                 {
                     _playValveInputTxt.Value = paths[0];
                     App.Storage.SetString(PlayValveInputTxtKey, _playValveInputTxt.Value);
@@ -696,7 +744,8 @@ namespace Lazy.Melody
         {
             FileBrowser.ShowLoadDialog(folderPath =>
             {
-                if (folderPath.Length > 0 && !string.IsNullOrEmpty(folderPath[0]))
+                if (folderPath.Length > 0 &&
+                    !string.IsNullOrEmpty(folderPath[0]))
                 {
                     _playValveOutputCsv.Value = folderPath[0];
                     App.Storage.SetString(PlayValveOutputCsvKey, _playValveOutputCsv.Value);
@@ -724,110 +773,33 @@ namespace Lazy.Melody
 
         private void OnClickQueryPlayValveSuit1ExportCalc()
         {
-            var prefix =
-                _currentPlayValveSuit1ExportPoker != null
-                    ? _currentPlayValveSuit1ExportPoker.Mark
-                    : "???";
+            var prefix = _currentPlayValveSuit1ExportPoker != null ? _currentPlayValveSuit1ExportPoker.Mark : "???";
             _playValveSuit1ExportCalc.Value =
-                prefix
-                + "\n"
-                + (
-                    _currentPlayValveSuit1ExportSolver != null
-                        ? _currentPlayValveSuit1ExportSolver.Calc.ToString()
-                        : "0"
-                );
+                prefix + "\n" + (_currentPlayValveSuit1ExportSolver != null ? _currentPlayValveSuit1ExportSolver.Calc.ToString() : "0");
         }
 
         private void OnClickQueryPlayValveSuit2ExportCalc()
         {
-            var prefix =
-                _currentPlayValveSuit2ExportPoker != null
-                    ? _currentPlayValveSuit2ExportPoker.Mark
-                    : "???";
+            var prefix = _currentPlayValveSuit2ExportPoker != null ? _currentPlayValveSuit2ExportPoker.Mark : "???";
             _playValveSuit2ExportCalc.Value =
-                prefix
-                + "\n"
-                + (
-                    _currentPlayValveSuit2ExportSolver != null
-                        ? _currentPlayValveSuit2ExportSolver.Calc.ToString()
-                        : "0"
-                );
+                prefix + "\n" + (_currentPlayValveSuit2ExportSolver != null ? _currentPlayValveSuit2ExportSolver.Calc.ToString() : "0");
         }
 
         private void OnClickQueryPlayValveSuit3ExportCalc()
         {
-            var prefix =
-                _currentPlayValveSuit3ExportPoker != null
-                    ? _currentPlayValveSuit3ExportPoker.Mark
-                    : "???";
+            var prefix = _currentPlayValveSuit3ExportPoker != null ? _currentPlayValveSuit3ExportPoker.Mark : "???";
             _playValveSuit3ExportCalc.Value =
-                prefix
-                + "\n"
-                + (
-                    _currentPlayValveSuit3ExportSolver != null
-                        ? _currentPlayValveSuit3ExportSolver.Calc.ToString()
-                        : "0"
-                );
+                prefix + "\n" + (_currentPlayValveSuit3ExportSolver != null ? _currentPlayValveSuit3ExportSolver.Calc.ToString() : "0");
         }
 
         private void OnClickQueryPlayValveSuit4ExportCalc()
         {
-            var prefix =
-                _currentPlayValveSuit4ExportPoker != null
-                    ? _currentPlayValveSuit4ExportPoker.Mark
-                    : "???";
+            var prefix = _currentPlayValveSuit4ExportPoker != null ? _currentPlayValveSuit4ExportPoker.Mark : "???";
             _playValveSuit4ExportCalc.Value =
-                prefix
-                + "\n"
-                + (
-                    _currentPlayValveSuit4ExportSolver != null
-                        ? _currentPlayValveSuit4ExportSolver.Calc.ToString()
-                        : "0"
-                );
+                prefix + "\n" + (_currentPlayValveSuit4ExportSolver != null ? _currentPlayValveSuit4ExportSolver.Calc.ToString() : "0");
         }
 
         #endregion
-
-        private void Update()
-        {
-            #region Vita Export
-
-            if (_stopExportVitaFlag)
-            {
-                _currentVitaExportSolver?.StopTask();
-                _currentVitaExportSolver?.Dispose();
-            }
-
-            #endregion
-
-            #region PlayValve Export
-
-            if (_stopExportPlayValveSuit1Flag)
-            {
-                _currentPlayValveSuit1ExportSolver?.StopTask();
-                _currentPlayValveSuit1ExportSolver?.Dispose();
-            }
-
-            if (_stopExportPlayValveSuit2Flag)
-            {
-                _currentPlayValveSuit2ExportSolver?.StopTask();
-                _currentPlayValveSuit2ExportSolver?.Dispose();
-            }
-
-            if (_stopExportPlayValveSuit3Flag)
-            {
-                _currentPlayValveSuit3ExportSolver?.StopTask();
-                _currentPlayValveSuit3ExportSolver?.Dispose();
-            }
-
-            if (_stopExportPlayValveSuit4Flag)
-            {
-                _currentPlayValveSuit4ExportSolver?.StopTask();
-                _currentPlayValveSuit4ExportSolver?.Dispose();
-            }
-
-            #endregion
-        }
     }
 }
 // Generation Time: Friday, April 25, 2025 8:47:41 AM
