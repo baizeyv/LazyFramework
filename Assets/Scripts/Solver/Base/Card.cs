@@ -3,11 +3,10 @@
     // "Ａ　２　３　４　５　６　７　８　９　Ｘ　Ｊ　Ｑ　Ｋ"
     public abstract class Card
     {
+        public readonly int OriginalValue;
         public readonly int Value;
 
         private bool _highlight;
-
-        public readonly int OriginalValue;
 
         protected Card(int value)
         {
@@ -31,6 +30,15 @@
             _highlight = false;
         }
 
+        public char ToChar()
+        {
+            var offsetIndex = OriginalValue - 1;
+            if (offsetIndex < 26)
+                return (char)('a' + offsetIndex);
+            else
+                return (char)('A' + offsetIndex);
+        }
+
         protected string GetValueString()
         {
             var result = _highlight ? "<color=#00ff00>" : "<color=#ffffff>";
@@ -49,7 +57,7 @@
                 11 => "Ｊ",
                 12 => "Ｑ",
                 13 => "Ｋ",
-                _ => "＃",
+                _ => "＃"
             };
             result += "</color>";
             return result;
@@ -61,8 +69,9 @@
     /// </summary>
     public sealed class HeartCard : Card
     {
-        public HeartCard(int value)
-            : base(value) { }
+        public HeartCard(int value) : base(value)
+        {
+        }
 
         public override string ToString()
         {
@@ -87,8 +96,9 @@
     /// </summary>
     public sealed class DiamondCard : Card
     {
-        public DiamondCard(int value)
-            : base(value) { }
+        public DiamondCard(int value) : base(value)
+        {
+        }
 
         public override string ToString()
         {
@@ -113,8 +123,9 @@
     /// </summary>
     public sealed class SpadeCard : Card
     {
-        public SpadeCard(int value)
-            : base(value) { }
+        public SpadeCard(int value) : base(value)
+        {
+        }
 
         public override string ToString()
         {
@@ -139,8 +150,9 @@
     /// </summary>
     public sealed class ClubsCard : Card
     {
-        public ClubsCard(int value)
-            : base(value) { }
+        public ClubsCard(int value) : base(value)
+        {
+        }
 
         public override string ToString()
         {

@@ -256,7 +256,9 @@ namespace Solver
                 PreviousPoker = poker,
                 CardCount = poker.CardCount,
                 CollectionStep = new List<int>(poker.CollectionStep),
-                Mark = poker.Mark
+                Mark = poker.Mark,
+                Level = poker.Level,
+                Serialized = poker.Serialized
             };
             if (fromIndex < 0 ||
                 toIndex < 0)

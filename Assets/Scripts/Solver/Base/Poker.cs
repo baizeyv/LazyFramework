@@ -55,12 +55,22 @@ namespace Solver
         /// </summary>
         public List<(int, int, int, bool)> History = new();
 
+        /// <summary>
+        /// * 关卡牌面
+        /// </summary>
+        public string Level = "";
+
         public string Mark = "";
 
         /// <summary>
         /// * 上一步状态
         /// </summary>
         public Poker PreviousPoker;
+
+        /// <summary>
+        /// * 关卡序列化
+        /// </summary>
+        public string Serialized = "";
 
         /// <summary>
         /// * 可见牌
@@ -78,6 +88,8 @@ namespace Solver
             Mark = seed.ToString();
             _suitCount = suitCount;
             var deck = GenerateDeck(seed, suitCount);
+            Level = ToLevel(deck);
+            Serialized = ToSerialized(deck);
             Build(deck);
         }
 
@@ -85,6 +97,8 @@ namespace Solver
         {
             Mark = vitaLevel;
             var deck = VitaLevelConvertToPoker(vitaLevel);
+            Level = ToLevel(deck);
+            Serialized = ToSerialized(deck);
             Build(deck);
         }
 
@@ -1163,6 +1177,66 @@ namespace Solver
             hash = VisibleGroup.SelectMany(item => item)
                 .Aggregate(hash, (current, card) => current * 31 + (card?.GetHashCode() ?? 0));
             return hash;
+        }
+
+        public string ToLevel(List<Card> cards)
+        {
+            var result = "";
+            for (var i = 0; i < cards.Count; i++)
+            {
+                result += cards[i].OriginalValue;
+                if (i != cards.Count - 1)
+                    result += ",";
+            }
+
+            return result;
+        }
+
+        public string ToSerialized(List<Card> cards)
+        {
+            List<List<Card>> hiddenCards = new();
+            List<List<Card>> visibleCards = new();
+            List<Card> deckCard = new();
+
+            // # 44张隐藏的
+            for (var i = 0; i < 44; ++i)
+            {
+                var tmp = i % 10;
+                while (hiddenCards.Count <= tmp)
+                    hiddenCards.Add(new List<Card>());
+                hiddenCards[tmp]
+                    .Add(cards[i]);
+            }
+
+            for (var i = 44; i < 54; i++)
+            {
+                var tmp = i % 10;
+                while (visibleCards.Count <= tmp)
+                    visibleCards.Add(new List<Card>());
+                visibleCards[tmp]
+                    .Add(cards[i]);
+            }
+
+            // # 初始化牌堆数组
+            for (var i = 54; i < cards.Count; i++) deckCard.Add(cards[i]);
+            foreach (var item in hiddenCards) item.Reverse();
+
+            var result = "";
+            for (var i = 0; i < 10; i++)
+            {
+                result += visibleCards[i].Count;
+                result += ",";
+                foreach (var card in visibleCards[i]) result += card.ToChar();
+                foreach (var card in hiddenCards[i]) result += card.ToChar();
+                result += ";";
+            }
+
+            if (deckCard.Count == 0)
+                result += "*";
+            else
+                foreach (var card in deckCard)
+                    result += card.ToChar();
+            return result;
         }
 
         /// <summary>
