@@ -468,18 +468,18 @@ namespace Lazy.Melody
                     _currentVitaExportSolver.SuitCount = poker.GetSuitCount();
                     await _currentVitaExportSolver.TaskDepthFirstSearch(poker, null, filePrefix + _currentVitaExportSolver.SuitCount + fileSuffix,
                         x.id, stepLimit: _vitaStepLimit.Value);
-                    if (!_currentVitaExportSolver.Solved)
-                    {
-                        _currentVitaExportSolver.Dispose();
-                        GC.Collect();
-                        _currentVitaExportSolver = new SpiderSolver();
-                        poker = new Poker(x.question);
-                        _currentVitaExportPoker = poker;
-                        _currentVitaExportSolver.SuitCount = poker.GetSuitCount();
-                        _currentVitaExportSolver.CancelSpecialFilter = true;
-                        await _currentVitaExportSolver.TaskDepthFirstSearch(poker, null, filePrefix + _currentVitaExportSolver.SuitCount + fileSuffix,
-                            x.id, stepLimit: _vitaStepLimit.Value);
-                    }
+                    // if (!_currentVitaExportSolver.Solved)
+                    // {
+                    //     _currentVitaExportSolver.Dispose();
+                    //     GC.Collect();
+                    //     _currentVitaExportSolver = new SpiderSolver();
+                    //     poker = new Poker(x.question);
+                    //     _currentVitaExportPoker = poker;
+                    //     _currentVitaExportSolver.SuitCount = poker.GetSuitCount();
+                    //     _currentVitaExportSolver.CancelSpecialFilter = true;
+                    //     await _currentVitaExportSolver.TaskDepthFirstSearch(poker, null, filePrefix + _currentVitaExportSolver.SuitCount + fileSuffix,
+                    //         x.id, stepLimit: _vitaStepLimit.Value);
+                    // }
 
                     _currentVitaExportSolver.Dispose();
                     GC.Collect();
@@ -570,18 +570,18 @@ namespace Lazy.Melody
                             };
                             _currentPlayValveSuit1ExportPoker = poker;
                             await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            if (!_currentPlayValveSuit1ExportSolver.Solved)
-                            {
-                                _currentPlayValveSuit1ExportSolver.Dispose();
-                                GC.Collect();
-                                _currentPlayValveSuit1ExportSolver = new SpiderSolver
-                                {
-                                    SuitCount = suit,
-                                    CancelSpecialFilter = true
-                                };
-                                _currentPlayValveSuit1ExportPoker = poker;
-                                await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            }
+                            // if (!_currentPlayValveSuit1ExportSolver.Solved)
+                            // {
+                            //     _currentPlayValveSuit1ExportSolver.Dispose();
+                            //     GC.Collect();
+                            //     _currentPlayValveSuit1ExportSolver = new SpiderSolver
+                            //     {
+                            //         SuitCount = suit,
+                            //         CancelSpecialFilter = true
+                            //     };
+                            //     _currentPlayValveSuit1ExportPoker = poker;
+                            //     await _currentPlayValveSuit1ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            // }
 
                             _currentPlayValveSuit1ExportSolver.Dispose();
                             GC.Collect();
@@ -593,18 +593,18 @@ namespace Lazy.Melody
                             };
                             _currentPlayValveSuit2ExportPoker = poker;
                             await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            if (!_currentPlayValveSuit2ExportSolver.Solved)
-                            {
-                                _currentPlayValveSuit2ExportSolver.Dispose();
-                                GC.Collect();
-                                _currentPlayValveSuit2ExportSolver = new SpiderSolver
-                                {
-                                    SuitCount = suit,
-                                    CancelSpecialFilter = true
-                                };
-                                _currentPlayValveSuit2ExportPoker = poker;
-                                await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            }
+                            // if (!_currentPlayValveSuit2ExportSolver.Solved)
+                            // {
+                            //     _currentPlayValveSuit2ExportSolver.Dispose();
+                            //     GC.Collect();
+                            //     _currentPlayValveSuit2ExportSolver = new SpiderSolver
+                            //     {
+                            //         SuitCount = suit,
+                            //         CancelSpecialFilter = true
+                            //     };
+                            //     _currentPlayValveSuit2ExportPoker = poker;
+                            //     await _currentPlayValveSuit2ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            // }
 
                             _currentPlayValveSuit2ExportSolver.Dispose();
                             GC.Collect();
@@ -616,18 +616,18 @@ namespace Lazy.Melody
                             };
                             _currentPlayValveSuit3ExportPoker = poker;
                             await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            if (!_currentPlayValveSuit3ExportSolver.Solved)
-                            {
-                                _currentPlayValveSuit3ExportSolver.Dispose();
-                                GC.Collect();
-                                _currentPlayValveSuit3ExportSolver = new SpiderSolver
-                                {
-                                    SuitCount = suit,
-                                    CancelSpecialFilter = true
-                                };
-                                _currentPlayValveSuit3ExportPoker = poker;
-                                await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            }
+                            // if (!_currentPlayValveSuit3ExportSolver.Solved)
+                            // {
+                            //     _currentPlayValveSuit3ExportSolver.Dispose();
+                            //     GC.Collect();
+                            //     _currentPlayValveSuit3ExportSolver = new SpiderSolver
+                            //     {
+                            //         SuitCount = suit,
+                            //         CancelSpecialFilter = true
+                            //     };
+                            //     _currentPlayValveSuit3ExportPoker = poker;
+                            //     await _currentPlayValveSuit3ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            // }
 
                             _currentPlayValveSuit3ExportSolver.Dispose();
                             GC.Collect();
@@ -639,18 +639,18 @@ namespace Lazy.Melody
                             };
                             _currentPlayValveSuit4ExportPoker = poker;
                             await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            if (!_currentPlayValveSuit4ExportSolver.Solved)
-                            {
-                                _currentPlayValveSuit4ExportSolver.Dispose();
-                                GC.Collect();
-                                _currentPlayValveSuit4ExportSolver = new SpiderSolver
-                                {
-                                    SuitCount = suit,
-                                    CancelSpecialFilter = true
-                                };
-                                _currentPlayValveSuit4ExportPoker = poker;
-                                await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
-                            }
+                            // if (!_currentPlayValveSuit4ExportSolver.Solved)
+                            // {
+                            //     _currentPlayValveSuit4ExportSolver.Dispose();
+                            //     GC.Collect();
+                            //     _currentPlayValveSuit4ExportSolver = new SpiderSolver
+                            //     {
+                            //         SuitCount = suit,
+                            //         CancelSpecialFilter = true
+                            //     };
+                            //     _currentPlayValveSuit4ExportPoker = poker;
+                            //     await _currentPlayValveSuit4ExportSolver.TaskDepthFirstSearch(poker, null, fullFile, seed, stepLimit: step);
+                            // }
 
                             _currentPlayValveSuit4ExportSolver.Dispose();
                             GC.Collect();
